@@ -3,6 +3,7 @@ import pickle
 import typing
 
 import torch
+import torch_geometric
 import torch_geometric as pyg
 from multiprocess.pool import Pool
 from tqdm import tqdm
@@ -84,6 +85,7 @@ class RSDataset(pyg.data.InMemoryDataset):
     def processed_dir(self) -> str:
         name = 'single_conformer' if self.single_conformer else 'all_conformers'
         graph_mode = self.graph_mode if self.graph_mode else ''
+        graph_mode += "+" + self.transformation_mode if self.transformation_mode else ''
         return os.path.join(self.root, name, graph_mode, 'processed')
 
     @property
@@ -171,3 +173,10 @@ class RSDataset(pyg.data.InMemoryDataset):
         split_df = split_df.drop(columns="rdkit_mol_cistrans_stereo")
         split_df[~split_df['SMILES_nostereo'].isin(to_remove)]
         split_df.to_csv(os.path.join(self.processed_dir, f"{self.split}.csv"), index=None)
+
+    def __getitem__(self, item):
+        data = super().__getitem__(item)
+        if isinstance(data, torch_geometric.data.Data):
+            if self.mask_chiral_tags:
+                data = self.masking(data)
+        return data

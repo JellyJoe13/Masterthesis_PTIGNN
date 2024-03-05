@@ -3,6 +3,7 @@ import typing
 
 import pandas as pd
 import torch
+import torch_geometric
 from chainer_chemistry.dataset.splitters.random_splitter import RandomSplitter
 from chainer_chemistry.dataset.splitters.scaffold_splitter import ScaffoldSplitter
 from multiprocess.pool import Pool
@@ -71,6 +72,7 @@ class BaceDataset(InMemoryDataset):
     @property
     def processed_dir(self) -> str:
         name = self.graph_mode if self.graph_mode else ''
+        name += "+" + self.transformation_mode if self.transformation_mode else ''
         return os.path.join(self.root, name, self.task_type, 'processed')
 
     @property
@@ -193,6 +195,13 @@ class BaceDataset(InMemoryDataset):
                 self.collate(data_list),
                 os.path.join(self.processed_dir, f"{split}.pt")
             )
+
+    def __getitem__(self, item):
+        data = super().__getitem__(item)
+        if isinstance(data, torch_geometric.data.Data):
+            if self.mask_chiral_tags:
+                data = self.masking(data)
+        return data
 
 
 class Tox21Dataset(InMemoryDataset):
@@ -252,6 +261,7 @@ class Tox21Dataset(InMemoryDataset):
     @property
     def processed_dir(self) -> str:
         name = self.graph_mode if self.graph_mode else ''
+        name += "+" + self.transformation_mode if self.transformation_mode else ''
         return os.path.join(self.root, name, self.task_type, 'processed')
 
     @property
@@ -374,3 +384,10 @@ class Tox21Dataset(InMemoryDataset):
                 self.collate(data_list),
                 os.path.join(self.processed_dir, f"{split}.pt")
             )
+
+    def __getitem__(self, item):
+        data = super().__getitem__(item)
+        if isinstance(data, torch_geometric.data.Data):
+            if self.mask_chiral_tags:
+                data = self.masking(data)
+        return data

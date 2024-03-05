@@ -4,6 +4,7 @@ import zipfile
 
 import pandas as pd
 import torch
+import torch_geometric
 from multiprocess.pool import Pool
 from torch_geometric.data import InMemoryDataset
 from tqdm import tqdm
@@ -66,7 +67,8 @@ class OGBDataset(InMemoryDataset):
     @property
     def processed_dir(self):
         graph_mode = self.graph_mode if self.graph_mode else ''
-        return os.path.join(self.root, self.ds_name, graph_mode, 'processed')
+        graph_mode += "+" + self.transformation_mode if self.transformation_mode else ''
+        return os.path.join(self.root, self.ds_name, graph_mode, self.task_type, 'processed')
 
     @property
     def raw_file_names(self):
@@ -161,3 +163,10 @@ class OGBDataset(InMemoryDataset):
                 self.collate(data_list),
                 os.path.join(self.processed_dir, f"{split}.pt")
             )
+
+    def __getitem__(self, item):
+        data = super().__getitem__(item)
+        if isinstance(data, torch_geometric.data.Data):
+            if self.mask_chiral_tags:
+                data = self.masking(data)
+        return data
