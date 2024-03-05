@@ -1,3 +1,5 @@
+import json
+
 import torch_geometric
 from typing import List
 
@@ -10,13 +12,21 @@ def basic_permutation_tree_chienn_replication(data: torch_geometric.data.Data):
     def _circle_index_to_primordial_tree(circle_index: List[int], parallel_node: int):
         # if nothing in the circular index return empty string
         if len(circle_index) == 0:
-            return f"P[{parallel_node}]"
+            return json.dumps({"P": [int(parallel_node)]})
         else:
             # not including parallel node index
             # return f"Z{[i for i in circle_index]}"
 
             # including parallel node index
-            return f"P[{parallel_node}, Z{[i for i in circle_index]}]"
+            # return f"P[{parallel_node}, Z{[i for i in circle_index]}]"
+            return json.dumps({
+                "P": [
+                    int(parallel_node),
+                    {
+                        "Z": [int(i) for i in circle_index]
+                    }
+                ]
+            })
 
     ptree = [
         _circle_index_to_primordial_tree(circle_index, parallel_node)
