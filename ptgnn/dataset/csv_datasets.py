@@ -144,6 +144,7 @@ class BaceDataset(InMemoryDataset):
                 # required for Windows to make the threads have the proper modules
                 from ptgnn.features.chienn.molecule3d import smiles_to_3d_mol
                 from ptgnn.dataset.utils_chienn import get_chiro_data_from_mol, convert_target_for_task
+                from ptgnn.transform.edge_graph import to_edge_graph
                 import logging
                 import torch
 
