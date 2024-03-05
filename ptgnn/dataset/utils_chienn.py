@@ -75,3 +75,18 @@ def get_chiro_data_from_mol(mol: rdkit.Chem.Mol):
     data.dihedral_angle_index = torch.as_tensor(dihedral_angle_index, dtype=torch.long).T
 
     return data
+
+
+def convert_target_for_task(
+        target: torch.Tensor,
+        task_type: str,
+        scale_label: float = 1.0
+) -> torch.Tensor:
+    """
+    From: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L142
+    """
+    if task_type in ['regression', 'regression_rank']:
+        return target.float() * scale_label
+    elif task_type == 'classification_multilabel':
+        return target.float().view(1, -1)
+    return target.long()

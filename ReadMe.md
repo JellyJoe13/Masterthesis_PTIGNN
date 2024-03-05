@@ -9,4 +9,5 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvi
 conda install pyg -c pyg
 pip install rdkit
 conda install jupyterlab numpy pandas matplotlib
+pip install chainer-chemistry
 ```
