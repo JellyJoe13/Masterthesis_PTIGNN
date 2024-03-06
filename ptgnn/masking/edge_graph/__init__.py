@@ -10,6 +10,8 @@ def edge_graph_masking(data: pyg.data.Data) -> pyg.data.Data:
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L220
     """
     # get dimension shapes
+    # could be calculated using the one hot embedding logic from ptgnn.features.chiro.embedding_functions but
+    # since it is not expected to change, it is left as it is. (one hot embedding = len(list) + 1)
     edge_dim = 14
     node_dim = 52
 

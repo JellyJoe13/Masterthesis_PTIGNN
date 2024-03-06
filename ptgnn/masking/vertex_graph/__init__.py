@@ -1,5 +1,6 @@
 import torch_geometric as pyg
 
+# value from the last one hot embedding (one hot embedding = len(list) + 1)
 num_default_node_feature_last_chiral = 9
 num_default_edge_attr_last_chiral = 7
 
