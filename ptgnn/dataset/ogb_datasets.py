@@ -143,7 +143,7 @@ class OGBDataset(InMemoryDataset):
                     data = self.pre_transform(data, self.transformation_mode, self.transformation_parameters)
 
                 # set label and append
-                data.y = torch.tensor(row.iloc[:-1])
+                data.y = torch.tensor(row.iloc[:-1].to_list())
                 data.y = convert_target_for_task(data.y, self.task_type)
 
                 return smiles, data
