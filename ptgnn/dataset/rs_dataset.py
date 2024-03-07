@@ -131,7 +131,7 @@ class RSDataset(pyg.data.InMemoryDataset):
 
             # check if mol present
             if mol is None:
-                return smiles_nonstereo, None
+                return index, smiles_nonstereo, None
 
             # attempt to generate data object (raw)
             try:
@@ -139,7 +139,7 @@ class RSDataset(pyg.data.InMemoryDataset):
             except Exception as e:
                 logging.warning(f"Omitting molecule {smiles} as cannot be properly embedded. The original error message"
                                 f" was: {e}.")
-                return smiles_nonstereo, None
+                return index, smiles_nonstereo, None
 
             # do transformation
             if self.pre_transform is not None:
@@ -148,22 +148,25 @@ class RSDataset(pyg.data.InMemoryDataset):
             # set label and append
             data.y = torch.tensor(row['RS_label_binary']).long()
 
-            return smiles_nonstereo, data
+            return index, smiles_nonstereo, data
 
         with Pool(processes=os.cpu_count()) as p:
             data_list = list(p.imap(worker, tqdm(split_df.iterrows())))
 
+        # re-create ordering before multiprocessing
+        data_list = sorted(data_list, key=lambda x: x[0])
+
         # extract elements to remove
         to_remove = set([
             smiles_entry
-            for smiles_entry, indicator in data_list
+            for _, smiles_entry, indicator in data_list
             if indicator is None
         ])
 
         # extract data list and remove elements to remove (from previous list)
         data_list = [
             data_object
-            for smiles, data_object in data_list
+            for _, smiles, data_object in data_list
             if data_object is not None and smiles not in to_remove
         ]
 
