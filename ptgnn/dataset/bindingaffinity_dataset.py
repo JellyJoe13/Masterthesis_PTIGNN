@@ -2,6 +2,7 @@ import os
 import pickle
 import typing
 
+import pandas as pd
 import torch
 import torch_geometric
 from multiprocess.pool import Pool
@@ -60,6 +61,7 @@ class BindingAffinityDataset(InMemoryDataset):
         # part that actually loads the data into the class
 
         self.data, self.slices = torch.load(os.path.join(self.processed_dir, f"{split}.pt"))
+        self.dataframe = pd.read_csv(os.path.join(self.processed_dir, f"{split}.csv"))
 
     @property
     def raw_file_names(self) -> typing.Union[str, typing.List[str], typing.Tuple[str, ...]]:
