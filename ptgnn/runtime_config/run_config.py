@@ -6,4 +6,5 @@ def run_config(config_dict: dict):
     # get optimizer
     # fetch training mode
     # fetch metrics (combined with above) (or inserted)
+    # todo
     pass
