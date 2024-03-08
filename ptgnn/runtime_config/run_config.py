@@ -1,13 +1,14 @@
 from ptgnn.dataset import DATASET_DICT
 from ptgnn.loading.load import UniversalLoader
 from ptgnn.loading.subsetting import subset_dataset
+from ptgnn.model.framework.custom_model import CustomModel
 from ptgnn.optimizing import OPTIMIZER_DICT, SCHEDULER_DICT
 
 
 def fetch_loaders(data_config: dict):
     dataset_config = data_config['dataset']
     # load dataset
-    ds_type = DATASET_DICT.get(dataset_config['ds_type'])
+    ds_type = DATASET_DICT.get(dataset_config['type'])
     train_ds = ds_type(**dataset_config, split='train')
     test_ds = ds_type(**dataset_config, split="test")
     val_ds = ds_type(**dataset_config, split="val")
@@ -36,17 +37,47 @@ def fetch_scheduler(optimizer, scheduler_config: dict):
     return scheduler(optimizer, **scheduler_config)
 
 
+def fetch_data_size(train_loader):
+    # get first element
+    for batch in train_loader:
+        break
+
+    # get node feature dim
+    node_dim = batch.x.shape[1]
+
+    # get edge attribute dim
+    edge_attr_dim = batch.edge_attr.shape[1] if 'edge_attr' in batch else None
+
+    return node_dim, edge_attr_dim
+
+
+def create_model(data_sizes, model_config):
+    if model_config['mode'] == 'custom':
+        return CustomModel(
+            data_sizes=data_sizes,
+            model_config=model_config
+        )
+    else:
+        raise NotImplementedError("Currently no other models besides custom model")
+
+
 def run_config(config_dict: dict):
     # load data
     train_loader, val_loader, test_loader = fetch_loaders(config_dict['data'])
 
     # get model
     # todo
-    model = ...
+    model = create_model(data_sizes=fetch_data_size(train_loader), model_config=config_dict['model'])
 
     # get optimizer
-    optimizer = fetch_optimizer(model.params(), **config_dict['optimizer'])
-    scheduler = fetch_scheduler(optimizer, **config_dict['scheduler'])
+    optimizer = fetch_optimizer(
+        model.parameters(),
+        config_dict['optimizer']
+    )
+    scheduler = fetch_scheduler(
+        optimizer,
+        config_dict['scheduler']
+    )
 
     # fetch training mode
     # todo
