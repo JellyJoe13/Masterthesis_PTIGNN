@@ -2,13 +2,14 @@ import torch.nn
 import typing
 
 from ptgnn.model.modules.graph_embedding import GraphEmbedding
+from ptgnn.model.modules.head_pooling import SANHead
 
 
 class CustomModel(torch.nn.Module):
     def __init__(
             self,
-            data_sizes: typing.Tuple[int, int],
-            model_config: dict
+            data_sizes: typing.Tuple[int, int, int],
+            model_config: dict,
     ):
         # model init
         super(CustomModel, self).__init__()
@@ -30,6 +31,7 @@ class CustomModel(torch.nn.Module):
 
         # define dimensions
         node_dim, edge_dim = data_sizes
+        out_dim = model_config['out_dim'] if 'out_dim' in model_config else 1
 
         for layer_idx in range(n_layers):
             # extract layer config
@@ -55,8 +57,19 @@ class CustomModel(torch.nn.Module):
         # make list to module list and save in param
         self.layers = torch.nn.ModuleList(modules)
 
+        # add the head part - i.e. the part where graph pooling and reducing to output dimension happens
+        head_config = model_config['head']
+        if head_config['type'] == "san_head":
+            self.head = SANHead(
+                in_dim=self.hidden_dim,
+                out_dim=out_dim,
+                **head_config
+            )
+        else:
+            raise NotImplementedError("Head type other than san_head not implemented.")
+
     def forward(self, batch):
         for layer in self.layers:
             batch = layer(batch)
 
-        return batch
+        return self.head(batch)
