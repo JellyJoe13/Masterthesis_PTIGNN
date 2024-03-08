@@ -54,7 +54,7 @@ def priority_merge_config(
         merged_dict = copy.deepcopy(dict1)
 
     # iterate over second dict and add entries not present
-    for key, value in dict2:
+    for key, value in dict2.items():
         if key not in merged_dict:
             merged_dict[key] = copy.deepcopy(value)
         else:
@@ -73,4 +73,14 @@ def priority_merge_config(
                 continue
 
     return merged_dict
+
+
+def optional_fetch(
+        config_dict: dict,
+        key: str
+) -> dict:
+    if key in config_dict:
+        return config_dict[key]
+    else:
+        return {}
 

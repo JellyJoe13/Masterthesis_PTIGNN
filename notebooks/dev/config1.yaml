@@ -1,0 +1,27 @@
+data:
+  dataset:
+    toast: browne
+    type: rs
+  loader:
+    general:
+      batch_size: 3
+      n_neighbors_in_circle: 3
+    test: {}
+    train: {}
+    val: {}
+model:
+  hidden_dim: 128
+  mode: custom
+  modules:
+    0:
+      edge_type: linear
+      node_type: linear
+      type: graph_embedding
+optimizer:
+  base_learning_rate: 0.001
+  type: adam_w
+  weight_decay: 1.0e-05
+scheduler:
+  max_epochs: 100
+  num_warmup_epochs: 10
+  type: cosine_with_warmup

@@ -3,6 +3,7 @@ from ptgnn.loading.load import UniversalLoader
 from ptgnn.loading.subsetting import subset_dataset
 from ptgnn.model.framework.custom_model import CustomModel
 from ptgnn.optimizing import OPTIMIZER_DICT, SCHEDULER_DICT
+from ptgnn.runtime_config.config import priority_merge_config, optional_fetch
 
 
 def fetch_loaders(data_config: dict):
@@ -20,9 +21,20 @@ def fetch_loaders(data_config: dict):
         val_ds = subset_dataset(val_ds, subset_size=data_config['subset_size'])
 
     # get loaders
-    train_loader = UniversalLoader(train_ds, **data_config['loader']['train'], **data_config['loader']['general'])
-    val_loader = UniversalLoader(val_ds, **data_config['loader']['val'], **data_config['loader']['general'])
-    test_loader = UniversalLoader(test_ds, **data_config['loader']['test'], **data_config['loader']['general'])
+    loader_config = optional_fetch(data_config, 'loader')
+    general_loader_config = optional_fetch(loader_config, 'general')
+    train_loader = UniversalLoader(
+        train_ds,
+        **priority_merge_config(optional_fetch(loader_config, 'train'), general_loader_config)
+    )
+    val_loader = UniversalLoader(
+        val_ds,
+        **priority_merge_config(optional_fetch(loader_config, 'val'), general_loader_config)
+    )
+    test_loader = UniversalLoader(
+        test_ds,
+        **priority_merge_config(optional_fetch(loader_config, 'test'), general_loader_config)
+    )
 
     return train_loader, val_loader, test_loader
 

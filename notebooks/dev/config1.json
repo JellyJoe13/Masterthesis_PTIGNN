@@ -1,0 +1,38 @@
+{
+    "data": {
+        "dataset": {
+            "type": "rs",
+            "toast": "browne"
+        },
+        "loader": {
+            "general": {
+                "n_neighbors_in_circle": 3,
+                "batch_size": 3
+            },
+            "train": {},
+            "test": {},
+            "val": {}
+        }
+    },
+    "model": {
+        "mode": "custom",
+        "hidden_dim": 128,
+        "modules": {
+            "0": {
+                "type": "graph_embedding",
+                "node_type": "linear",
+                "edge_type": "linear"
+            }
+        }
+    },
+    "optimizer": {
+        "type": "adam_w",
+        "base_learning_rate": 0.001,
+        "weight_decay": 1e-05
+    },
+    "scheduler": {
+        "type": "cosine_with_warmup",
+        "num_warmup_epochs": 10,
+        "max_epochs": 100
+    }
+}
