@@ -1,9 +1,12 @@
+import torch.cuda
+
 from ptgnn.dataset import DATASET_DICT
 from ptgnn.loading.load import UniversalLoader
 from ptgnn.loading.subsetting import subset_dataset
 from ptgnn.model.framework.custom_model import CustomModel
 from ptgnn.optimizing import OPTIMIZER_DICT, SCHEDULER_DICT
 from ptgnn.runtime_config.config import priority_merge_config, optional_fetch
+from ptgnn.runtime_config.loss import l1_loss, graphgym_cross_entropy_loss
 
 
 def fetch_loaders(data_config: dict):
@@ -73,13 +76,98 @@ def create_model(data_sizes, model_config):
         raise NotImplementedError("Currently no other models besides custom model")
 
 
+def training_procedure(
+        model,
+        optimizer,
+        scheduler,
+        train_loader,
+        val_loader,
+        test_loader,
+        metric_calculator,
+        device,
+        n_max_epochs: int,  # hyperopt framework may or may not interrupt
+        loss_function: str,  # cross entropy or l1
+        **kwargs
+):
+    # initialize loss function
+    if loss_function == 'l1':
+        loss_function = l1_loss
+    elif loss_function == 'cross_entropy':
+        loss_function = graphgym_cross_entropy_loss
+    else:
+        raise NotImplementedError("only l1 and cross entropy loss implemented")
+
+    # initialize metric storage
+    metric_storage_train = []
+    metric_storage_val = []
+    metric_storage_test = []
+
+    for epoch in range(n_max_epochs):
+
+        model.train()
+
+        # train, val
+        for batch in train_loader:
+            # reset optimizer
+            optimizer.zero_grad()
+
+            # put batch to device
+            batch = batch.to(device)
+
+            # generate prediction
+            pred = model(batch)
+
+            # calculate loss
+            loss, pred = loss_function(pred, batch.y)
+
+            # train model
+            loss.backward()
+
+            # optimizer step
+            optimizer.step()
+
+            # calc metrics (pred is modified for binary results)
+            metric_dict = metric_calculator(
+                pred.detach().cpu(),
+                batch.y.detach().cpu()
+            )
+            metric_dict['loss'] = loss.item()
+
+            # append metric dict to list
+            metric_storage_train.append(metric_dict)
+
+        # scheduler step
+        scheduler.step()
+
+        # val
+        # todo copy paste with nograd und model.eval()
+        # todo: report to ray and checkpointing
+        # test
+        # todo copy paste with nograd und model.eval()
+        #  logic for if it should be done or not (tuning phase or final)
+
+    # todo:
+    #  check if final test (do evaluation on test_loader or not)
+    #  generate metric scores
+    #  integration to hyperparameter opt framework
+    #  - reporting
+    #  - checkpointing
+    pass
+
+
 def run_config(config_dict: dict):
+    # todo: seed everything
+
     # load data
     train_loader, val_loader, test_loader = fetch_loaders(config_dict['data'])
 
     # get model
-    # todo
+    # todo: add intermediary layers (what to do with GPS? which version?)
     model = create_model(data_sizes=fetch_data_size(train_loader), model_config=config_dict['model'])
+
+    # put model to device
+    device = "cuda" if torch.cuda.is_available() else 'cpu'
+    model = model.to(device)
 
     # get optimizer
     optimizer = fetch_optimizer(
@@ -91,8 +179,21 @@ def run_config(config_dict: dict):
         config_dict['scheduler']
     )
 
-    # fetch training mode
-    # todo
-    # fetch metrics (combined with above) (or inserted)
+    # fetch metric calculators
+    metric_calculator = ...  # todo
+
+    # start training
+    metric_dict = training_procedure(
+        model=model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        train_loader=train_loader,
+        val_loader=val_loader,
+        test_loader=test_loader,
+        metric_calculator=metric_calculator,
+        **config_dict['training']
+    )
+
+    # save/display metrics
     # todo
     pass
