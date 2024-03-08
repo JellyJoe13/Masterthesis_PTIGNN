@@ -31,6 +31,7 @@ class OGBDataset(InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            **kwargs
     ):
         self.link_storage = {
             "hiv": "http://snap.stanford.edu/ogb/data/graphproppred/csv_mol_download/hiv.zip",

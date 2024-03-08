@@ -30,6 +30,7 @@ class RSDataset(pyg.data.InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            **kwargs
     ):
         """
         Init of the RS dataset class. Starts the downloading and processing if the corresponding files are not present.

@@ -31,6 +31,7 @@ class BindingAffinityDataset(InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            **kwargs
     ):
         self.link_storage = {
             'train': 'https://figshare.com/ndownloader/files/30975697?private_link=e23be65a884ce7fc8543',

@@ -5,7 +5,8 @@ import typing
 def adam_w_optimizer(
         parameter: typing.Iterator[torch.nn.Parameter],
         base_learning_rate: float,
-        weight_decay: float
+        weight_decay: float,
+        **kwargs
 ) -> torch.optim.AdamW:
     """
     Adapted from

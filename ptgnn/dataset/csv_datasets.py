@@ -32,6 +32,7 @@ class BaceDataset(InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            **kwargs
     ):
         # connection to dataset download
         self.link_storage = {
@@ -221,6 +222,7 @@ class Tox21Dataset(InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            **kwargs
     ):
         # connection to dataset download
         self.link_storage = {

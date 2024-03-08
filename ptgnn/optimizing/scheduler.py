@@ -8,7 +8,8 @@ def cosine_with_warmup_scheduler(
         num_warmup_epochs: int,
         max_epochs: int,
         last_epoch: int = -1,
-        num_cycles: float = 0.5
+        num_cycles: float = 0.5,
+        **kwargs
 ):
     """
     Adapted from
