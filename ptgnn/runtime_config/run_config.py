@@ -95,6 +95,7 @@ def training_procedure(
         loss_function: str,  # cross entropy or l1
         clip_grad_norm: bool = False,
         out_dim: int = 1,
+        use_test_set: bool = False,
         **kwargs
 ):
     # initialize loss function
@@ -118,68 +119,29 @@ def training_procedure(
         df_dict = defaultdict(lambda: None)
 
     for epoch in range(n_max_epochs):
-
-        model.train()
-
-        loss_storage = []
-        pred_storage = []
-        true_storage = []
-
         metric_dict = {}
 
-        # train, val
-        for batch in tqdm(train_loader):
-            # reset optimizer
-            optimizer.zero_grad()
-
-            # put batch to device
-            batch = batch.to(device)
-
-            # generate prediction
-            pred, true = model(batch)
-
-            # calculate loss
-            loss, pred = loss_function(pred, true)
-
-            # train model
-            loss.backward()
-
-            # grad norm clipping
-            if clip_grad_norm:
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-
-            # optimizer step
-            optimizer.step()
-
-            # add pred, true and loss to storage to compute metrics
-            loss_storage.append(loss.item())
-            pred_storage.append(pred.detach().cpu())
-            true_storage.append(true.detach().cpu())
-
-        # calc metrics (pred is modified for binary results)
-        mode = 'train'  # todo: change when copying
-        metric_dict.update(metric_system(
-            pred=pred_storage,
-            true=true_storage,
-            task_type=task_type,
-            device=device,
-            training_mode=mode,
-            dataframe=df_dict[mode],
-            out_dim=out_dim,
-            prefix=mode
-        ))
-        metric_dict[f'{mode}_mean_loss'] = sum(loss_storage) / len(loss_storage)
-        metric_dict[f'{mode}_sum_loss'] = sum(loss_storage)
-
-        # scheduler step
-        scheduler.step()
+        metric_dict = train_epoch(
+            metric_dict,
+            clip_grad_norm,
+            device,
+            df_dict,
+            loss_function,
+            model,
+            optimizer,
+            out_dim,
+            scheduler,
+            task_type,
+            train_loader
+        )
 
         # val
-        # todo copy paste with nograd und model.eval()
+        metric_dict = eval_epoch(metric_dict, device, df_dict, loss_function, model, out_dim, task_type, val_loader, 'val')
+
         # todo: report to ray and checkpointing
         # test
-        # todo copy paste with nograd und model.eval()
-        #  logic for if it should be done or not (tuning phase or final)
+        if use_test_set:
+            metric_dict = eval_epoch(device, df_dict, loss_function, model, out_dim, task_type, test_loader, 'test')
 
         # append metric dict to list
         metric_storage.append(metric_dict)
@@ -193,6 +155,123 @@ def training_procedure(
 
     # return metric dict
     return pd.DataFrame(metric_storage)
+
+
+def train_epoch(
+        metric_dict: dict,
+        clip_grad_norm: bool,
+        device: str,
+        df_dict: dict,
+        loss_function,
+        model: torch.nn.Module,
+        optimizer,
+        out_dim: int,
+        scheduler,
+        task_type: str,
+        train_loader
+):
+    model.train()
+
+    loss_storage = []
+    pred_storage = []
+    true_storage = []
+
+    # train, val
+    for batch in tqdm(train_loader):
+        # reset optimizer
+        optimizer.zero_grad()
+
+        # put batch to device
+        batch = batch.to(device)
+
+        # generate prediction
+        pred, true = model(batch)
+
+        # calculate loss
+        loss, pred = loss_function(pred, true)
+
+        # train model
+        loss.backward()
+
+        # grad norm clipping
+        if clip_grad_norm:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+
+        # optimizer step
+        optimizer.step()
+
+        # add pred, true and loss to storage to compute metrics
+        loss_storage.append(loss.item())
+        pred_storage.append(pred.detach().cpu())
+        true_storage.append(true.detach().cpu())
+    # calc metrics (pred is modified for binary results)
+    mode = 'train'  # todo: change when copying
+    metric_dict.update(metric_system(
+        pred=pred_storage,
+        true=true_storage,
+        task_type=task_type,
+        device=device,
+        training_mode=mode,
+        dataframe=df_dict[mode],
+        out_dim=out_dim,
+        prefix=mode
+    ))
+    metric_dict[f'{mode}_mean_loss'] = sum(loss_storage) / len(loss_storage)
+    metric_dict[f'{mode}_sum_loss'] = sum(loss_storage)
+    # scheduler step
+    scheduler.step()
+    return metric_dict
+
+
+def eval_epoch(
+        metric_dict: dict,
+        device: str,
+        df_dict: dict,
+        loss_function,
+        model: torch.nn.Module,
+        out_dim: int,
+        task_type: str,
+        eval_loader,
+        mode: str
+):
+    model.eval()
+
+    loss_storage = []
+    pred_storage = []
+    true_storage = []
+
+    # eval
+    with torch.no_grad():
+        for batch in tqdm(eval_loader):
+
+            # put batch to device
+            batch = batch.to(device)
+
+            # generate prediction
+            pred, true = model(batch)
+
+            # calculate loss
+            loss, pred = loss_function(pred, true)
+
+            # add pred, true and loss to storage to compute metrics
+            loss_storage.append(loss.item())
+            pred_storage.append(pred.detach().cpu())
+            true_storage.append(true.detach().cpu())
+
+    # calc metrics (pred is modified for binary results)
+    metric_dict.update(metric_system(
+        pred=pred_storage,
+        true=true_storage,
+        task_type=task_type,
+        device=device,
+        training_mode=mode,
+        dataframe=df_dict[mode],
+        out_dim=out_dim,
+        prefix=mode
+    ))
+    metric_dict[f'{mode}_mean_loss'] = sum(loss_storage) / len(loss_storage)
+    metric_dict[f'{mode}_sum_loss'] = sum(loss_storage)
+    return metric_dict
 
 
 def run_config(config_dict: dict):
