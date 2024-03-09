@@ -1,4 +1,5 @@
 import torch.cuda
+from tqdm import tqdm
 
 from ptgnn.dataset import DATASET_DICT
 from ptgnn.loading.load import UniversalLoader
@@ -87,6 +88,7 @@ def training_procedure(
         device,
         n_max_epochs: int,  # hyperopt framework may or may not interrupt
         loss_function: str,  # cross entropy or l1
+        clip_grad_norm: bool = False,
         **kwargs
 ):
     # initialize loss function
@@ -106,8 +108,12 @@ def training_procedure(
 
         model.train()
 
+        loss_storage = []
+        pred_storage = []
+        true_storage = []
+
         # train, val
-        for batch in train_loader:
+        for batch in tqdm(train_loader):
             # reset optimizer
             optimizer.zero_grad()
 
@@ -115,26 +121,35 @@ def training_procedure(
             batch = batch.to(device)
 
             # generate prediction
-            pred = model(batch)
+            pred, true = model(batch)
 
             # calculate loss
-            loss, pred = loss_function(pred, batch.y)
+            loss, pred = loss_function(pred, true)
 
             # train model
             loss.backward()
 
+            # grad norm clipping
+            if clip_grad_norm:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+
             # optimizer step
             optimizer.step()
 
-            # calc metrics (pred is modified for binary results)
-            metric_dict = metric_calculator(
-                pred.detach().cpu(),
-                batch.y.detach().cpu()
-            )
-            metric_dict['loss'] = loss.item()
+            # add pred, true and loss to storage to compute metrics
+            loss_storage.append(loss.item())
+            pred_storage.append(pred.detach().cpu())
+            true_storage.append(true.detach().cpu())
 
-            # append metric dict to list
-            metric_storage_train.append(metric_dict)
+        # calc metrics (pred is modified for binary results)
+        metric_dict = metric_calculator(
+            pred.detach().cpu(),
+            batch.y.detach().cpu()
+        )
+        metric_dict['loss'] = loss.item()
+
+        # append metric dict to list
+        metric_storage_train.append(metric_dict)
 
         # scheduler step
         scheduler.step()
@@ -191,6 +206,7 @@ def run_config(config_dict: dict):
         val_loader=val_loader,
         test_loader=test_loader,
         metric_calculator=metric_calculator,
+        device=device,
         **config_dict['training']
     )
 
