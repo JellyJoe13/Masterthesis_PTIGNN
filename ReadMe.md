@@ -10,4 +10,5 @@ conda install pyg -c pyg
 pip install rdkit
 conda install jupyterlab numpy pandas matplotlib
 pip install chainer-chemistry
+conda install -c conda-forge torchmetrics
 ```

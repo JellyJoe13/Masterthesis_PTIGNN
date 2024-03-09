@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+import pandas as pd
 import torch.cuda
 from tqdm import tqdm
 
@@ -8,6 +11,7 @@ from ptgnn.model.framework.custom_model import CustomModel
 from ptgnn.optimizing import OPTIMIZER_DICT, SCHEDULER_DICT
 from ptgnn.runtime_config.config import priority_merge_config, optional_fetch
 from ptgnn.runtime_config.loss import l1_loss, graphgym_cross_entropy_loss
+from ptgnn.runtime_config.metrics import metric_system
 
 
 def fetch_loaders(data_config: dict):
@@ -84,11 +88,13 @@ def training_procedure(
         train_loader,
         val_loader,
         test_loader,
-        metric_calculator,
+        optimization_metric,
+        task_type,
         device,
         n_max_epochs: int,  # hyperopt framework may or may not interrupt
         loss_function: str,  # cross entropy or l1
         clip_grad_norm: bool = False,
+        out_dim: int = 1,
         **kwargs
 ):
     # initialize loss function
@@ -100,9 +106,16 @@ def training_procedure(
         raise NotImplementedError("only l1 and cross entropy loss implemented")
 
     # initialize metric storage
-    metric_storage_train = []
-    metric_storage_val = []
-    metric_storage_test = []
+    metric_storage = []
+
+    # initialize loading of dataframe if required
+    if task_type == 'regression_rank' and 'dataframe' in train_loader.dataset:
+        df_dict = {
+            'train': train_loader.dataset.dataframe,
+        }
+
+    else:
+        df_dict = defaultdict(lambda: None)
 
     for epoch in range(n_max_epochs):
 
@@ -111,6 +124,8 @@ def training_procedure(
         loss_storage = []
         pred_storage = []
         true_storage = []
+
+        metric_dict = {}
 
         # train, val
         for batch in tqdm(train_loader):
@@ -142,14 +157,19 @@ def training_procedure(
             true_storage.append(true.detach().cpu())
 
         # calc metrics (pred is modified for binary results)
-        metric_dict = metric_calculator(
-            pred.detach().cpu(),
-            batch.y.detach().cpu()
-        )
-        metric_dict['loss'] = loss.item()
-
-        # append metric dict to list
-        metric_storage_train.append(metric_dict)
+        mode = 'train'  # todo: change when copying
+        metric_dict.update(metric_system(
+            pred=pred_storage,
+            true=true_storage,
+            task_type=task_type,
+            device=device,
+            training_mode=mode,
+            dataframe=df_dict[mode],
+            out_dim=out_dim,
+            prefix=mode
+        ))
+        metric_dict[f'{mode}_mean_loss'] = sum(loss_storage) / len(loss_storage)
+        metric_dict[f'{mode}_sum_loss'] = sum(loss_storage)
 
         # scheduler step
         scheduler.step()
@@ -161,13 +181,18 @@ def training_procedure(
         # todo copy paste with nograd und model.eval()
         #  logic for if it should be done or not (tuning phase or final)
 
+        # append metric dict to list
+        metric_storage.append(metric_dict)
+
     # todo:
     #  check if final test (do evaluation on test_loader or not)
     #  generate metric scores
     #  integration to hyperparameter opt framework
     #  - reporting
     #  - checkpointing
-    pass
+
+    # return metric dict
+    return pd.DataFrame(metric_storage)
 
 
 def run_config(config_dict: dict):
@@ -207,6 +232,7 @@ def run_config(config_dict: dict):
         test_loader=test_loader,
         metric_calculator=metric_calculator,
         device=device,
+        out_dim=config_dict['model']['out_dim'] if 'out_dim' in config_dict['model'] else 1,
         **config_dict['training']
     )
 
