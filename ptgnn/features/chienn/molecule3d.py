@@ -1,5 +1,9 @@
+import torch_geometric
 from rdkit import Chem
 from rdkit.Chem import AllChem
+
+from ptgnn.features.chienn.mol_to_data import mol_to_data
+from ptgnn.transform.edge_graph import to_edge_graph
 
 
 def smiles_to_3d_mol(smiles: str, max_number_of_atoms: int = 100, max_number_of_attempts: int = 10):
@@ -43,3 +47,23 @@ def smiles_to_3d_mol(smiles: str, max_number_of_atoms: int = 100, max_number_of_
         )
         return None
     return mol
+
+
+def smiles_to_data_with_circle_index(smiles: str) -> torch_geometric.data.Data:
+    """
+    From: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/chienn/data/featurize.py
+    Transforms a SMILES string into a torch_geometric Data object that can be fed into the ChiENNLayer.
+    Args:
+        smiles: a SMILES string.
+
+    Returns:
+        Data object containing the following attributes:
+            - x (num_nodes,): node features.
+            - edge_index (2, num_edges): edge index.
+            - circle_index (num_nodes, circle_size): neighbors indices ordered around a node.
+    """
+    mol = smiles_to_3d_mol(smiles)
+    data = mol_to_data(mol)
+    data = to_edge_graph(data)
+    data.pos = None
+    return data
