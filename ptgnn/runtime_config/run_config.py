@@ -88,7 +88,6 @@ def training_procedure(
         train_loader,
         val_loader,
         test_loader,
-        optimization_metric,
         task_type,
         device,
         n_max_epochs: int,  # hyperopt framework may or may not interrupt
@@ -298,9 +297,6 @@ def run_config(config_dict: dict):
         config_dict['scheduler']
     )
 
-    # fetch metric calculators
-    metric_calculator = ...  # todo
-
     # start training
     metric_dict = training_procedure(
         model=model,
@@ -309,7 +305,6 @@ def run_config(config_dict: dict):
         train_loader=train_loader,
         val_loader=val_loader,
         test_loader=test_loader,
-        metric_calculator=metric_calculator,
         device=device,
         out_dim=config_dict['model']['out_dim'] if 'out_dim' in config_dict['model'] else 1,
         **config_dict['training']
@@ -317,4 +312,6 @@ def run_config(config_dict: dict):
 
     # save/display metrics
     # todo
+
+    # todo: add hyperparameter reporting and support
     pass
