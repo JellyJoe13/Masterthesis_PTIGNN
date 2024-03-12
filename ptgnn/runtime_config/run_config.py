@@ -15,8 +15,6 @@ from ptgnn.runtime_config.loss import l1_loss, graphgym_cross_entropy_loss
 from ptgnn.runtime_config.metrics import metric_system
 
 
-
-
 def fetch_loaders(data_config: dict):
     dataset_config = data_config['dataset']
     # load dataset
