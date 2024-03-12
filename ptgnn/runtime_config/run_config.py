@@ -2,6 +2,7 @@ from collections import defaultdict
 
 import pandas as pd
 import torch.cuda
+import torch_geometric
 from tqdm import tqdm
 
 from ptgnn.dataset import DATASET_DICT
@@ -12,6 +13,8 @@ from ptgnn.optimizing import OPTIMIZER_DICT, SCHEDULER_DICT
 from ptgnn.runtime_config.config import priority_merge_config, optional_fetch
 from ptgnn.runtime_config.loss import l1_loss, graphgym_cross_entropy_loss
 from ptgnn.runtime_config.metrics import metric_system
+
+
 
 
 def fetch_loaders(data_config: dict):
@@ -274,7 +277,9 @@ def eval_epoch(
 
 
 def run_config(config_dict: dict):
-    # todo: seed everything
+    # seed everything
+    seed = config_dict['seed'] if 'seed' in config_dict else 1
+    torch_geometric.seed_everything(seed)
 
     # load data
     train_loader, val_loader, test_loader = fetch_loaders(config_dict['data'])

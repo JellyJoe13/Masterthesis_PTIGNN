@@ -11,4 +11,6 @@ pip install rdkit
 conda install jupyterlab numpy pandas matplotlib
 pip install chainer-chemistry
 conda install -c conda-forge torchmetrics
+pip install "ray[tune]" torch torchvision
+pip install hyperopt
 ```
