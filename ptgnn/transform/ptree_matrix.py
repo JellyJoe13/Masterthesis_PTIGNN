@@ -49,4 +49,12 @@ def permutation_tree_to_matrix(ptree_string_list: typing.List[str], k: int = 3):
     num_layers = permutation_tree_depth(permutation_trees)
 
     # fetch the matrix for the permutation trees
-    return get_matrix(permutation_trees, depth=num_layers)
+    idx_matrix, type_matrix = get_matrix(permutation_trees, depth=num_layers)
+
+    # fill -1 in matrix with last values
+    for i in range(1,idx_matrix.shape[1]):
+        # get the -1 entry mask
+        mask = idx_matrix[:, i] == -1
+        idx_matrix[mask, i] = idx_matrix[mask, i-1]
+
+    return idx_matrix, type_matrix
