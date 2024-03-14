@@ -9,6 +9,7 @@ from multiprocess.pool import Pool
 from torch_geometric.data import InMemoryDataset
 from tqdm import tqdm
 
+from ptgnn.dataset.utils import dict_to_storage_path
 from ptgnn.dataset.utils_chienn import download_url_to_path, convert_target_for_task
 from ptgnn.masking import MASKING_MAPPING
 from ptgnn.transform import PRE_TRANSFORM_MAPPING
@@ -69,7 +70,14 @@ class OGBDataset(InMemoryDataset):
     def processed_dir(self):
         graph_mode = self.graph_mode if self.graph_mode else ''
         graph_mode += "+" + self.transformation_mode if self.transformation_mode else ''
-        return os.path.join(self.root, self.ds_name, graph_mode, self.task_type, 'processed')
+        return os.path.join(
+            self.root,
+            self.ds_name,
+            graph_mode,
+            self.task_type,
+            dict_to_storage_path(self.transformation_parameters),
+            'processed'
+        )
 
     @property
     def raw_file_names(self):

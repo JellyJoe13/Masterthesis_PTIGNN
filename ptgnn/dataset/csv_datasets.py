@@ -11,6 +11,7 @@ from torch_geometric.data import InMemoryDataset
 from tqdm import tqdm
 
 from ptgnn.dataset.chainer_chemistry_split import scaffold_split
+from ptgnn.dataset.utils import dict_to_storage_path
 from ptgnn.dataset.utils_chienn import download_url_to_path, convert_target_for_task
 from ptgnn.masking import MASKING_MAPPING
 from ptgnn.transform import PRE_TRANSFORM_MAPPING
@@ -74,7 +75,13 @@ class BaceDataset(InMemoryDataset):
     def processed_dir(self) -> str:
         name = self.graph_mode if self.graph_mode else ''
         name += "+" + self.transformation_mode if self.transformation_mode else ''
-        return os.path.join(self.root, name, self.task_type, 'processed')
+        return os.path.join(
+            self.root,
+            name,
+            self.task_type,
+            dict_to_storage_path(self.transformation_parameters),
+            'processed'
+        )
 
     @property
     def processed_file_names(self) -> typing.Union[str, typing.List[str], typing.Tuple[str, ...]]:
