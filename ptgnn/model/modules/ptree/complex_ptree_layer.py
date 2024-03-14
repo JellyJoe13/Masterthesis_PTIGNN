@@ -131,7 +131,7 @@ class ComplexPtreeLayer(torch.nn.Module):
             # global pooling
             data_array = torch_geometric.nn.global_add_pool(temporary_data_array, current_layer_pooling)
 
-            # post aggregation embedding: ELU + linear # todo: only for the ones with type not 0
+            # post aggregation embedding: ELU + linear
             type_mask2 = type_mask[torch.unique(current_layer_pooling)]
 
             # apply final elu layer. why the masking? so that elements that are tunneled through don't get exposed to
