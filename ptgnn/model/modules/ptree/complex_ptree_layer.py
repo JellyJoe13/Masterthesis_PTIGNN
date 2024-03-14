@@ -73,6 +73,8 @@ class ComplexPtreeLayer(torch.nn.Module):
                 for emb, t in zip(self.z_layer, embedding)
             ], dim=1)
 
+            embedding[(order_matrix.T == 0).unsqueeze(-1).expand_as(embedding)] = 0.
+
             embedding = embedding.sum(dim=1)
             embedding = self.z_final_layer(embedding)
 

@@ -4,6 +4,7 @@ import torch_geometric
 from typing import List
 
 from ptgnn.transform.edge_graph.chienn.to_edge_graph import to_edge_graph
+from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
 
 
 def basic_permutation_tree_chienn_replication(data: torch_geometric.data.Data):
@@ -43,3 +44,12 @@ def basic_permutation_tree_chienn_replication(data: torch_geometric.data.Data):
     )
 
     return new_element
+
+
+def order_matrix_permutation_tree_chienn_replication(data: torch_geometric.data.Data, k):
+    data = basic_permutation_tree_chienn_replication(data)
+
+    # generate order matrix
+    data = permutation_tree_to_order_matrix(data, k)
+
+    return data

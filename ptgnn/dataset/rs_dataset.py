@@ -73,7 +73,7 @@ class RSDataset(pyg.data.InMemoryDataset):
             root=root,
             transform=None,
             pre_transform=self.pre_transform,
-            pre_filter=None
+            pre_filter=None,
         )
 
         # part that actually loads the data into the class

@@ -1,6 +1,7 @@
 import json
 from typing import Optional, Iterable, List
 
+import torch
 from torch_geometric.data import Batch
 from torch_geometric.data.data import BaseData
 from torch_geometric.loader.dataloader import Collater
@@ -105,9 +106,90 @@ def permutation_tree_batching(data_list: List[BaseData]):
 def permutation_tree_collation(
         data_list: List[BaseData]
 ):
+    # create list of keys to exclude
+    exclude_keys = ['ptree']
+    if hasattr(data_list[0], 'num_layer'):
+        num_layer = max([data.num_layer for data in data_list])
+
+        exclude_keys += ['num_layer', 'initial_map']
+        exclude_keys += [
+            f"layer{layer_idx}_order_matrix"
+            for layer_idx in range(num_layer)
+        ]
+        exclude_keys += [
+            f"layer{layer_idx}_type_mask"
+            for layer_idx in range(num_layer)
+        ]
+        exclude_keys += [
+            f"layer{layer_idx}_pooling"
+            for layer_idx in range(num_layer)
+        ]
+
     batch = Batch.from_data_list(
         data_list=data_list,
-        exclude_keys=['ptree']
+        exclude_keys=exclude_keys
     )
     batch.ptree = permutation_tree_batching(data_list)
+
+    if hasattr(data_list[0], 'num_layer'):
+        batch.num_layer = num_layer
+
+        # initial map
+        pooling_max = []
+        num_nodes = 0
+        initial_map_matrix = []
+        for data in data_list:
+            initial_map_matrix.append(
+                data.initial_map + num_nodes
+            )
+            pooling_max.append(data.initial_map.shape[0])
+            num_nodes += data.x.shape[0]
+
+        setattr(batch, "initial_map", torch.cat(initial_map_matrix))
+
+        # i know its stupid but having these wrapped in two lists was the best way to counter the auto-collation
+        # function of pyg... without hardcoding the dimensions which
+
+        for layer_idx in range(num_layer):
+
+            # order matrix section and graph pooling
+            order_matrix = []
+            index_offset = 0
+
+            for data, p_max in zip(data_list, pooling_max):
+                o_m = data[f"layer{layer_idx}_order_matrix"][0][0].clone()
+
+                mask = (o_m == -1)
+                o_m += index_offset
+                o_m[mask] = -1
+
+                index_offset += p_max
+                order_matrix.append(o_m)
+
+            batch[f"layer{layer_idx}_order_matrix"] = torch.cat(order_matrix, dim=1)
+
+            # type mask section
+            type_mask = [
+                data[f"layer{layer_idx}_type_mask"][0][0]
+                for data in data_list
+            ]
+            batch[f"layer{layer_idx}_type_mask"] = torch.cat(type_mask, dim=0)
+
+            # pooling
+            pooling_max = []
+            index_offset = 0
+            pool_matrix = []
+
+            for data in data_list:
+                pool = data[f"layer{layer_idx}_pooling"][0][0].clone()
+                max_val = pool.max() + 1  # mind the 0
+
+                pool += index_offset
+                pool_matrix.append(pool)
+                pooling_max.append(max_val)
+
+                index_offset += max_val
+
+            batch[f"layer{layer_idx}_pooling"] = torch.cat(pool_matrix, dim=0)
+
     return batch
