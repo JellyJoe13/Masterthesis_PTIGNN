@@ -39,11 +39,57 @@ def get_matrix(tree, depth, idx_prefix: list = [], type_prefix: list = []) -> li
         return [-1]
 
 
+def remove_inverted_through_p(perm_tree: dict):
+    if isinstance(perm_tree, int):
+        return perm_tree
+
+    key = next(iter(perm_tree.keys()))
+    if key == "Q":
+        return {
+            "P": [
+                {
+                    "S": [
+                        remove_inverted_through_p(subtree)
+                        for subtree in perm_tree[key]
+                    ]
+                },
+                {
+                    "S": [
+                             remove_inverted_through_p(subtree)
+                             for subtree in perm_tree[key]
+                         ][::-1]
+                }
+            ]
+        }
+    elif key == "C":
+        return {
+            "P": [
+                {
+                    "Z": perm_tree[key]
+                },
+                {
+                    "Z": [
+                             remove_inverted_through_p(subtree)
+                             for subtree in perm_tree[key]
+                         ][::-1]
+                }
+            ]
+        }
+    else:
+        return perm_tree
+
+
 def permutation_tree_to_matrix(ptree_string_list: typing.List[str], k: int = 3):
     # transform to dict
     permutation_trees = [
         json.loads(p_string)
         for p_string in ptree_string_list
+    ]
+
+    # replace C, Q by P(Z,Z) and P(S,S)
+    permutation_trees = [
+        remove_inverted_through_p(tree)
+        for tree in permutation_trees
     ]
 
     # get number of layers
