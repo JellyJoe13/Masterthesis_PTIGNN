@@ -1,6 +1,8 @@
 import torch
 import torch_geometric
 
+from ptgnn.transform.ptree_matrix import type_dict
+
 
 class ComplexPtreeLayer(torch.nn.Module):
     def __init__(
@@ -12,74 +14,143 @@ class ComplexPtreeLayer(torch.nn.Module):
         self.k = k
         self.hidden_dim = hidden_dim
 
-        self.z_layer = torch.nn.ModuleList([
+        # s layer
+        self.s_layer = torch.nn.ModuleList(
             torch.nn.Linear(self.hidden_dim, self.hidden_dim)
-            for _ in range(k)
-        ])
+            for _ in range(self.k)
+        )
+        self.s_intermediate_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.s_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.s_elu = torch.nn.ELU()
 
         # z layer
         self.z_layer = torch.nn.ModuleList(
             torch.nn.Linear(self.hidden_dim, self.hidden_dim)
             for _ in range(self.k)
         )
+        self.z_intermediate_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
         self.z_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
         self.z_elu = torch.nn.ELU()
 
         # p layer
         self.p_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.p_elu = torch.nn.ELU()
         self.p_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+
+        self.final_elu = torch.nn.ELU()
+        self.type_dict = type_dict
 
     def forward(
             self,
             batch
     ):
-        # make link to batch idx_matrix
-        idx_matrix = batch.idx_matrix
+        # create initial data space
+        data_array = batch.x[batch.initial_map]
 
-        # load first index range of elements
-        data_array = batch.x[idx_matrix[:, -1]]
+        # iterate over layers
+        for layer_idx in range(batch.num_layer):
 
-        # get structure to orient to
-        idx_structure = idx_matrix[:, :-1]
+            # fetch instructions for this layer
+            order_matrix = batch[f"layer{layer_idx}_order_matrix"]
+            current_layer_pooling = batch[f"layer{layer_idx}_pooling"]
+            type_mask = batch[f"layer{layer_idx}_type_mask"]
 
-        for layer_idx in range(idx_matrix.shape[1]-2):
-            # get indexes for graph pooling
-            idx_structure, current_layer_pooling_counts = torch.unique(idx_structure[:, :-1], dim=0, return_counts=True)
-
-            # get indexes for graph pooling
-            current_layer_pooling = torch.repeat_interleave(current_layer_pooling_counts)
-
-            # init circling
-            # todo: rework for other types - treat everything as Z
-            order_matrix = torch.zeros(self.k, len(current_layer_pooling), dtype=torch.int) - 1
-
-            cur_pos = 0
-            for i in current_layer_pooling_counts:
-                current_k = min(self.k, i)
-                r = torch.arange(cur_pos, cur_pos+i)
-                for j in range(current_k):
-                    order_matrix[:current_k, cur_pos+j] = torch.roll(r, shifts=-j)
-                cur_pos += i
-
-            # add zero padding to data list
-            data_array = torch.cat([torch.zeros(1, data_array.shape[-1], device=data_array.device), data_array], dim=0)
+            # order matrix contains -1. This is due to not all permutations requiring k elements to connect.
+            # solve this with creating new index zero that is full of zeros and increasing order_matrix index
+            data_array = torch.cat(
+                [
+                    torch.zeros(1, data_array.shape[-1], device=data_array.device),
+                    data_array
+                ],
+                dim=0
+            )
             order_matrix += 1
 
-            embedding = data_array[order_matrix]
-            # mask_z = batch.type_matrix
+            # create order mask (required later to remove elements that were -1 -> 0 but after linear layer they
+            # are no longer 0)
+            mask_order_matrix = order_matrix == 0
 
-            embedding = torch.stack([
-                emb(t)
-                for emb, t in zip(self.z_layer, embedding)
-            ], dim=1)
+            # change indices from order list to real data (technically this inflates the matrix, but all are references
+            # so no actual space should be required.
+            data_array = data_array[order_matrix]
 
-            embedding[(order_matrix.T == 0).unsqueeze(-1).expand_as(embedding)] = 0.
+            # do operation for each layer and put result into a temporary array
+            # array initialized with the first column to cover the case of doing nothing (tree extension for uniform
+            # layer count)
+            temporary_data_array = data_array[0].clone()
+            for node_type, node_value in self.type_dict.items():  # todo: where was this one dict again... features?
+                # create mask for this type:
+                mask = type_mask == node_value
 
-            embedding = embedding.sum(dim=1)
-            embedding = self.z_final_layer(embedding)
+                if not mask.any():
+                    continue
+
+                if node_type == "Z":
+                    # iterate over k and get embeddings
+                    temp = torch.stack([
+                        emb(t)
+                        for emb, t in zip(self.z_layer, data_array[:, mask])
+                    ], dim=0)
+                    # set entries that were previously only the -1's to zero
+                    temp[mask_order_matrix[:, mask]] = 0.
+
+                    # sum k (shifted [in order_matrix] embeddings)
+                    temp = temp.sum(dim=0)
+
+                    # run through final layer
+                    temp = self.z_intermediate_layer(temp)
+
+                    # put into temporary_array
+                    temporary_data_array[mask] = temp
+
+                elif node_type == "S":
+                    # iterate over k and get embeddings
+                    temp = torch.stack([
+                        emb(t)
+                        for emb, t in zip(self.s_layer, data_array[:, mask])
+                    ], dim=0)
+                    # set entries that were previously only the -1's to zero
+                    temp[mask_order_matrix[:, mask]] = 0.
+
+                    # sum k (shifted [in order_matrix] embeddings)
+                    temp = temp.sum(dim=0)
+
+                    # run through final layer
+                    temp = self.s_intermediate_layer(temp)
+
+                    # put into temporary_array
+                    temporary_data_array[mask] = temp
+
+                elif node_type == "P":
+                    # no iterating over k layers
+                    temp = self.p_layer(data_array[0, mask])
+
+                    # put into temporary_array
+                    temporary_data_array[mask] = temp
+                else:
+                    raise NotImplementedError("invalid node type")
 
             # global pooling
-            data_array = torch_geometric.nn.global_add_pool(embedding, current_layer_pooling)
+            data_array = torch_geometric.nn.global_add_pool(temporary_data_array, current_layer_pooling)
 
+            # post aggregation embedding: ELU + linear
+            data_array = self.final_elu(data_array)
+            type_mask2 = type_mask[torch.unique(current_layer_pooling)]
+
+            # create mask for this type:
+            # type p
+            mask = type_mask2 == 1
+            data_array[mask] = self.p_final_layer(data_array[mask])
+
+            # type z
+            mask = type_mask2 == 2
+            data_array[mask] = self.z_final_layer(data_array[mask])
+
+            # type s
+            mask = type_mask2 == 3
+            data_array[mask] = self.s_final_layer(data_array[mask])
+
+        batch.x = data_array
+        return batch
 
 

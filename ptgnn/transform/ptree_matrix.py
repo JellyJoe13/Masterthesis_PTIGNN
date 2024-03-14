@@ -6,6 +6,7 @@ import typing
 type_dict = {
     "P": 1,
     "Z": 2,
+    "S": 3
 }
 
 
