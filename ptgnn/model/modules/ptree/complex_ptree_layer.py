@@ -46,6 +46,7 @@ class ComplexPtreeLayer(torch.nn.Module):
     ):
         # create initial data space
         data_array = batch.x[batch.initial_map]
+        # todo: check if all -1 are minded - especially for s when whole order matrix col is -1
 
         # iterate over layers
         for layer_idx in range(batch.num_layer):
@@ -97,11 +98,8 @@ class ComplexPtreeLayer(torch.nn.Module):
                     # sum k (shifted [in order_matrix] embeddings)
                     temp = temp.sum(dim=0)
 
-                    # run through final layer
-                    temp = self.z_intermediate_layer(temp)
-
-                    # put into temporary_array
-                    temporary_data_array[mask] = temp
+                    # run through final layer and put into temporary_array
+                    temporary_data_array[mask] = self.z_intermediate_layer(temp)
 
                 elif node_type == "S":
                     # iterate over k and get embeddings
@@ -115,11 +113,8 @@ class ComplexPtreeLayer(torch.nn.Module):
                     # sum k (shifted [in order_matrix] embeddings)
                     temp = temp.sum(dim=0)
 
-                    # run through final layer
-                    temp = self.s_intermediate_layer(temp)
-
-                    # put into temporary_array
-                    temporary_data_array[mask] = temp
+                    # run through final layer and put into temporary_array
+                    temporary_data_array[mask] = self.s_intermediate_layer(temp)
 
                 elif node_type == "P":
                     # no iterating over k layers
@@ -130,12 +125,19 @@ class ComplexPtreeLayer(torch.nn.Module):
                 else:
                     raise NotImplementedError("invalid node type")
 
+            # in case of S type or errors, if order matrix contains only -1 entries in a column, set to 0
+            temporary_data_array[mask_order_matrix.all(dim=0)] = 0.
+
             # global pooling
             data_array = torch_geometric.nn.global_add_pool(temporary_data_array, current_layer_pooling)
 
-            # post aggregation embedding: ELU + linear
-            data_array = self.final_elu(data_array)
+            # post aggregation embedding: ELU + linear # todo: only for the ones with type not 0
             type_mask2 = type_mask[torch.unique(current_layer_pooling)]
+
+            # apply final elu layer. why the masking? so that elements that are tunneled through don't get exposed to
+            # elu layer before embedding
+            mask = type_mask2 != 0
+            data_array[mask] = self.final_elu(data_array[mask])
 
             # create mask for this type:
             # type p

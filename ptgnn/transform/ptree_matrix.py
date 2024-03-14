@@ -86,7 +86,7 @@ def permutation_tree_to_order_matrix(batch, k): # can also be data object as lon
             current_k = min(k, i)
 
             # create the index to put into the order matrix
-            r = torch.arange(cur_pos, cur_pos+current_k)
+            r = torch.arange(cur_pos, cur_pos+i)
 
             # get type
             new_type_matrix.append(type_matrix[cur_pos, :-1])
@@ -94,12 +94,13 @@ def permutation_tree_to_order_matrix(batch, k): # can also be data object as lon
 
             # switch for node types
             if t == 0 or t == 1:
-                order_matrix[0, cur_pos:(cur_pos+current_k)] = r
+                order_matrix[0, cur_pos:(cur_pos+current_k)] = r[:current_k]
             elif t == 2:
                 for j in range(i):
-                    order_matrix[:current_k, cur_pos+j] = torch.roll(r, shifts=-j)
+                    order_matrix[:current_k, cur_pos+j] = torch.roll(r, shifts=-j)[:current_k]
             elif t == 3:
-                order_matrix[:current_k, cur_pos] = r
+                for j in range(i - current_k + 1):
+                    order_matrix[:current_k, cur_pos+j] = torch.roll(r, shifts=-j)[:current_k]
 
             cur_pos += i
 
