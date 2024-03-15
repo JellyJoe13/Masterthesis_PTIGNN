@@ -7,28 +7,34 @@ from ptgnn.transform.edge_graph.chienn.to_edge_graph import to_edge_graph
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
 
 
+def _circle_index_to_primordial_tree(
+        circle_index: List[int],
+        parallel_node: int,
+        self_node: int,
+        inner_type: str = "Z"
+):
+    # if nothing in the circular index return empty string
+    if len(circle_index) == 0:
+        return json.dumps({"P": [int(parallel_node)]})
+    else:
+        # not including parallel node index
+        # return f"Z{[i for i in circle_index]}"
+
+        # including parallel node index
+        # return f"P[{parallel_node}, Z{[i for i in circle_index]}]"
+        return json.dumps({
+            "S": [
+                int(self_node),
+                int(parallel_node),
+                {
+                    inner_type: [int(i) for i in circle_index]
+                }
+            ]
+        })
+
+
 def basic_permutation_tree_chienn_replication(data: torch_geometric.data.Data):
     edge_graph = to_edge_graph(data)
-
-    def _circle_index_to_primordial_tree(circle_index: List[int], parallel_node: int, self_node: int):
-        # if nothing in the circular index return empty string
-        if len(circle_index) == 0:
-            return json.dumps({"P": [int(parallel_node)]})
-        else:
-            # not including parallel node index
-            # return f"Z{[i for i in circle_index]}"
-
-            # including parallel node index
-            # return f"P[{parallel_node}, Z{[i for i in circle_index]}]"
-            return json.dumps({
-                "S": [
-                    int(self_node),
-                    int(parallel_node),
-                    {
-                        "Z": [int(i) for i in circle_index]
-                    }
-                ]
-            })
 
     ptree = [
         _circle_index_to_primordial_tree(circle_index, parallel_node, idx)
