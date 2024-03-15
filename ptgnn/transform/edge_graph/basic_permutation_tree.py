@@ -10,7 +10,7 @@ from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
 def basic_permutation_tree_chienn_replication(data: torch_geometric.data.Data):
     edge_graph = to_edge_graph(data)
 
-    def _circle_index_to_primordial_tree(circle_index: List[int], parallel_node: int):
+    def _circle_index_to_primordial_tree(circle_index: List[int], parallel_node: int, self_node: int):
         # if nothing in the circular index return empty string
         if len(circle_index) == 0:
             return json.dumps({"P": [int(parallel_node)]})
@@ -21,7 +21,8 @@ def basic_permutation_tree_chienn_replication(data: torch_geometric.data.Data):
             # including parallel node index
             # return f"P[{parallel_node}, Z{[i for i in circle_index]}]"
             return json.dumps({
-                "P": [
+                "S": [
+                    int(self_node),
                     int(parallel_node),
                     {
                         "Z": [int(i) for i in circle_index]
@@ -30,8 +31,8 @@ def basic_permutation_tree_chienn_replication(data: torch_geometric.data.Data):
             })
 
     ptree = [
-        _circle_index_to_primordial_tree(circle_index, parallel_node)
-        for circle_index, parallel_node in zip(edge_graph.circle_index, edge_graph.parallel_node_index)
+        _circle_index_to_primordial_tree(circle_index, parallel_node, idx)
+        for idx, (circle_index, parallel_node) in enumerate(zip(edge_graph.circle_index, edge_graph.parallel_node_index))
     ]
 
     new_element = torch_geometric.data.Data(
