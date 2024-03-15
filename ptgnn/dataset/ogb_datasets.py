@@ -149,7 +149,12 @@ class OGBDataset(InMemoryDataset):
 
                 # do transformation
                 if self.pre_transform is not None:
-                    data = self.pre_transform(data, self.transformation_mode, self.transformation_parameters)
+                    data = self.pre_transform(
+                        data,
+                        self.transformation_mode,
+                        self.transformation_parameters,
+                        mol=mol
+                    )
 
                 # set label and append
                 data.y = torch.tensor(row.iloc[:-1].to_list())

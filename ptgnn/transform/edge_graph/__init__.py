@@ -9,6 +9,7 @@ def edge_graph_transform(
         data,
         transformation_mode='chienn',
         transformation_parameters={},
+        mol=None
 ):
     if transformation_mode == 'default' or transformation_mode == 'chienn':
         return to_edge_graph(data)
