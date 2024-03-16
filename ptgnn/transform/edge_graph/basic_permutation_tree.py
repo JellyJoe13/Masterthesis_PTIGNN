@@ -15,7 +15,10 @@ def _circle_index_to_primordial_tree(
 ):
     # if nothing in the circular index return empty string
     if len(circle_index) == 0:
-        return json.dumps({"P": [int(parallel_node)]})
+        return json.dumps({"S": [
+            int(self_node),
+            int(parallel_node)
+        ]})
     else:
         # not including parallel node index
         # return f"Z{[i for i in circle_index]}"

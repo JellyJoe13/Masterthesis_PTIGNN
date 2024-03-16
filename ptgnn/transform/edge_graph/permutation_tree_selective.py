@@ -145,13 +145,6 @@ def get_chiral_center_node_mask(
 
 
 def remove_duplicate_edges_function(data, node_mapping):
-    # todo:
-    #  - make list of nodes
-    #  - add their duplicate
-    #  - remove double entries
-    #  - remove duplicates and make features the max of both previous (to make invariant to graph changes)
-    #  - adapt tree: keep lower part(sub s), connect with other sub part via P and that with S to its own representation
-    #  - sort out edges and do same for them
 
     # determine which nodes to keep and which to discard
     keep_nodes = []
@@ -173,9 +166,6 @@ def remove_duplicate_edges_function(data, node_mapping):
         for node in discard_nodes
     ])
 
-    # subselect elements
-    nodes = data.x[keep_idx]
-
     # modify edge set so that bad nodes are swapped out with good nodes
     def _replace(i: int):
         if i in keep_idx:
@@ -192,50 +182,103 @@ def remove_duplicate_edges_function(data, node_mapping):
         for source, target in data.edge_index.T.tolist()
     ]).T
 
-    mask = edge_index[0] == edge_index[1]
+    mask = edge_index[0] != edge_index[1]
     edge_index = edge_index[:, mask]
     edge_attr = data.edge_attr[mask]
 
     # map indices of edge index to new nodes
     key, value = keep_idx.sort()
     d = dict(zip(key.tolist(), value.tolist()))
-    edge_index = torch.tensor([[d[a], d[b]] for a,b in edge_index.T.tolist()]).T
+    edge_index = torch.tensor([[d[a], d[b]] for a, b in edge_index.T.tolist()]).T
 
-    # todo: do something with node embedding... max of both, sum of both or uniquely determine one.
-    #  lexicographical sort?
+    nodes = []
+    # create absolute choice of which node embedding to choose
+    for idx in keep_idx:
+        # get elements to compare
+        x = data.x[idx]
+        y = data.x[data.parallel_node_index[idx]]
+
+        # compare
+        one = x < y
+        two = x > y
+
+        # catch exception where two nodes are identical
+        if (not one.any()) and (not two.any()):
+            nodes.append(x)
+        # absolute comparison
+        elif torch.where(one)[0][0] < torch.where(two)[0][0]:
+            nodes.append(x)
+        else:
+            nodes.append(y)
+    nodes = torch.stack(nodes)
 
     # merge ptrees
-    def _merge_ptrees(tree_a, tree_b, idx):
+    def _map_tree(tree):
+        if isinstance(tree, dict):
+            _map_tree(next(iter(tree.values())))
+        elif isinstance(tree, list):
+            for i in range(len(tree)):
+                if isinstance(tree[i], int):
+                    tree[i] = d[int(_replace(tree[i]))]
+                else:
+                    _map_tree(tree[i])
+        return tree
+
+    def _merge_map_ptrees(tree_a, tree_b, idx):
+        # get s node rooted list
+        tree_a = json.loads(tree_a)['S']
+        tree_b = json.loads(tree_b)['S']
+
+        # catch cases where tree is just nonsensical
+        if len(tree_a) < 3 and len(tree_b) < 3:
+            return json.dumps(_map_tree({"S": [int(idx)]}))
+        elif len(tree_a) < 3:
+            return json.dumps(_map_tree({
+                "S": [
+                    int(idx),
+                    tree_b[-1]
+                ]
+            }))
+        elif len(tree_b) < 3:
+            return json.dumps(_map_tree({
+                "S": [
+                    int(idx),
+                    tree_a[-1]
+                ]
+            }))
         # create tree
-        tree_a = json.loads(tree_a)['S'][-1]
-        tree_b = json.loads(tree_b)['S'][-1]
+        tree_a = tree_a[-1]
+        tree_b = tree_b[-1]
         # map with _replace, then map with d dict
-        return json.dumps({
+        return json.dumps(_map_tree({
             "S": [
-                idx # todo: map,
+                int(idx),
                 {
-                    "P":[
-                        tree_a,     # todo: map
-                        tree_b      # todo: map
+                    "P": [
+                        tree_a,
+                        tree_b
                     ]
                 }
             ]
-        })
+        }))
 
     ptrees = [
-        _merge_ptrees(data.ptree[idx], data.ptree[data.parallel_node_index[idx]], idx)
+        _merge_map_ptrees(data.ptree[idx], data.ptree[data.parallel_node_index[idx]], idx)
         for idx in keep_idx
     ]
 
     # set elements into data
-    data.x = nodes
-    data.edge_index = edge_index
-    data.edge_attr = edge_attr
-    data.ptree = ptrees
+    new_data = torch_geometric.data.Data(
+        x=nodes,
+        edge_index=edge_index,
+        edge_attr=edge_attr,
+        ptree=ptrees
+    )
 
-    # todo: modify node_mapping before returning
+    # filter and map node_mapping
+    node_mapping = dict(zip(keep_nodes, range(len(keep_nodes))))
 
-    return data, node_mapping
+    return new_data, node_mapping
 
 
 def permutation_tree_transformation(
