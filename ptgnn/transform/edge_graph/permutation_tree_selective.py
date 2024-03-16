@@ -348,6 +348,9 @@ def permutation_tree_transformation(
     if remove_duplicate_edges:
         data, node_mapping = remove_duplicate_edges_function(data, node_mapping)
 
+    # todo: add cis/trans tree change with detection on where double edges with 4 neighbors (and stereochemistry entered)
+    #   though will not harm if done anyways, could be done for any <=4 neighbors to edge
+
     # generate order matrix
     data = permutation_tree_to_order_matrix(data, k)
 
