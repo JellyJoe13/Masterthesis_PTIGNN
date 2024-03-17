@@ -42,6 +42,9 @@ def get_matrix(tree, depth, idx_prefix: list = [], type_prefix: list = []) -> li
 def remove_inverted_through_p(perm_tree: dict):
     if isinstance(perm_tree, int):
         return perm_tree
+    elif isinstance(perm_tree, list):
+        # no inverting happening here, this is meant for normal types
+        return [remove_inverted_through_p(subtree) for subtree in perm_tree]
 
     key = next(iter(perm_tree.keys()))
     if key == "Q":
@@ -76,7 +79,7 @@ def remove_inverted_through_p(perm_tree: dict):
             ]
         }
     else:
-        return perm_tree
+        return {key: remove_inverted_through_p(value) for key, value in perm_tree.items()}
 
 
 def permutation_tree_to_matrix(ptree_string_list: typing.List[str], k: int = 3):
