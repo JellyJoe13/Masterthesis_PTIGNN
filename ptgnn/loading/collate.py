@@ -147,6 +147,9 @@ def permutation_tree_collation(
 
         setattr(batch, "initial_map", torch.cat(initial_map_matrix))
 
+        # get k parameter
+        k = data_list[0].layer0_order_matrix[0][0].shape[0]
+
         # i know its stupid but having these wrapped in two lists was the best way to counter the auto-collation
         # function of pyg... without hardcoding the dimensions which
 
@@ -157,7 +160,11 @@ def permutation_tree_collation(
             index_offset = 0
 
             for data, p_max in zip(data_list, pooling_max):
-                o_m = data[f"layer{layer_idx}_order_matrix"][0][0].clone()
+                o_m = data[f"layer{layer_idx}_order_matrix"][0][0]
+                if o_m is None:
+                    o_m = torch.stack([torch.arange(p_max)] + [torch.full((p_max,), -1) for _ in range(k-1)], dim=0)
+                else:
+                    o_m = o_m.clone()
 
                 mask = (o_m == -1)
                 o_m += index_offset
@@ -173,15 +180,24 @@ def permutation_tree_collation(
                 data[f"layer{layer_idx}_type_mask"][0][0]
                 for data in data_list
             ]
+            # iterate over type mask and create matrices for null situations
+            for idx in range(len(type_mask)):
+                if type_mask[idx] is None:
+                    type_mask[idx] = torch.zeros(pooling_max[idx])
             batch[f"layer{layer_idx}_type_mask"] = torch.cat(type_mask, dim=0)
 
             # pooling
+            old_pooling_max = pooling_max
             pooling_max = []
             index_offset = 0
             pool_matrix = []
 
-            for data in data_list:
-                pool = data[f"layer{layer_idx}_pooling"][0][0].clone()
+            for data, pmax_old in zip(data_list, old_pooling_max):
+                pool = data[f"layer{layer_idx}_pooling"][0][0]
+                if pool is None:
+                    pool = torch.arange(pmax_old)
+                else:
+                    pool = pool.clone()
                 max_val = pool.max() + 1  # mind the 0
 
                 pool += index_offset
