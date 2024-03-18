@@ -211,6 +211,22 @@ class BaceDataset(InMemoryDataset):
                 if data_object is not None
             ]
 
+            # get data object to have the same number of layers
+            if 'num_layer' in data_list[0]:
+                # get number of layers
+                n_layers = max([
+                    data.num_layer
+                    for data in data_list
+                ])
+                for data in tqdm(data_list, desc="Postprocessing matrices"):
+                    if data.num_layer == n_layers:
+                        continue
+                    for idx in range(data.num_layer, n_layers):
+                        for matrix in ['type_mask', 'order_matrix', 'pooling']:
+                            name = f"layer{idx}_{matrix}"
+                            if name not in data:
+                                data[name] = [[None]]
+
             # save processed data
             torch.save(
                 self.collate(data_list),
@@ -407,6 +423,22 @@ class Tox21Dataset(InMemoryDataset):
                 for _, data_object in data_list
                 if data_object is not None
             ]
+
+            # get data object to have the same number of layers
+            if 'num_layer' in data_list[0]:
+                # get number of layers
+                n_layers = max([
+                    data.num_layer
+                    for data in data_list
+                ])
+                for data in tqdm(data_list, desc="Postprocessing matrices"):
+                    if data.num_layer == n_layers:
+                        continue
+                    for idx in range(data.num_layer, n_layers):
+                        for matrix in ['type_mask', 'order_matrix', 'pooling']:
+                            name = f"layer{idx}_{matrix}"
+                            if name not in data:
+                                data[name] = [[None]]
 
             # save processed data
             torch.save(
