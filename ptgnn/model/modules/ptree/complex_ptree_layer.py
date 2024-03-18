@@ -145,12 +145,12 @@ class ComplexPtreeLayer(torch.nn.Module):
             data_array[mask] = self.p_final_layer(data_array[mask])
 
             # type z
-            mask = type_mask2 == 2
-            data_array[mask] = self.z_final_layer(data_array[mask])
+            # mask = type_mask2 == 2
+            # data_array[mask] = self.z_final_layer(data_array[mask])
 
             # type s
-            mask = type_mask2 == 3
-            data_array[mask] = self.s_final_layer(data_array[mask])
+            # mask = type_mask2 == 3
+            # data_array[mask] = self.s_final_layer(data_array[mask])
 
         batch.x = data_array
         return batch

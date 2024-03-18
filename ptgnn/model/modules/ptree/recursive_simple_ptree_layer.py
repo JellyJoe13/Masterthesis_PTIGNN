@@ -99,7 +99,7 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         after_z = self.z_final_layer(after_z)
         # sum
         after_z = torch.sum(after_z, dim=0)
-        return after_z
+        return self.z_elu(after_z)
 
     def c_layer_fn(self, data_list):
         one_direction = self.z_layer_fn(data_list)
@@ -128,7 +128,7 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         after_s = self.s_final_layer(after_s)
         # sum
         after_s = torch.sum(after_s, dim=0)
-        return after_s
+        return self.s_elu(after_s)
 
     def q_layer_fn(self, data_list):
         one_direction = self.s_layer_fn(data_list)
