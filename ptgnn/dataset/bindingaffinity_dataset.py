@@ -153,7 +153,14 @@ class BindingAffinityDataset(InMemoryDataset):
             return index, smiles_nonstereo, data
 
         with Pool(processes=os.cpu_count()) as p:
-            data_list = list(p.imap(worker, tqdm(split_df.iterrows())))
+            data_list = list(p.imap(
+                worker,
+                tqdm(
+                    split_df.iterrows(),
+                    total=len(split_df),
+                    desc=f"Split: {self.split}"
+                )
+            ))
 
         # re-create ordering before multiprocessing
         data_list = sorted(data_list, key=lambda x: x[0])

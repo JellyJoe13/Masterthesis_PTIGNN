@@ -163,7 +163,14 @@ class OGBDataset(InMemoryDataset):
                 return smiles, data
 
             with Pool(processes=os.cpu_count()) as p:
-                data_list = list(p.imap(worker, tqdm(split_df.iterrows())))
+                data_list = list(p.imap(
+                    worker,
+                    tqdm(
+                        split_df.iterrows(),
+                        total=len(split_df),
+                        desc=f"Split: {split}"
+                    )
+                ))
 
             # extract data list and remove elements to remove (from previous list)
             data_list = [
