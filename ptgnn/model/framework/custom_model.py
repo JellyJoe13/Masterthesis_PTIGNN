@@ -1,6 +1,9 @@
 import torch.nn
 import typing
 
+from ptgnn.model.chienn.chienn_layer import ChiENNLayer
+from ptgnn.model.modules.custom_wrapper import CustomWrapper
+from ptgnn.model.modules.gps_layer import CustomGPSLayer
 from ptgnn.model.modules.graph_embedding import GraphEmbedding
 from ptgnn.model.modules.head_pooling import SANHead
 
@@ -39,20 +42,50 @@ class CustomModel(torch.nn.Module):
 
             # get type
             layer_type = layer_config['type']
-            if layer_type == 'graph_embedding':
-                modules.append(
-                    GraphEmbedding(
-                        node_in_dim=node_dim,
-                        edge_in_dim=edge_dim,
-                        node_out_dim=self.hidden_dim,
-                        edge_out_dim=self.hidden_dim,
-                        **layer_config
+            # get number of times layer should be inserted
+            n_times_layer = layer_config['times'] if 'times' in layer_config else 1
+
+            # extract parameters
+            param_config = layer_config['parameter'] if 'parameter' in layer_config else {}
+
+            # repeatedly create layer
+            for _ in range(n_times_layer):
+                # create different layers
+                if layer_type == 'graph_embedding':
+                    modules.append(
+                        GraphEmbedding(
+                            node_in_dim=node_dim,
+                            edge_in_dim=edge_dim,
+                            node_out_dim=self.hidden_dim,
+                            edge_out_dim=self.hidden_dim,
+                            **param_config
+                        )
                     )
-                )
-                node_dim = self.hidden_dim
-                edge_dim = self.hidden_dim
-            else:
-                raise NotImplementedError(f"layer type {layer_type} not yet implemented.")
+                    node_dim = self.hidden_dim
+                    edge_dim = self.hidden_dim
+                elif layer_type == "chienn":
+                    modules.append(
+                        CustomWrapper(
+                            ChiENNLayer(
+                                hidden_dim=self.hidden_dim,
+                                **param_config
+                            )
+                        )
+                    )
+                elif layer_type == "gps_layer":
+                    modules.append(
+                        CustomGPSLayer(
+                            hidden_dim=self.hidden_dim,
+                            **param_config
+                        )
+                    )
+                else:
+                    # todo: add other layers and enable multiple additions of layers
+                    #  - type
+                    #  - params
+                    #  - times the layer is to be repeated
+                    #  maybe composite layer? specify number of layers for mixing architectures?
+                    raise NotImplementedError(f"layer type {layer_type} not yet implemented.")
 
         # make list to module list and save in param
         self.layers = torch.nn.ModuleList(modules)

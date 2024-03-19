@@ -314,6 +314,7 @@ def run_config(config_dict: dict):
     )
 
     # save/display metrics
+    display(metric_dict)
     # todo
 
     # todo: add hyperparameter reporting and support
