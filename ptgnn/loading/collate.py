@@ -44,14 +44,14 @@ class UniversalCollater:
 
             # if it has a circle index treat is as a chienn related data object
             # assumes that if not this field is deleted
-            if hasattr(sample, 'circle_index'):
+            if hasattr(sample, 'ptree'):
+                return permutation_tree_collation(batch)
+
+            elif hasattr(sample, 'circle_index'):
                 return collate_with_circle_index(
                     data_list=batch,
                     k_neighbors=self.n_neighbors_in_circle
                 )
-
-            elif hasattr(sample, 'ptree'):
-                return permutation_tree_collation(batch)
 
             # default treatment
             else:
