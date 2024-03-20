@@ -91,7 +91,7 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         # shift
         _idx = torch.arange(data_list.shape[0])
         after_z = [
-            embedding[torch.roll(_idx, shifts=idx), :]
+            embedding[torch.roll(_idx, shifts=-idx), :]
             for idx, embedding in enumerate(after_z)
         ]
         after_z = torch.stack(after_z, dim=0)

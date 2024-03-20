@@ -6,6 +6,7 @@ from ptgnn.model.modules.custom_wrapper import CustomWrapper
 from ptgnn.model.modules.gps_layer import CustomGPSLayer
 from ptgnn.model.modules.graph_embedding import GraphEmbedding
 from ptgnn.model.modules.head_pooling import SANHead
+from ptgnn.model.modules.ptree.advanced_tree_layer import AdvancedPermutationTreeLayer
 from ptgnn.model.modules.ptree.complex_ptree_layer import ComplexPtreeLayer
 
 
@@ -80,11 +81,13 @@ class CustomModel(torch.nn.Module):
                             **param_config
                         )
                     )
-                elif layer_type == "permutation_tree_advanced":
+                elif layer_type == "permutation_tree":
                     modules.append(
-                        ComplexPtreeLayer(
-                            hidden_dim=self.hidden_dim,
-                            **param_config
+                        CustomWrapper(
+                            AdvancedPermutationTreeLayer(
+                                hidden_dim=self.hidden_dim,
+                                **param_config
+                            )
                         )
                     )
                 else:

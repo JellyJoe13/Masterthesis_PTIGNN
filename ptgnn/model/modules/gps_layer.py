@@ -4,7 +4,7 @@ from torch.nn import Linear, Dropout, Sequential, ReLU, BatchNorm1d
 from torch_geometric.nn import GraphNorm
 
 from ptgnn.model.chienn.chienn_layer import ChiENNLayer
-from ptgnn.model.modules.ptree.complex_ptree_layer import ComplexPtreeLayer
+from ptgnn.model.modules.ptree.advanced_tree_layer import AdvancedPermutationTreeLayer
 
 
 class CustomGPSLayer(torch.nn.Module):
@@ -33,7 +33,7 @@ class CustomGPSLayer(torch.nn.Module):
                 **local_model_params
             )
         elif local_model == 'permutation_tree':
-            self.local_model = ComplexPtreeLayer(
+            self.local_model = AdvancedPermutationTreeLayer(
                 hidden_dim=self.hidden_dim,
                 **local_model_params
             )
