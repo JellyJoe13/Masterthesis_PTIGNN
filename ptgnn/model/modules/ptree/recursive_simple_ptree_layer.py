@@ -90,9 +90,11 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         ]
         # shift
         _idx = torch.arange(data_list.shape[0])
+        # fix issue with less elements than k:
+        current_k = min(self.k, len(data_list))
         after_z = [
             embedding[torch.roll(_idx, shifts=-idx), :]
-            for idx, embedding in enumerate(after_z)
+            for idx, embedding in enumerate(after_z[:current_k])
         ]
         after_z = torch.stack(after_z, dim=0)
         # sum
@@ -117,11 +119,13 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
             layer(data_list)
             for layer in self.s_layer
         ]
+        # fix for too short
+        current_k = min(self.k, len(data_list))
         # shift
         _idx = torch.arange(data_list.shape[0])
         after_s = [
-            embedding[idx:embedding.shape[-2]-self.k+idx+1, :]
-            for idx, embedding in enumerate(after_s)
+            embedding[idx:embedding.shape[-2]-current_k+idx+1, :]
+            for idx, embedding in enumerate(after_s[:current_k])
         ]
         after_s = torch.stack(after_s)
         # sum
