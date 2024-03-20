@@ -97,6 +97,16 @@ def permutation_tree_vertex_transformation(
             for x, y in out_edges.T.tolist()
         ]
 
+        # convert the cycle indices into node indices (currently edge indices)
+        reverse_dict = dict(zip(node_mapping.values(), node_mapping.keys()))
+        circle_indices = [
+            [
+                reverse_dict[c][0]
+                for c in circ_ind
+            ]
+            for circ_ind in circle_indices
+        ]
+
         # merge tree and add to list
         permutation_trees.append(json.dumps({
             "S": [
