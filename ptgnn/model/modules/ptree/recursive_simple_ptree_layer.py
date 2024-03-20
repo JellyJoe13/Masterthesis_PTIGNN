@@ -1,3 +1,5 @@
+import json
+
 import torch.nn
 import torch_geometric.data
 
@@ -14,30 +16,32 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
 
         # z layer
         self.z_layer = torch.nn.ModuleList(
-            torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+            torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
             for _ in range(self.k)
         )
-        self.z_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.z_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
         self.z_elu = torch.nn.ELU()
 
         # p layer
-        self.p_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
-        self.p_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.p_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+        self.p_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
 
         # c layer
         # uses layers of z.
 
         # s layer
         self.s_layer = torch.nn.ModuleList([
-            torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+            torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
             for _ in range(self.k)
         ])
-        self.s_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.s_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+        self.s_elu = torch.nn.ELU()
         # q layer
 
     def forward(self, batch: torch_geometric.data.Batch):
+        unpack_fn = lambda x: json.loads(x) if isinstance(x, str) else x
         return torch.stack([
-            self.do_module(batch, ptree)
+            self.do_module(batch, unpack_fn(ptree))
             for ptree in batch.ptree
         ])
 
@@ -90,7 +94,7 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
             embedding[torch.roll(_idx, shifts=idx), :]
             for idx, embedding in enumerate(after_z)
         ]
-        after_z = torch.stack(after_z)
+        after_z = torch.stack(after_z, dim=0)
         # sum
         after_z = torch.sum(after_z, dim=0)
         # apply ELU

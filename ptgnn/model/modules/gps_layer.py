@@ -1,8 +1,10 @@
 import torch.nn
+import torch_geometric.data.data
 from torch.nn import Linear, Dropout, Sequential, ReLU, BatchNorm1d
 from torch_geometric.nn import GraphNorm
 
 from ptgnn.model.chienn.chienn_layer import ChiENNLayer
+from ptgnn.model.modules.ptree.complex_ptree_layer import ComplexPtreeLayer
 
 
 class CustomGPSLayer(torch.nn.Module):
@@ -27,6 +29,11 @@ class CustomGPSLayer(torch.nn.Module):
         if local_model == 'chienn':
             self.local_model = ChiENNLayer(
                 dropout=dropout,
+                hidden_dim=self.hidden_dim,
+                **local_model_params
+            )
+        elif local_model == 'permutation_tree':
+            self.local_model = ComplexPtreeLayer(
                 hidden_dim=self.hidden_dim,
                 **local_model_params
             )
@@ -70,6 +77,8 @@ class CustomGPSLayer(torch.nn.Module):
 
         # put through local model
         local_node_embedding = self.local_model(batch)
+        if isinstance(local_node_embedding, torch_geometric.data.data.BaseData):
+            local_node_embedding = local_node_embedding.x
 
         local_node_embedding = self.dropout_local(local_node_embedding)
 

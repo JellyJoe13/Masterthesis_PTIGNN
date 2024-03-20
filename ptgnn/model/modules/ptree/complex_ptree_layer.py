@@ -15,27 +15,27 @@ class ComplexPtreeLayer(torch.nn.Module):
         self.hidden_dim = hidden_dim
 
         # s layer
-        self.s_layer = torch.nn.ModuleList(
-            torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.s_layer = torch.nn.ModuleList([
+            torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
             for _ in range(self.k)
-        )
-        self.s_intermediate_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
-        self.s_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        ])
+        self.s_intermediate_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+        self.s_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
         self.s_elu = torch.nn.ELU()
 
         # z layer
-        self.z_layer = torch.nn.ModuleList(
-            torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.z_layer = torch.nn.ModuleList([
+            torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
             for _ in range(self.k)
-        )
-        self.z_intermediate_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
-        self.z_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        ])
+        self.z_intermediate_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+        self.z_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
         self.z_elu = torch.nn.ELU()
 
         # p layer
-        self.p_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.p_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
         self.p_elu = torch.nn.ELU()
-        self.p_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        self.p_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
 
         self.final_elu = torch.nn.ELU()
         self.type_dict = type_dict
@@ -52,7 +52,7 @@ class ComplexPtreeLayer(torch.nn.Module):
         for layer_idx in range(batch.num_layer):
 
             # fetch instructions for this layer
-            order_matrix = batch[f"layer{layer_idx}_order_matrix"]
+            order_matrix = batch[f"layer{layer_idx}_order_matrix"] + 1
             current_layer_pooling = batch[f"layer{layer_idx}_pooling"]
             type_mask = batch[f"layer{layer_idx}_type_mask"]
 
@@ -65,7 +65,6 @@ class ComplexPtreeLayer(torch.nn.Module):
                 ],
                 dim=0
             )
-            order_matrix += 1
 
             # create order mask (required later to remove elements that were -1 -> 0 but after linear layer they
             # are no longer 0)
@@ -78,6 +77,7 @@ class ComplexPtreeLayer(torch.nn.Module):
             # do operation for each layer and put result into a temporary array
             # array initialized with the first column to cover the case of doing nothing (tree extension for uniform
             # layer count)
+            # todo: replace with zero and add selectively to it
             temporary_data_array = data_array[0].clone()
             for node_type, node_value in self.type_dict.items():  # todo: where was this one dict again... features?
                 # create mask for this type:
@@ -129,10 +129,15 @@ class ComplexPtreeLayer(torch.nn.Module):
             temporary_data_array[mask_order_matrix.all(dim=0)] = 0.
 
             # global pooling
+            # B = current_layer_pooling.max() + 1
+            # data_array = torch.zeros(B, temporary_data_array.shape[-1], device=temporary_data_array.device)
+            # for add_to, val in zip(current_layer_pooling, temporary_data_array):
+            #     data_array[add_to] = data_array[add_to] + val
             data_array = torch_geometric.nn.global_add_pool(temporary_data_array, current_layer_pooling)
 
             # post aggregation embedding: ELU + linear
-            type_mask2 = type_mask[torch.unique(current_layer_pooling)]
+            # type_mask2 = type_mask[torch.unique(current_layer_pooling)]
+            type_mask2 = torch_geometric.nn.global_max_pool(type_mask, current_layer_pooling)
 
             # apply final elu layer. why the masking? so that elements that are tunneled through don't get exposed to
             # elu layer before embedding
@@ -152,7 +157,6 @@ class ComplexPtreeLayer(torch.nn.Module):
             # mask = type_mask2 == 3
             # data_array[mask] = self.s_final_layer(data_array[mask])
 
-        batch.x = data_array
-        return batch
+        return data_array
 
 
