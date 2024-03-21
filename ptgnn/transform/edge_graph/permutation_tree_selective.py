@@ -4,7 +4,8 @@ from collections import defaultdict
 import torch_geometric
 import torch
 
-from ptgnn.transform.detect_chem_structures import get_chiral_center_node_mask, fetch_cis_trans_edges
+from ptgnn.transform.detect_chem_structures import get_chiral_center_node_mask, fetch_cis_trans_edges, \
+    detect_possible_axial_chiral_edges
 from ptgnn.transform.edge_graph.basic_permutation_tree import _circle_index_to_primordial_tree
 from ptgnn.transform.edge_graph.chienn.get_circle_index import get_circle_index
 from ptgnn.transform.edge_graph.permutation_tree_special import get_cistrans_tree
@@ -263,6 +264,7 @@ def permutation_tree_transformation(
         remove_duplicate_edges: bool = False,
         cis_trans_edges: bool = False,
         cis_trans_edges_select_potential: bool = False,
+        axial_chirality: bool = False,
         create_order_matrix: bool = True
 ) -> torch_geometric.data.Data:
     # transform to edge graph using custom function
@@ -313,7 +315,7 @@ def permutation_tree_transformation(
         for i in mask:
             edge_graph.ptree[i] = _circle_index_to_primordial_tree(
                 edge_graph.circle_index[i],
-                edge_graph.parallel_node[i],
+                edge_graph.parallel_node_index[i],
                 i,
                 inner_type="Z"
             )
@@ -329,6 +331,22 @@ def permutation_tree_transformation(
 
         # iterate over edges and generate new ptrees for these entries
         for node_a, node_b in cis_trans_nodes_list:
+            edge_graph.ptree[node_mapping[(node_a, node_b)]] = get_cistrans_tree(
+                vertex_graph=data,
+                node_a=node_a,
+                node_b=node_b,
+                node_mapping=node_mapping
+            )
+
+    if axial_chirality:
+        # calculate candidates for axial chirality
+        potential_axial_nodes_list = detect_possible_axial_chiral_edges(
+            molecule=mol,
+            node_mapping=node_mapping
+        )
+
+        # iterate over edges and generate new ptrees for these entries
+        for node_a, node_b in potential_axial_nodes_list:
             edge_graph.ptree[node_mapping[(node_a, node_b)]] = get_cistrans_tree(
                 vertex_graph=data,
                 node_a=node_a,
