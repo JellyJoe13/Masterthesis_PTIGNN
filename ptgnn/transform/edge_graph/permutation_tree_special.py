@@ -1,40 +1,6 @@
-import copy
 import json
 
 import torch
-from rdkit import Chem
-
-
-CIS_TRANS_STEREO_LIST = [
-    Chem.rdchem.BondStereo.STEREOCIS,
-    Chem.rdchem.BondStereo.STEREOTRANS,
-    Chem.rdchem.BondStereo.STEREOZ,
-    Chem.rdchem.BondStereo.STEREOE
-]
-
-
-def fetch_cis_trans_edges(node_mapping, molecule, cis_trans_edges_select_potential):
-    nodes_list = []
-    # iterate over bonds
-    for bond in molecule.GetBonds():
-        # check if bond is a double bond and stereo is specified
-        # add potential stereo elements to check list
-        check_list = copy.copy(CIS_TRANS_STEREO_LIST)
-        if cis_trans_edges_select_potential:
-            check_list += [Chem.rdchem.BondStereo.STEREOANY]
-        # random (cis or trans)
-        if bond.GetBondType() == Chem.rdchem.BondType.DOUBLE and bond.GetStereo() in CIS_TRANS_STEREO_LIST:
-            # fetch ends of the bond
-            node_a = bond.GetBeginAtom().GetIdx()
-            node_b = bond.GetEndAtom().GetIdx()
-
-            # check if first direction edge is in node mapping
-            if (node_a, node_b) in node_mapping:
-                nodes_list.append((node_a, node_b))
-            if (node_b, node_a) in node_mapping:
-                nodes_list.append((node_b, node_a))
-
-    return nodes_list
 
 
 def get_cistrans_tree(vertex_graph, node_a, node_b, node_mapping):

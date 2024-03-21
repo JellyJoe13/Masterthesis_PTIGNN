@@ -3,12 +3,11 @@ from collections import defaultdict
 
 import torch_geometric
 import torch
-from rdkit import Chem
-from rdkit.Chem import AllChem
 
+from ptgnn.transform.detect_chem_structures import get_chiral_center_node_mask, fetch_cis_trans_edges
 from ptgnn.transform.edge_graph.basic_permutation_tree import _circle_index_to_primordial_tree
 from ptgnn.transform.edge_graph.chienn.get_circle_index import get_circle_index
-from ptgnn.transform.edge_graph.permutation_tree_special import fetch_cis_trans_edges, get_cistrans_tree
+from ptgnn.transform.edge_graph.permutation_tree_special import get_cistrans_tree
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
 
 
@@ -115,34 +114,6 @@ def custom_to_edge_graph(data):
     data.parallel_node_index = parallel_node_index
     data.circle_index = get_circle_index(data, clockwise=False)
     return data, node_mapping
-
-
-def get_chiral_center_node_mask(
-        mol,
-        chiral_center_select_potential,
-        node_mapping,
-        only_out: bool
-):
-    # get chiral centers
-    chiral_center_list = AllChem.FindMolChiralCenters(mol, includeUnassigned=chiral_center_select_potential)
-    # modify so that only the node idx is left in the list (not interested in R/S)
-    chiral_center_list = [c[0] for c in chiral_center_list]
-
-    # browse through node mapping and select edges
-    # separation between only_out mode
-    if only_out:
-        return [
-            idx
-            for idx, (key, value) in enumerate(node_mapping.items())
-            if key[0] in chiral_center_list
-        ]
-
-    else:
-        return [
-            idx
-            for idx, (key, value) in enumerate(node_mapping.items())
-            if key[0] in chiral_center_list or key[1] in chiral_center_list
-        ]
 
 
 def remove_duplicate_edges_function(data, node_mapping):
@@ -299,7 +270,6 @@ def permutation_tree_transformation(
         data=data,
         # remove_duplicate_edges=remove_duplicate_edges  # removed as removal is done at the end
     )
-    # todo: vertex transformation - do edge graph, collect circular indices and create constructs with it
 
     # ==================================================================================================================
     # create default behaviour: P tree or C tree - in case of tetrahedral_chiral and !chiral_center_selective Z

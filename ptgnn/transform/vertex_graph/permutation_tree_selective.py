@@ -5,7 +5,7 @@ import torch_geometric
 from rdkit.Chem import AllChem
 
 from ptgnn.transform.edge_graph.permutation_tree_selective import custom_to_edge_graph
-from ptgnn.transform.edge_graph.permutation_tree_special import fetch_cis_trans_edges
+from ptgnn.transform.detect_chem_structures import fetch_cis_trans_edges
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
 
 
