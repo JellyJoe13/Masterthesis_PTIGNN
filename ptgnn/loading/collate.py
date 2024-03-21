@@ -1,4 +1,5 @@
 import json
+import typing
 from typing import Optional, Iterable, List
 
 import torch
@@ -12,6 +13,9 @@ from ptgnn.loading.chienn_collate import collate_with_circle_index
 class UniversalCollater:
     """
     Inspiration/Extension of https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/collate.py#L9
+
+    Collates all types of data used in this project so that it can be used in a batch. Differentiates based on the
+    fields that are registered in the input pytorch geometric data.
     """
     def __init__(
             self,
@@ -58,7 +62,19 @@ class UniversalCollater:
                 return self.default_collator(batch)
 
 
-def permutation_tree_batching(data_list: List[BaseData]):
+def permutation_tree_batching(
+        data_list: List[BaseData]
+) -> typing.List[str]:
+    """
+    Utilized for permutation tree batching. This function increases the indices in the permutation trees so that
+    they can be merged into one larger list of permutation trees - which would be an internal parameter for the batch
+    object.
+
+    :param data_list: List of data objects with the trees to 'batch'
+    :type data_list: List[BaseData]
+    :return: List of permutation trees to insert into the batch object
+    :rtype: typing.List[str]
+    """
     # make container for transformed ptree strings
     ptree_batch_list = []
 
@@ -105,7 +121,16 @@ def permutation_tree_batching(data_list: List[BaseData]):
 
 def permutation_tree_collation(
         data_list: List[BaseData]
-):
+) -> Batch:
+    """
+    Collates data that is related to permutation tree data, i.e. contains a parameter with ptree and the order, type and
+    pooling instruction matrices. Returns a batch object.
+
+    :param data_list: List of data objects to 'batch'
+    :type data_list: List[BaseData]
+    :return: Batched permutation tree related data
+    :rtype: Batch
+    """
     # create list of keys to exclude
     exclude_keys = ['ptree']
     if hasattr(data_list[0], 'num_layer'):

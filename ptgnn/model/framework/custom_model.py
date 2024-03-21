@@ -1,6 +1,8 @@
 import torch.nn
 import typing
 
+import torch_geometric.data
+
 from ptgnn.model.chienn.chienn_layer import ChiENNLayer
 from ptgnn.model.modules.custom_wrapper import CustomWrapper
 from ptgnn.model.modules.gps_layer import CustomGPSLayer
@@ -11,11 +13,22 @@ from ptgnn.model.modules.ptree.complex_ptree_layer import ComplexPtreeLayer
 
 
 class CustomModel(torch.nn.Module):
+    """
+    Model designed to be as customizable as possible through the input dictionary that specifies internal structure
+    """
     def __init__(
             self,
-            data_sizes: typing.Tuple[int, int, int],
-            model_config: dict,
+            data_sizes: typing.Tuple[int, int],
+            model_config: typing.Dict[str, typing.Any],
     ):
+        """
+        Init function of ``CustomModel``
+
+        :param data_sizes: node and edge dimension as a tuple
+        :type data_sizes: tying.Tuple[int, int]
+        :param model_config: Config as a dictionary which contents determine how the internal structure looks like
+        :type model_config: typing.Dict[str, typing.Any]
+        """
         # model init
         super(CustomModel, self).__init__()
 
@@ -112,7 +125,18 @@ class CustomModel(torch.nn.Module):
         else:
             raise NotImplementedError("Head type other than san_head not implemented.")
 
-    def forward(self, batch):
+    def forward(
+            self,
+            batch: torch_geometric.data.Batch
+    ) -> torch.Tensor:
+        """
+        Forward function of ``CustomModel``
+
+        :param batch: Batch object to be passed through layers of this model and the head (pooling)
+        :type batch: torch_geometric.data.Batch
+        :return: Labels of the graphs in the input batch
+        :rtype: torch.Tensor
+        """
         for layer in self.layers:
             batch = layer(batch)
 
