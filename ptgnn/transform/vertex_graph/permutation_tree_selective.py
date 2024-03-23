@@ -168,7 +168,7 @@ def permutation_tree_vertex_transformation(
         for ((source_a, source_b), (target_a, target_b)) in stereo_paths:
             # get circle indices
             source_circle_index = edge_graph.circle_index[node_mapping[(source_a, source_b)]]
-            target_circle_index = edge_graph.circle_index[node_mapping[(target_a, target_b)]]
+            target_circle_index = edge_graph.circle_index[node_mapping[(target_b, target_a)]]
 
             # create new node with zero embedding
             data.x = torch.cat([
