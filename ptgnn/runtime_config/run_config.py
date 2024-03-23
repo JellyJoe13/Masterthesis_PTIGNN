@@ -1,3 +1,4 @@
+import typing
 from collections import defaultdict
 
 import pandas as pd
@@ -14,8 +15,20 @@ from ptgnn.runtime_config.config import priority_merge_config, optional_fetch
 from ptgnn.runtime_config.loss import l1_loss, graphgym_cross_entropy_loss
 from ptgnn.runtime_config.metrics import metric_system
 
+from ray import train
 
-def fetch_loaders(data_config: dict):
+
+def fetch_loaders(
+        data_config: typing.Dict[str, typing.Any]
+) -> typing.Tuple[torch.utils.DataLoader, torch.utils.DataLoader, torch.utils.DataLoader]:
+    """
+    Function used to build the loaders based on the parameters passed in the config dict object.
+
+    :param data_config: config object storing the parameters required for the creation of the loaders
+    :type data_config: typing.Dict[str, typing.Any]
+    :return: train, validation and test loaders
+    :rtype: typing.Tuple[torch.utils.DataLoader, torch.utils.DataLoader, torch.utils.DataLoader]
+    """
     dataset_config = data_config['dataset']
     # load dataset
     ds_type = DATASET_DICT.get(dataset_config['type'])
@@ -48,17 +61,49 @@ def fetch_loaders(data_config: dict):
     return train_loader, val_loader, test_loader
 
 
-def fetch_optimizer(model_params, optimizer_config: dict):
+def fetch_optimizer(
+        model_params,
+        optimizer_config: typing.Dict[str, typing.Any]
+):
+    """
+    Function that creates optimizer based on the passed parameters in the dictionary.
+
+    :param model_params: Model parameters to use for the creation of the optimizer
+    :param optimizer_config: Config storing the config for the optimizer
+    :type optimizer_config: typing.Dict[str, typing.Any]
+    :return: Optimizer
+    """
     optimizer = OPTIMIZER_DICT.get(optimizer_config['type'])
     return optimizer(model_params, **optimizer_config)
 
 
-def fetch_scheduler(optimizer, scheduler_config: dict):
+def fetch_scheduler(
+        optimizer,
+        scheduler_config: typing.Dict[str, typing.Any]
+):
+    """
+    Function to build the scheduler. A scheduler adapts the learning rate to safely converge to an optimum.
+
+    :param optimizer: Optimizer to use for the creation of the scheduler
+    :param scheduler_config: Config to pass to the scheduler and the type of scheduler to use.
+    :type scheduler_config: typing.Dict[str, typing.Any]
+    :return: Scheduler
+    """
     scheduler = SCHEDULER_DICT.get(scheduler_config['type'])
     return scheduler(optimizer, **scheduler_config)
 
 
-def fetch_data_size(train_loader):
+def fetch_data_size(
+        train_loader: torch.utils.DataLoader
+) -> typing.Tuple[int, int]:
+    """
+    Function to fetch the data sizes from an existing loader. Returns the node and edge dimension.
+
+    :param train_loader: Loader to use for fetching the first element
+    :type train_loader: torch.utils.DataLoader
+    :return: node and edge dimension, respectively
+    :rtype: typing.Tuple[int, int]
+    """
     # get first element
     for batch in train_loader:
         break
@@ -72,7 +117,20 @@ def fetch_data_size(train_loader):
     return node_dim, edge_attr_dim
 
 
-def create_model(data_sizes, model_config):
+def create_model(
+        data_sizes: typing.Tuple[int, int],
+        model_config: typing.Dict[str, typing.Any]
+) -> torch.nn.Module:
+    """
+    Function to create the model based on the passed config.
+
+    :param data_sizes: sizes of the data, node and edge dimension respectively
+    :type data_sizes: typing.Tuple[int, int]
+    :param model_config: config to use for building the model
+    :type model_config: typing.Dict[str, typing.Any]
+    :return: Model built using the config
+    :rtype: Inherits torch.nn.Module
+    """
     if model_config['mode'] == 'custom':
         return CustomModel(
             data_sizes=data_sizes,
@@ -96,6 +154,7 @@ def training_procedure(
         clip_grad_norm: bool = False,
         out_dim: int = 1,
         use_test_set: bool = False,
+        report: bool = False,
         **kwargs
 ):
     # initialize loss function
@@ -138,7 +197,10 @@ def training_procedure(
         # val
         metric_dict = eval_epoch(metric_dict, device, df_dict, loss_function, model, out_dim, task_type, val_loader, 'val')
 
-        # todo: report to ray and checkpointing
+        # reporting to ray train
+        if report:
+            train.report(metric_dict)
+
         # test
         if use_test_set:
             metric_dict = eval_epoch(device, df_dict, loss_function, model, out_dim, task_type, test_loader, 'test')
@@ -147,10 +209,7 @@ def training_procedure(
         metric_storage.append(metric_dict)
 
     # todo:
-    #  check if final test (do evaluation on test_loader or not)
-    #  generate metric scores
-    #  integration to hyperparameter opt framework
-    #  - reporting
+    #  - integration to hyperparameter opt framework
     #  - checkpointing
 
     # return metric dict
@@ -274,7 +333,7 @@ def eval_epoch(
     return metric_dict
 
 
-def run_config(config_dict: dict):
+def run_config(config_dict: dict, report: bool = False):
     # seed everything
     seed = config_dict['seed'] if 'seed' in config_dict else 1
     torch_geometric.seed_everything(seed)
@@ -310,6 +369,7 @@ def run_config(config_dict: dict):
         test_loader=test_loader,
         device=device,
         out_dim=config_dict['model']['out_dim'] if 'out_dim' in config_dict['model'] else 1,
+        report=report,
         **config_dict['training']
     )
 
@@ -318,4 +378,4 @@ def run_config(config_dict: dict):
     # todo
 
     # todo: add hyperparameter reporting and support
-    pass
+    return metric_dict
