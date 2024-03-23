@@ -5,7 +5,7 @@ import torch_geometric
 from rdkit.Chem import AllChem
 
 from ptgnn.transform.edge_graph.permutation_tree_selective import custom_to_edge_graph
-from ptgnn.transform.detect_chem_structures import fetch_cis_trans_edges
+from ptgnn.transform.detect_chem_structures import fetch_cis_trans_edges, detect_possible_axial_chiral_edges
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
 
 
@@ -50,7 +50,8 @@ def permutation_tree_vertex_transformation(
         chiral_center_select_potential: bool = True,
         cis_trans_edges: bool = False,
         cis_trans_edges_select_potential: bool = False,
-        create_order_matrix: bool = True
+        create_order_matrix: bool = True,
+        axial_chirality: bool = False
 ) -> torch_geometric.data.Data:
     # get the edge graph transformation
     # required for some permutation tree creations (due to circle index needed from edges)
@@ -131,6 +132,21 @@ def permutation_tree_vertex_transformation(
 
         # iterate over edges and generate new ptrees for these entries
         for node_a, node_b in cis_trans_nodes_list:
+            permutation_trees[node_a] = json.dumps({
+                'S': [
+                    int(node_a),
+                    {'C': get_cis_trans_ordering(data, node_a, node_b)}
+                ]
+            })
+
+    if axial_chirality:
+        # calculate candidates for axial chirality
+        potential_axial_nodes_list = detect_possible_axial_chiral_edges(
+            molecule=mol
+        )
+
+        # iterate over edges and generate new ptrees for these entries
+        for node_a, node_b in potential_axial_nodes_list:
             permutation_trees[node_a] = json.dumps({
                 'S': [
                     int(node_a),
