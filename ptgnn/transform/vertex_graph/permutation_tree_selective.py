@@ -6,6 +6,7 @@ from rdkit.Chem import AllChem
 
 from ptgnn.transform.edge_graph.permutation_tree_selective import custom_to_edge_graph
 from ptgnn.transform.detect_chem_structures import fetch_cis_trans_edges, detect_possible_axial_chiral_edges
+from ptgnn.transform.multi_stereo_center import calc_edges_multiple_stereo_centers
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
 
 
@@ -51,7 +52,8 @@ def permutation_tree_vertex_transformation(
         cis_trans_edges: bool = False,
         cis_trans_edges_select_potential: bool = False,
         create_order_matrix: bool = True,
-        axial_chirality: bool = False
+        axial_chirality: bool = False,
+        multi_stereo_center_dia: bool = False
 ) -> torch_geometric.data.Data:
     # get the edge graph transformation
     # required for some permutation tree creations (due to circle index needed from edges)
@@ -153,6 +155,66 @@ def permutation_tree_vertex_transformation(
                     {'C': get_cis_trans_ordering(data, node_a, node_b)}
                 ]
             })
+
+    # in case only diastereomers are to be distinguished
+    if multi_stereo_center_dia:
+        # get reverse dict
+        reverse_dict = dict(zip(node_mapping.values(), node_mapping.keys()))
+
+        # get stereo paths
+        stereo_paths = calc_edges_multiple_stereo_centers(mol, chiral_center_select_potential)
+
+        # iterate over stereo paths
+        for ((source_a, source_b), (target_a, target_b)) in stereo_paths:
+            # get circle indices
+            source_circle_index = edge_graph.circle_index[node_mapping[(source_a, source_b)]]
+            target_circle_index = edge_graph.circle_index[node_mapping[(target_a, target_b)]]
+
+            # create new node with zero embedding
+            data.x = torch.cat([
+                data.x,
+                torch.zeros(1, data.x.shape[-1])
+            ], dim=0)
+
+            # create new permutation tree
+            permutation_trees.append(
+                json.dumps({
+                    "P": [
+                        {
+                            "P": [
+                                {
+                                    "Z": [
+                                        reverse_dict[circ_ind][0]
+                                        for circ_ind in source_circle_index
+                                    ]
+                                },
+                                {
+                                    "Z": [
+                                        reverse_dict[circ_ind][0]
+                                        for circ_ind in target_circle_index
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "P": [
+                                {
+                                    "Z": [
+                                        reverse_dict[circ_ind][0]
+                                        for circ_ind in source_circle_index[::-1]
+                                    ]
+                                },
+                                {
+                                    "Z": [
+                                        reverse_dict[circ_ind][0]
+                                        for circ_ind in target_circle_index[::-1]
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                })
+            )
 
     # register permutation trees in data object
     data.ptree = permutation_trees
