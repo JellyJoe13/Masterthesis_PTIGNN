@@ -8,7 +8,8 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
     def __init__(
             self,
             k: int,
-            hidden_dim: int
+            hidden_dim: int,
+            batch_norm: bool = False
     ):
         # set super
         super(AdvancedPermutationTreeLayer, self).__init__()
@@ -40,6 +41,10 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
         self.elu = torch.nn.ELU()
         # init node type dict
         self.type_dict = type_dict
+
+        # batch norm
+        self.do_batch_norm = batch_norm
+        self.batch_norm = torch.nn.BatchNorm1d(self.hidden_dim)
 
     def forward(
             self,
@@ -105,6 +110,10 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
                     # put through final layer
                     after_p = self.p_final_layer(after_p)
 
+                    # do batch norm
+                    if self.do_batch_norm:
+                        after_p = self.batch_norm(after_p)
+
                     # put into layer_output
                     layer_output[node_type_mask_after] = layer_output[node_type_mask_after] + after_p[node_type_mask_after[:after_p.shape[0]]]
 
@@ -141,6 +150,10 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
                     # apply elu
                     after_z = self.elu(after_z)
 
+                    # do batch norm
+                    if self.do_batch_norm:
+                        after_z = self.batch_norm(after_z)
+
                     # put into layer output
                     layer_output[node_type_mask_after] = layer_output[node_type_mask_after] + after_z[node_type_mask_after[:after_z.shape[0]]]
 
@@ -176,6 +189,10 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
                     after_s = torch_geometric.nn.global_add_pool(after_s, current_layer_pooling[node_type_mask])
                     # apply elu
                     after_s = self.elu(after_s)
+
+                    # do batch norm
+                    if self.do_batch_norm:
+                        after_s = self.batch_norm(after_s)
 
                     # put into layer output
                     layer_output[node_type_mask_after] = layer_output[node_type_mask_after] + after_s[node_type_mask_after[:after_s.shape[0]]]

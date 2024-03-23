@@ -1,3 +1,4 @@
+import copy
 import json
 from collections import defaultdict
 
@@ -9,6 +10,7 @@ from ptgnn.transform.detect_chem_structures import get_chiral_center_node_mask, 
 from ptgnn.transform.edge_graph.basic_permutation_tree import _circle_index_to_primordial_tree
 from ptgnn.transform.edge_graph.chienn.get_circle_index import get_circle_index
 from ptgnn.transform.edge_graph.permutation_tree_special import get_cistrans_tree
+from ptgnn.transform.multi_stereo_center import calc_edges_multiple_stereo_centers
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
 
 
@@ -265,13 +267,15 @@ def permutation_tree_transformation(
         cis_trans_edges: bool = False,
         cis_trans_edges_select_potential: bool = False,
         axial_chirality: bool = False,
-        create_order_matrix: bool = True
+        create_order_matrix: bool = True,
+        multi_stereo_center_dia: bool = False
 ) -> torch_geometric.data.Data:
     # transform to edge graph using custom function
     edge_graph, node_mapping = custom_to_edge_graph(
         data=data,
         # remove_duplicate_edges=remove_duplicate_edges  # removed as removal is done at the end
     )
+    original_node_mapping = copy.deepcopy(node_mapping)
 
     # ==================================================================================================================
     # create default behaviour: P tree or C tree - in case of tetrahedral_chiral and !chiral_center_selective Z
@@ -353,6 +357,48 @@ def permutation_tree_transformation(
                 node_b=node_b,
                 node_mapping=node_mapping
             )
+
+    # in case only diastereomers are to be distinguished
+    if multi_stereo_center_dia:
+        # get stereo paths
+        stereo_paths = calc_edges_multiple_stereo_centers(mol, chiral_center_select_potential)
+
+        # iterate over stereo_paths
+        for (source_a, source_b), (target_a, target_b) in stereo_paths:
+            # get circle indices
+            source_circle_index = edge_graph.circle_index[original_node_mapping[(source_a, source_b)]]
+            target_circle_index = edge_graph.circle_index[original_node_mapping[(target_a, target_b)]]
+
+            # create tree to insert
+            temp_tree = {
+                "P": [
+                    {
+                        "P": [
+                            {"Z": source_circle_index},
+                            {"Z": target_circle_index}
+                        ]
+                    },
+                    {
+                        "P": [
+                            {"Z": source_circle_index[::-1]},
+                            {"Z": target_circle_index[::-1]}
+                        ]
+                    }
+                ]
+            }
+
+            create_new_node = True
+            if (source_a, target_b) in node_mapping:
+                edge_graph.ptree[node_mapping[(source_a, target_b)]] = json.dumps(temp_tree)
+                create_new_node = False
+            if (target_b, source_a) in node_mapping:
+                edge_graph.ptree[node_mapping[(target_b, source_a)]] = json.dumps(temp_tree)
+                create_new_node = False
+
+            if create_new_node:
+                node_mapping[(source_a, target_b)] = len(node_mapping)
+                edge_graph.x = torch.cat([edge_graph.x, torch.zeros(1, edge_graph.x.shape[-1])], dim=0)
+                edge_graph.ptree.append(json.dumps(temp_tree))
 
     if create_order_matrix:
         # generate order matrix
