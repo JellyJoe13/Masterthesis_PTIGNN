@@ -8,7 +8,9 @@ from ptgnn.runtime_config.run_config import run_config
 def run_config_adapter(
         hyper_opt_config: typing.Dict[str, typing.Any],
         default_config: typing.Dict[str, typing.Any] = {},
-        report: bool = False
+        report: bool = False,
+        verbose: bool = False,
+        device: str = None
 ):
     """
     Function that runs the original function ``run_config`` with parameters from the hyperparameter optimization
@@ -23,12 +25,17 @@ def run_config_adapter(
     :param report: Whether or not the hyperparameter optimization is active - controlls whether the metrics are to be
         reported using ``ray.train.report(...)``
     :type report: bool
+    :param verbose: Whether or not progress is reported
+    :type verbose: bool
+    :param device: Specifies device to run on. If ``None`` then cuda is used if available, else cpu. If specified then
+        this device is used.
+    :type device: str
     :return: Returns the output of the ``run_config(...)`` function.
     """
     # merge configs with priority to hyperopt config
-    merged_config = priority_merge_config(hyper_opt_config, default_config, in_place=True)
+    merged_config = priority_merge_config(hyper_opt_config, default_config, in_place=False)
 
-    return run_config(config_dict=merged_config, report=report)
+    return run_config(config_dict=merged_config, report=report, verbose=verbose, device=device)
 
 
 def load_and_merge_default_configs(

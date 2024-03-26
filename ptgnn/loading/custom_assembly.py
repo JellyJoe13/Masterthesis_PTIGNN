@@ -18,6 +18,13 @@ def custom_loader(
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L99
     """
     if sampler == "single_conformer_sampler":
+        # select dataframe
+        if dataframe is None:
+            if not hasattr(dataset, 'dataframe'):
+                raise Exception("set sampling to single conformer sampler but the dataset does not have a corresponding"
+                                "dataframe.")
+            dataframe = dataset.dataframe
+
         # suspicion that this parameter is utterly pointless if single_conformer is enabled in the datasets
         # because of this action:
         # group by id and randomly select one

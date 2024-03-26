@@ -212,7 +212,7 @@ class RSDataset(pyg.data.InMemoryDataset):
             os.path.join(self.processed_dir, f"{self.split}.pt")
         )
         split_df = split_df.drop(columns="rdkit_mol_cistrans_stereo")
-        split_df[~split_df['SMILES_nostereo'].isin(to_remove)]
+        split_df = split_df[~split_df['SMILES_nostereo'].isin(to_remove)]
         split_df.to_csv(os.path.join(self.processed_dir, f"{self.split}.csv"), index=None)
 
     def __getitem__(self, item):

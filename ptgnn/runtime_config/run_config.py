@@ -7,6 +7,7 @@ import torch_geometric
 from tqdm import tqdm
 
 from ptgnn.dataset import DATASET_DICT
+from ptgnn.loading.custom_assembly import custom_loader
 from ptgnn.loading.load import UniversalLoader
 from ptgnn.loading.subsetting import subset_dataset
 from ptgnn.model.framework.custom_model import CustomModel
@@ -20,14 +21,14 @@ from ray import train
 
 def fetch_loaders(
         data_config: typing.Dict[str, typing.Any]
-) -> typing.Tuple[torch.utils.DataLoader, torch.utils.DataLoader, torch.utils.DataLoader]:
+) -> typing.Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     """
     Function used to build the loaders based on the parameters passed in the config dict object.
 
     :param data_config: config object storing the parameters required for the creation of the loaders
     :type data_config: typing.Dict[str, typing.Any]
     :return: train, validation and test loaders
-    :rtype: typing.Tuple[torch.utils.DataLoader, torch.utils.DataLoader, torch.utils.DataLoader]
+    :rtype: typing.Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader]
     """
     dataset_config = data_config['dataset']
     # load dataset
@@ -37,7 +38,7 @@ def fetch_loaders(
     val_ds = ds_type(**dataset_config, split="val")
 
     # subset data
-    if 'subset_size' in dataset_config:
+    if 'subset_size' in data_config:
         train_ds = subset_dataset(train_ds, subset_size=data_config['subset_size'])
         test_ds = subset_dataset(test_ds, subset_size=data_config['subset_size'])
         val_ds = subset_dataset(val_ds, subset_size=data_config['subset_size'])
@@ -45,15 +46,15 @@ def fetch_loaders(
     # get loaders
     loader_config = optional_fetch(data_config, 'loader')
     general_loader_config = optional_fetch(loader_config, 'general')
-    train_loader = UniversalLoader(
+    train_loader = custom_loader(
         train_ds,
         **priority_merge_config(optional_fetch(loader_config, 'train'), general_loader_config)
     )
-    val_loader = UniversalLoader(
+    val_loader = custom_loader(
         val_ds,
         **priority_merge_config(optional_fetch(loader_config, 'val'), general_loader_config)
     )
-    test_loader = UniversalLoader(
+    test_loader = custom_loader(
         test_ds,
         **priority_merge_config(optional_fetch(loader_config, 'test'), general_loader_config)
     )
@@ -94,13 +95,13 @@ def fetch_scheduler(
 
 
 def fetch_data_size(
-        train_loader: torch.utils.DataLoader
+        train_loader: torch.utils.data.DataLoader
 ) -> typing.Tuple[int, int]:
     """
     Function to fetch the data sizes from an existing loader. Returns the node and edge dimension.
 
     :param train_loader: Loader to use for fetching the first element
-    :type train_loader: torch.utils.DataLoader
+    :type train_loader: torch.utils.data.DataLoader
     :return: node and edge dimension, respectively
     :rtype: typing.Tuple[int, int]
     """
@@ -155,6 +156,7 @@ def training_procedure(
         out_dim: int = 1,
         use_test_set: bool = False,
         report: bool = False,
+        verbose: bool = True,
         **kwargs
 ):
     # initialize loss function
@@ -191,11 +193,12 @@ def training_procedure(
             out_dim,
             scheduler,
             task_type,
-            train_loader
+            train_loader,
+            verbose=verbose
         )
 
         # val
-        metric_dict = eval_epoch(metric_dict, device, df_dict, loss_function, model, out_dim, task_type, val_loader, 'val')
+        metric_dict = eval_epoch(metric_dict, device, df_dict, loss_function, model, out_dim, task_type, val_loader, 'val', verbose=verbose)
 
         # reporting to ray train
         if report:
@@ -203,7 +206,7 @@ def training_procedure(
 
         # test
         if use_test_set:
-            metric_dict = eval_epoch(device, df_dict, loss_function, model, out_dim, task_type, test_loader, 'test')
+            metric_dict = eval_epoch(device, df_dict, loss_function, model, out_dim, task_type, test_loader, 'test', verbose=verbose)
 
         # append metric dict to list
         metric_storage.append(metric_dict)
@@ -227,7 +230,8 @@ def train_epoch(
         out_dim: int,
         scheduler,
         task_type: str,
-        train_loader
+        train_loader,
+        verbose: bool = True
 ):
     model.train()
 
@@ -236,7 +240,11 @@ def train_epoch(
     true_storage = []
 
     # train, val
-    for batch in tqdm(train_loader):
+    if verbose:
+        iter_loop = tqdm(train_loader)
+    else:
+        iter_loop = train_loader
+    for batch in iter_loop:
         # reset optimizer
         optimizer.zero_grad()
 
@@ -291,7 +299,8 @@ def eval_epoch(
         out_dim: int,
         task_type: str,
         eval_loader,
-        mode: str
+        mode: str,
+        verbose: bool = True
 ):
     model.eval()
 
@@ -301,7 +310,8 @@ def eval_epoch(
 
     # eval
     with torch.no_grad():
-        for batch in tqdm(eval_loader):
+        iter_loop = tqdm(eval_loader) if verbose else eval_loader
+        for batch in iter_loop:
 
             # put batch to device
             batch = batch.to(device)
@@ -333,7 +343,12 @@ def eval_epoch(
     return metric_dict
 
 
-def run_config(config_dict: dict, report: bool = False):
+def run_config(
+        config_dict: dict,
+        report: bool = False,
+        verbose: bool = True,
+        device: str = None
+):
     # seed everything
     seed = config_dict['seed'] if 'seed' in config_dict else 1
     torch_geometric.seed_everything(seed)
@@ -346,7 +361,8 @@ def run_config(config_dict: dict, report: bool = False):
     model = create_model(data_sizes=fetch_data_size(train_loader), model_config=config_dict['model'])
 
     # put model to device
-    device = "cuda" if torch.cuda.is_available() else 'cpu'
+    if device is None:
+        device = "cuda" if torch.cuda.is_available() else 'cpu'
     model = model.to(device)
 
     # get optimizer
@@ -370,12 +386,9 @@ def run_config(config_dict: dict, report: bool = False):
         device=device,
         out_dim=config_dict['model']['out_dim'] if 'out_dim' in config_dict['model'] else 1,
         report=report,
+        verbose=verbose,
         **config_dict['training']
     )
 
-    # save/display metrics
-    display(metric_dict)
-    # todo
-
-    # todo: add hyperparameter reporting and support
+    # todo: check functions
     return metric_dict
