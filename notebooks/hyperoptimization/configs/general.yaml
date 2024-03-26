@@ -1,0 +1,13 @@
+optimizer:
+  type: adam_w
+  base_learning_rate: 1.0e-03
+  weight_decay: 1.0e-05
+
+scheduler:
+  type: cosine_with_warmup
+  num_warmup_epochs: 10
+  max_epochs: 100
+
+training:
+  n_max_epochs: 100
+  clip_grad_norm: True

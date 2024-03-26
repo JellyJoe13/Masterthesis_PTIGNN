@@ -1,0 +1,6 @@
+output_dir: results/rs_chienn
+config_files:
+  - configs/datasets/rs_dataset.yaml
+  - configs/models/chienn.yaml
+  - configs/general.yaml
+  - configs/hyper_param_opt/subsetting.yaml
