@@ -2,12 +2,16 @@
     "data": {
         "dataset": {
             "type": "rs",
-            "toast": "browne"
+            "mask_chiral_tags": true
         },
         "loader": {
             "general": {
                 "n_neighbors_in_circle": 3,
-                "batch_size": 3
+                "batch_size": 32,
+                "num_workers": 0,
+                "precompute_pos_enc": [
+                    "RWSE"
+                ]
             },
             "train": {},
             "test": {},
@@ -17,12 +21,32 @@
     "model": {
         "mode": "custom",
         "hidden_dim": 128,
+        "out_dim": 1,
         "modules": {
             "0": {
                 "type": "graph_embedding",
-                "node_type": "linear",
-                "edge_type": "linear"
+                "parameter": {
+                    "node_type": "linear+RWSE",
+                    "edge_type": "linear",
+                    "rwse_params": {
+                        "dim_pos_enc": 28,
+                        "norm_type": "batchnorm"
+                    }
+                }
+            },
+            "1": {
+                "type": "gps_layer",
+                "parameter": {
+                    "local_model": "chienn",
+                    "local_model_params": {}
+                },
+                "times": 5
             }
+        },
+        "head": {
+            "type": "san_head",
+            "n_layer": 3,
+            "pool_function": "add"
         }
     },
     "optimizer": {
@@ -34,5 +58,12 @@
         "type": "cosine_with_warmup",
         "num_warmup_epochs": 10,
         "max_epochs": 100
+    },
+    "training": {
+        "n_max_epochs": 2,
+        "loss_function": "cross_entropy",
+        "clip_grad_norm": true,
+        "optimization_metric": "accuracy",
+        "task_type": "classification"
     }
 }
