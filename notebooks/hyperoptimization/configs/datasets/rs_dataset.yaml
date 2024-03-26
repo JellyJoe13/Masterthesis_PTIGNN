@@ -17,6 +17,7 @@ data:
 training:
   loss_function: cross_entropy
   optimization_metric: accuracy
+  optimization_metric_mode: max
   task_type: classification
 
 model:

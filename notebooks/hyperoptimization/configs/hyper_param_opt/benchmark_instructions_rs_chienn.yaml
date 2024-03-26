@@ -4,3 +4,4 @@ config_files:
   - configs/models/chienn.yaml
   - configs/general.yaml
   - configs/hyper_param_opt/subsetting.yaml
+num_samples: 2 # currently reduced for development
