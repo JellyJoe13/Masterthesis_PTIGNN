@@ -1,0 +1,14 @@
+data:
+  loader:
+    general:
+      precompute_pos_enc:
+        - RWSE
+
+model:
+  modules:
+    0:
+      parameter:
+        node_type: linear+RWSE
+        rwse_params:
+          dim_pos_enc: 28
+          norm_type: batchnorm

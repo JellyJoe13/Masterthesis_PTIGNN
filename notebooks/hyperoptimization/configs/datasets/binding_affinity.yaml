@@ -1,0 +1,26 @@
+data:
+  dataset:
+    type: ba
+    mask_chiral_tasks: True
+    single_conformer: True
+    single_enantiomer: False
+  loader:
+    general:
+      n_neighbors_in_circle: 3
+      batch_size: 32
+      num_workers: 0
+    train:
+      sampler: full_batch
+    val:
+      sampler: full_batch
+    test:
+      sampler: full_batch
+
+training:
+  loss_function: l1
+  optimization_metric: mae
+  optimization_metric_mode: min
+  task_type: regression
+
+model:
+  out_dim: 1
