@@ -1,4 +1,4 @@
-output_dir: results/ba_chienn
+output_dir: results/ba_chienn_rwse
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml

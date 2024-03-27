@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     # set up and run tuner
     tuner = tune.Tuner(
-        tune.with_resources(trainable_function, {"cpu": 4, "gpu": 0.2}),
+        tune.with_resources(trainable_function, {"cpu": 3, "gpu": 0.2}),
         # trainable=trainable_function,
         param_space=search_space,
         tune_config=tune.TuneConfig(
@@ -127,6 +127,9 @@ if __name__ == '__main__':
             max_concurrent_trials=hyper_settings['max_concurrent_trials'],
         ),
         run_config=train.RunConfig(
+            storage_path=os.path.abspath("ray_temp"),
+            local_dir=os.path.abspath("ray_temp"),
+            name=f"{default_config['data']['dataset']['type']}_1",
             progress_reporter=CLIReporter(
                 metric_columns=[optimization_score],
             ),
