@@ -6,6 +6,7 @@ from ray import tune, train
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.search.hyperopt import HyperOptSearch
+from ray.tune.stopper import TrialPlateauStopper
 
 from ptgnn.runtime_config.config import import_as, export_as
 from ptgnn.runtime_config.config_helpers import load_and_merge_default_configs, run_config_adapter
@@ -88,6 +89,17 @@ if __name__ == '__main__':
     # init ray
     # ray.init(runtime_env={"env_vars": {"RAY_AIR_NEW_OUTPUT": "0"}})
 
+    # build stopper if in config
+    stopper = None
+    if 'stopper' in hyper_settings:
+        stopper = TrialPlateauStopper(
+            metric=optimization_score,
+            num_results=hyper_settings['stopper']['num_results'],
+            metric_threshold=hyper_settings['stopper']['metric_threshold'],
+            mode=score_mode,
+            grace_period=hyper_settings['scheduler']['grace_period']
+        )
+
     # set up and run tuner
     tuner = tune.Tuner(
         tune.with_resources(trainable_function, {"cpu": 4, "gpu": 0.5}),
@@ -114,6 +126,7 @@ if __name__ == '__main__':
             progress_reporter=CLIReporter(
                 metric_columns=[optimization_score],
             ),
+            stop=stopper
         )
     )
     results = tuner.fit()
