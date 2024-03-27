@@ -32,5 +32,10 @@ def graphgym_cross_entropy_loss(
 
 
 def l1_loss(pred, true):
+    # default manipulation for pred and true
+    # can be skipped if special loss computation is needed
+    pred = pred.squeeze(-1) if pred.ndim > 1 else pred
+    true = true.squeeze(-1) if true.ndim > 1 else true
+
     loss = torch.nn.L1Loss()
     return loss(pred, true), pred

@@ -17,7 +17,8 @@ import numpy as np
 import pandas as pd
 import torch
 from scipy.stats import stats
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, r2_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, r2_score, mean_absolute_error, \
+    mean_squared_error
 from torchmetrics.functional import (
     accuracy,
     auroc,
@@ -27,8 +28,6 @@ from torchmetrics.functional import (
     precision_recall_curve,
     precision,
     recall,
-    mean_absolute_error,
-    mean_squared_error,
 )
 
 METRICS_DICT_TORCHMETRICS = {
