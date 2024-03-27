@@ -12,7 +12,8 @@ def custom_loader(
         shuffle: bool = True,
         dataframe: pd.DataFrame = None,
         num_workers: int = 0,
-        verbose: bool = True
+        verbose: bool = True,
+        precompute_pos_enc: list = []
 ) -> UniversalLoader:
     """
     Adapted from
@@ -48,7 +49,8 @@ def custom_loader(
             batch_sampler=sampler,
             num_workers=num_workers,
             n_neighbors_in_circle=n_neighbors_in_circle,
-            verbose=verbose
+            verbose=verbose,
+            precompute_pos_enc=precompute_pos_enc
         )
 
     # not sure for what the original authors included the latter trigger condition
@@ -60,7 +62,8 @@ def custom_loader(
             num_workers=num_workers,
             pin_memory=True,
             n_neighbors_in_circle=n_neighbors_in_circle,
-            verbose=verbose
+            verbose=verbose,
+            precompute_pos_enc=precompute_pos_enc
         )
 
     else:
