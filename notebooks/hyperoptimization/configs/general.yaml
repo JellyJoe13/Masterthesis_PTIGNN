@@ -9,5 +9,5 @@ scheduler:
   max_epochs: 100
 
 training:
-  n_max_epochs: 100
+  n_max_epochs: 100 # for testing reduced
   clip_grad_norm: True

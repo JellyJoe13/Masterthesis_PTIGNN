@@ -1,0 +1,2 @@
+training:
+  n_max_epochs: 10

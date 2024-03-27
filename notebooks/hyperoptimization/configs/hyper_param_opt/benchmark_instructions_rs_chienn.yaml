@@ -1,7 +1,22 @@
 output_dir: results/rs_chienn
+
 config_files:
+  - configs/hyper_param_opt/subsetting.yaml
+  - configs/hyper_param_opt/epoch_reduction.yaml
   - configs/datasets/rs_dataset.yaml
   - configs/models/chienn.yaml
   - configs/general.yaml
-  - configs/hyper_param_opt/subsetting.yaml
-num_samples: 2 # currently reduced for development
+
+search_space:
+  model:
+    modules:
+      1:
+        times: tune.randint(1,6)
+
+hyper_settings:
+  scheduler:
+    grace_period: 2
+    reduction_factor: 3
+    brackets: 1
+  max_concurrent_trials: 2
+  num_samples: 4 # set to this as this optimization is quite simplistic
