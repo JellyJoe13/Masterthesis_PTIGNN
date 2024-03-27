@@ -11,7 +11,8 @@ def custom_loader(
         sampler: str = "full_batch",  # alternative: single_conformer_sampler
         shuffle: bool = True,
         dataframe: pd.DataFrame = None,
-        num_workers: int = 0
+        num_workers: int = 0,
+        verbose: bool = True
 ) -> UniversalLoader:
     """
     Adapted from
@@ -46,7 +47,8 @@ def custom_loader(
             dataset=dataset,
             batch_sampler=sampler,
             num_workers=num_workers,
-            n_neighbors_in_circle=n_neighbors_in_circle
+            n_neighbors_in_circle=n_neighbors_in_circle,
+            verbose=verbose
         )
 
     # not sure for what the original authors included the latter trigger condition
@@ -57,7 +59,8 @@ def custom_loader(
             shuffle=shuffle,
             num_workers=num_workers,
             pin_memory=True,
-            n_neighbors_in_circle=n_neighbors_in_circle
+            n_neighbors_in_circle=n_neighbors_in_circle,
+            verbose=verbose
         )
 
     else:

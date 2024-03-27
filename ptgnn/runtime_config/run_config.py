@@ -20,13 +20,16 @@ from ray import train
 
 
 def fetch_loaders(
-        data_config: typing.Dict[str, typing.Any]
+        data_config: typing.Dict[str, typing.Any],
+        verbose: bool = True
 ) -> typing.Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     """
     Function used to build the loaders based on the parameters passed in the config dict object.
 
     :param data_config: config object storing the parameters required for the creation of the loaders
     :type data_config: typing.Dict[str, typing.Any]
+    :param verbose: Whether or not progress should be plotted to output
+    :type verbose: bool
     :return: train, validation and test loaders
     :rtype: typing.Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader]
     """
@@ -48,6 +51,7 @@ def fetch_loaders(
     general_loader_config = optional_fetch(loader_config, 'general')
     train_loader = custom_loader(
         train_ds,
+        verbose=verbose,
         **priority_merge_config(optional_fetch(loader_config, 'train'), general_loader_config)
     )
     val_loader = custom_loader(
@@ -354,7 +358,7 @@ def run_config(
     torch_geometric.seed_everything(seed)
 
     # load data
-    train_loader, val_loader, test_loader = fetch_loaders(config_dict['data'])
+    train_loader, val_loader, test_loader = fetch_loaders(config_dict['data'], verbose=verbose)
 
     # get model
     # todo: add intermediary layers (what to do with GPS? which version?)

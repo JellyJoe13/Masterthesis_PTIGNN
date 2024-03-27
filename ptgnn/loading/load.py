@@ -21,6 +21,7 @@ class UniversalLoader(DataLoader):
             exclude_keys: Optional[List[str]] = None,
             n_neighbors_in_circle: Optional[int] = None,
             precompute_pos_enc: list = [],
+            verbose: bool = True,
             **kwargs
     ):
         super().__init__(
@@ -36,4 +37,4 @@ class UniversalLoader(DataLoader):
         )
 
         if len(precompute_pos_enc):
-            precompute_pos_enc_function(dataset, precompute_pos_enc)
+            precompute_pos_enc_function(dataset, precompute_pos_enc, verbose=verbose)

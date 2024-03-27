@@ -86,17 +86,21 @@ def transform_func(
     return data
 
 
-def precompute_pos_enc_function(dataset, precompose_pos_enc):
+def precompute_pos_enc_function(dataset, precompose_pos_enc, verbose: bool = True):
     """
     Adapted from
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/transforms.py#L8
     """
+    iter_loop = range(len(dataset))
+    if verbose:
+        iter_loop = tqdm(iter_loop, desc="generating positional encoding(s)")
+
     data_list = [
         transform_func(
             dataset.get(i),
             pe_types=precompose_pos_enc
         )
-        for i in tqdm(range(len(dataset)), desc="generating positional encoding(s)")
+        for i in iter_loop
     ]
 
     data_list = list(filter(None, data_list))
