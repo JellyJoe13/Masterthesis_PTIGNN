@@ -52,7 +52,6 @@ if __name__ == '__main__':
     if verbose:
         print(default_config)
 
-
     # ==================================================================================================================
     # define search space
     def eval_search_space(d):
@@ -71,7 +70,6 @@ if __name__ == '__main__':
     search_space = eval_search_space(benchmark_config['search_space'])
     if verbose:
         print("search space: ", search_space)
-
 
     # define trainable function for ray
     def trainable_function(config):

@@ -56,10 +56,12 @@ def fetch_loaders(
     )
     val_loader = custom_loader(
         val_ds,
+        verbose=verbose,
         **priority_merge_config(optional_fetch(loader_config, 'val'), general_loader_config)
     )
     test_loader = custom_loader(
         test_ds,
+        verbose=verbose,
         **priority_merge_config(optional_fetch(loader_config, 'test'), general_loader_config)
     )
 
