@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 
 import ray
 from ray import tune, train
@@ -7,7 +8,7 @@ from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.search.hyperopt import HyperOptSearch
 from ray.tune.stopper import TrialPlateauStopper
-
+sys.path.append("../../")
 from ptgnn.runtime_config.config import import_as, export_as
 from ptgnn.runtime_config.config_helpers import load_and_merge_default_configs, run_config_adapter
 
@@ -51,6 +52,7 @@ if __name__ == '__main__':
     if verbose:
         print(default_config)
 
+
     # ==================================================================================================================
     # define search space
     def eval_search_space(d):
@@ -64,9 +66,12 @@ if __name__ == '__main__':
             else:
                 raise Exception("unknown type in search space, only use str as values")
         return d
+
+
     search_space = eval_search_space(benchmark_config['search_space'])
     if verbose:
         print("search space: ", search_space)
+
 
     # define trainable function for ray
     def trainable_function(config):
@@ -77,6 +82,7 @@ if __name__ == '__main__':
             verbose=False,
             device=None
         )
+
 
     # ==================================================================================================================
     # fetch score to optimize
@@ -102,7 +108,7 @@ if __name__ == '__main__':
 
     # set up and run tuner
     tuner = tune.Tuner(
-        tune.with_resources(trainable_function, {"cpu": 4, "gpu": 0.5}),
+        tune.with_resources(trainable_function, {"cpu": 4, "gpu": 0.2}),
         # trainable=trainable_function,
         param_space=search_space,
         tune_config=tune.TuneConfig(
