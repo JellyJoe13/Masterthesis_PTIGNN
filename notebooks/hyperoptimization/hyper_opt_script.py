@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     # make sure that output_dir exists
     if not os.path.exists(output_path):
-        os.mkdirs(output_path)
+        os.makedirs(output_path)
 
     # save general configs
     export_as(default_config, os.path.join(output_path, "general_config.yaml"), save_type='yaml')
