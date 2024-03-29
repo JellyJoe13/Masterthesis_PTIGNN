@@ -254,7 +254,7 @@ def regression_rank(
 
     dataframe["outputs"] = pred
     dataframe["targets"] = true
-    margins, ranking_accuracy, _, _ = \
+    margins, ranking_accuracy = \
         get_ranking_accuracies(dataframe)  # >= is the mode reported in ChIRo paper
     regression.update({f'{prefix}_ranking_accuracy_{m:.1f}': rounding_fn(a) for m, a in zip(margins, ranking_accuracy)})
     return regression

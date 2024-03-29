@@ -177,9 +177,11 @@ def training_procedure(
     metric_storage = []
 
     # initialize loading of dataframe if required
-    if task_type == 'regression_rank' and 'dataframe' in train_loader.dataset:
+    if task_type == 'regression_rank' and hasattr(train_loader.dataset, 'dataframe'):
         df_dict = {
             'train': train_loader.dataset.dataframe,
+            'val': val_loader.dataset.dataframe,
+            'test': test_loader.dataset.dataframe
         }
 
     else:
@@ -212,7 +214,7 @@ def training_procedure(
 
         # test
         if use_test_set:
-            metric_dict = eval_epoch(device, df_dict, loss_function, model, out_dim, task_type, test_loader, 'test', verbose=verbose)
+            metric_dict = eval_epoch(metric_dict, device, df_dict, loss_function, model, out_dim, task_type, test_loader, 'test', verbose=verbose)
 
         # append metric dict to list
         metric_storage.append(metric_dict)
