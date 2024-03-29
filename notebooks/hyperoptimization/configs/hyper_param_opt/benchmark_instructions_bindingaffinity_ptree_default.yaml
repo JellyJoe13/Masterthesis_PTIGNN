@@ -1,4 +1,4 @@
-output_dir: results/results/ba_ptree/default
+output_dir: results/ba_ptree/default
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
