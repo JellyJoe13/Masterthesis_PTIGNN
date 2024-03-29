@@ -188,6 +188,8 @@ def training_procedure(
         df_dict = defaultdict(lambda: None)
 
     for epoch in range(n_max_epochs):
+        if verbose:
+            print(f"\nEpoch: {epoch}")
         metric_dict = {}
 
         metric_dict = train_epoch(

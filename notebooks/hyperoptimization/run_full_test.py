@@ -42,6 +42,10 @@ if __name__ == "__main__":
     default_config = load_and_merge_default_configs(
         test_config['config_files']
     )
+    # create absolute data path for dataset as hyperopt changes directory
+    default_config['data']['dataset']['root'] = os.path.abspath(
+        os.path.join("src", default_config['data']['dataset']['type'])
+    )
 
     # load results
     loading_dir = os.path.abspath(test_config['loading_dir'])
@@ -73,15 +77,28 @@ if __name__ == "__main__":
     # iterate over few selected indices and run experiment
     for i, idx in enumerate(metric_val_sorted_idx[:n_best]):
 
+        print(f"Starting rank {i + 1}")
+
         # get trial identifier
         trial_identifier = results.iloc[idx].logdir
 
+        # load trail config
+        trial_config = import_as(
+            os.path.join(os.path.abspath(test_config['loading_dir']), f"{trial_identifier}.yaml"),
+            loading_type='yaml'
+        )
+
+        # deal with issue that model.modules may have the key as a str, not int
+        if 'model' in trial_config and 'modules' in trial_config['model']:
+            new_dict = {
+                int(key): value
+                for key, value in trial_config['model']['modules'].items()
+            }
+            trial_config['model']['modules'] = new_dict
+
         # load config
         local_config = priority_merge_config(
-            import_as(
-                os.path.join(os.path.abspath(test_config['loading_dir']), f"{trial_identifier}.yaml"),
-                loading_type='yaml'
-            ),
+            trial_config,
             default_config
         )
 
@@ -89,13 +106,11 @@ if __name__ == "__main__":
             print(local_config)
 
         # run config with test
-        full_trial_df = pd.DataFrame([1,2,3])
-        #todo: include test dataset and check
-        #full_trial_df = run_config(
-        #    local_config,
-        #    report=False,
-        #    verbose=verbose
-        #)
+        full_trial_df = run_config(
+            local_config,
+            report=False,
+            verbose=verbose
+        )
 
         # define output name
         output_name = f"rank{i+1}_{trial_identifier}_"

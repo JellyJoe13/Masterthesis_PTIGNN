@@ -23,4 +23,4 @@ hyper_settings:
     reduction_factor: 3
     brackets: 1
   max_concurrent_trials: 5
-  num_samples: 30 # experience from bindingaffinity
+  num_samples: 30 # reduced runtime due to experiences with bindingaffinity
