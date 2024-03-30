@@ -1,0 +1,4 @@
+data:
+  dataset:
+    transformation_parameters:
+      chiral_center_selective: True
