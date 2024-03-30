@@ -1,8 +1,8 @@
 data:
   dataset:
-    type: bace
+    type: tox21
     mask_chiral_tasks: True
-    task_type: classification
+    task_type: classification_multilabel
   loader:
     general:
       n_neighbors_in_circle: 3
@@ -19,7 +19,7 @@ training:
   loss_function: cross_entropy
   optimization_metric: auc
   optimization_metric_mode: max
-  task_type: classification
+  task_type: classification_multilabel
 
 model:
-  out_dim: 1
+  out_dim: 12

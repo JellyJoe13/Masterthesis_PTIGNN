@@ -5,11 +5,18 @@ def graphgym_cross_entropy_loss(
         pred,
         true,
         reduction='mean',
+        is_multilabel: bool = False,
         **kwargs
 ):
     """
     Adapted from https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/graphgym/loss.html
     """
+    # catch  multilabel case: source https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loss/multilabel_classification_loss.py
+    if is_multilabel:
+        bce_loss = torch.nn.BCEWithLogitsLoss()
+        is_labeled = ~true.isnan()
+        return bce_loss(pred[is_labeled], true[is_labeled].float()), pred
+
     # default manipulation for pred and true
     # can be skipped if special loss computation is needed
     pred = pred.squeeze(-1) if pred.ndim > 1 else pred

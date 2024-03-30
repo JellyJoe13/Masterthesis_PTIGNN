@@ -1,5 +1,6 @@
 import typing
 from collections import defaultdict
+from functools import partial
 
 import pandas as pd
 import torch.cuda
@@ -169,7 +170,13 @@ def training_procedure(
     if loss_function == 'l1':
         loss_function = l1_loss
     elif loss_function == 'cross_entropy':
-        loss_function = graphgym_cross_entropy_loss
+        if task_type == "classification_multilabel":
+            loss_function = partial(
+                graphgym_cross_entropy_loss,
+                is_multilabel=True
+            )
+        else:
+            loss_function = graphgym_cross_entropy_loss
     else:
         raise NotImplementedError("only l1 and cross entropy loss implemented")
 
