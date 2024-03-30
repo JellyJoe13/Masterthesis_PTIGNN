@@ -1,4 +1,4 @@
-loading_dir: results/ba_ptree/default
+loading_dir: results/ba_ptree/edge/default
 
 config_files:
   - configs/add_test_set.yaml

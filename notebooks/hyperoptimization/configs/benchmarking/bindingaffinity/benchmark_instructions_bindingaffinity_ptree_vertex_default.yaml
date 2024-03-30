@@ -1,7 +1,8 @@
-output_dir: results/ba_ptree/edge/default
+output_dir: results/ba_ptree/vertex/default
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
+  - configs/vertex_mode.yaml
   - configs/datasets/binding_affinity.yaml
   - configs/models/ptree_default.yaml
   - configs/general.yaml

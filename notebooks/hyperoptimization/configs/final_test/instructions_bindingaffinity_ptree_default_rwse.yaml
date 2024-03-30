@@ -1,4 +1,4 @@
-loading_dir: results/ba_ptree_/rwse_default
+loading_dir: results/ba_ptree/edge/rwse_default
 
 config_files:
   - configs/add_test_set.yaml
