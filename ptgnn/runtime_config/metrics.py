@@ -57,6 +57,7 @@ def classification_binary(
 ):
     # modify input
     true = torch.cat(true).squeeze(-1)
+    true_int = true.int()
     pred = torch.cat(pred).squeeze(-1)
     pred_int = (pred >= 0.5).int()
 
@@ -65,7 +66,7 @@ def classification_binary(
         # apparently computation for extremely large datasets is too slow
         auroc_score = auroc(
             pred.to(device),
-            true.to(device),
+            true_int.to(device),
             task='binary'
         ).item()
     else:
