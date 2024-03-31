@@ -24,3 +24,6 @@ hyper_settings:
     brackets: 1
   max_concurrent_trials: 5
   num_samples: 30 # reduced runtime due to experiences with bindingaffinity
+  stopper:
+    num_results: 4
+    metric_threshold: 0.9
