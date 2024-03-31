@@ -104,6 +104,10 @@ if __name__ == '__main__':
             grace_period=hyper_settings['scheduler']['grace_period']
         )
 
+    ray.init(runtime_env={
+        "working_dir": "../../"
+    })
+
     # set up and run tuner
     tuner = tune.Tuner(
         tune.with_resources(trainable_function, {"cpu": 3, "gpu": 0.2}),

@@ -1,7 +1,8 @@
-output_dir: results/ba_ptree/default
+output_dir: results/ba_ptree/edge/reduction
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
+  - configs/chem/remove_duplicate_edges.yaml
   - configs/datasets/binding_affinity.yaml
   - configs/models/ptree_default.yaml
   - configs/general.yaml

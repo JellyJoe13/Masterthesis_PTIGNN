@@ -13,4 +13,5 @@ pip install chainer-chemistry
 conda install -c conda-forge torchmetrics
 pip install "ray[tune]" torch torchvision
 pip install hyperopt
+pip install multiprocess
 ```

@@ -1,0 +1,4 @@
+data:
+  dataset:
+    transformation_parameters:
+      remove_duplicate_edges: True

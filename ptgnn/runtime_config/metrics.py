@@ -20,18 +20,18 @@ from scipy.stats import stats
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, r2_score, mean_absolute_error, \
     mean_squared_error
 from torchmetrics.functional import (
-    accuracy,
     auroc,
-    average_precision,
     confusion_matrix,
     fbeta_score,
     precision_recall_curve,
     precision,
     recall,
+    accuracy,
+    average_precision,
 )
 
 METRICS_DICT_TORCHMETRICS = {
-    "accuracy": accuracy,
+    "accuracy": accuracy,  # replaced by binary accuracy - see latter comment
     "averageprecision": average_precision,
     "auroc": auroc,
     "confusionmatrix": confusion_matrix,
@@ -57,6 +57,7 @@ def classification_binary(
 ):
     # modify input
     true = torch.cat(true).squeeze(-1)
+    true_int = true.int()
     pred = torch.cat(pred).squeeze(-1)
     pred_int = (pred >= 0.5).int()
 
@@ -65,7 +66,7 @@ def classification_binary(
         # apparently computation for extremely large datasets is too slow
         auroc_score = auroc(
             pred.to(device),
-            true.to(device),
+            true_int.to(device),
             task='binary'
         ).item()
     else:
@@ -112,6 +113,7 @@ def classification_multilabel(
             pred,
             true,
             metric_name,
+            task_type: str = "multilabel",
             **kwargs
     ):
         # fetch metric
@@ -123,35 +125,54 @@ def classification_multilabel(
         for ii in range(len(true)):
             # threshold parameter lands in kwargs where it is not used, except in self.metric
             metric_val.append(
-                metric(pred[ii], true[ii].int(), **kwargs)
+                metric(pred[ii], true[ii].int(), task=task_type, **kwargs)
             )
 
         return torch.nanmean(torch.stack(metric_val))
 
     # calculate metrics
-    acc = _compute_metric(
+    # comment from Johannes Urban:
+    # This originally threw an error. I tracked it down to the accuracy function of torchmetric of torch lightning.
+    # The function requires a task, but in the kwargs of ChiENN such is not given. So I thought maybe an older version
+    # was being used. I was right - it is not stated in ChiENN and GraphGPS(on which this builds) but I went back in the
+    # versions until this parameter was not required. Currently (March 2024) we are at version 1.3.2, this parameter
+    # was added in version 0.11.0, so they are using torch metric version <= 0.10.3.
+    # At this time, it is my personal guess that it is treated as binary accuracy, which will be used here.
+    # The same is true for average precision and auroc, this seems to be binary in this context too...
+    original_acc = _compute_metric(
         pred,
         true,
         "accuracy",
-        threshold=0.
+        threshold=0.0,
+        task_type='binary'
     )
+    normal_acc = _compute_metric(
+        pred,
+        true,
+        "accuracy",
+        threshold=0.5,
+        task_type='binary'
+    )
+    # i think its strange that the threshold is 0. it should rather be 0.5 like in every default binary prediction
+    # and i think this is a binary prediction of each label/marker (12 of them)
     ap = _compute_metric(
         pred,
         true,
         "averageprecision",
-        pos_label=1
+        task_type='binary'
     )
     auroc = _compute_metric(
         pred,
         true,
         "auroc",
-        pos_label=1
+        "binary"
     )
 
     return {
-        f'{prefix}_accuracy': rounding_fn(acc),
-        f'{prefix}_ap': rounding_fn(ap),
-        f'{prefix}_auc': rounding_fn(auroc),
+        f'{prefix}_accuracy-0_5': rounding_fn(original_acc.item()),
+        f'{prefix}_accuracy-0_0': rounding_fn(normal_acc.item()),
+        f'{prefix}_ap': rounding_fn(ap.item()),
+        f'{prefix}_auc': rounding_fn(auroc.item()),
     }
 
 
@@ -274,7 +295,7 @@ def metric_system(
     Adapted from
     https://github.com/pyg-team/pytorch_geometric/blob/1675b019c7182dbdc4970561f0dbff6dec3ee299/torch_geometric/graphgym/logger.py#L226
     """
-    if task_type == 'classification':
+    if task_type == 'classification' or task_type == "classification_multilabel":
         if out_dim <= 2:
             return classification_binary(true=true, pred=pred, device=device, prefix=prefix)
         else:

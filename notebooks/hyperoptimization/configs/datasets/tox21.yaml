@@ -1,0 +1,25 @@
+data:
+  dataset:
+    type: tox21
+    mask_chiral_tasks: True
+    task_type: classification_multilabel
+  loader:
+    general:
+      n_neighbors_in_circle: 3
+      batch_size: 32
+      num_workers: 0
+    train:
+      sampler: full_batch
+    val:
+      sampler: full_batch
+    test:
+      sampler: full_batch
+
+training:
+  loss_function: cross_entropy
+  optimization_metric: auc
+  optimization_metric_mode: max
+  task_type: classification_multilabel
+
+model:
+  out_dim: 12
