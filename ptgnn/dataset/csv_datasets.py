@@ -400,7 +400,12 @@ class Tox21Dataset(InMemoryDataset):
 
                 # do transformation
                 if self.pre_transform is not None:
-                    data = self.pre_transform(data, self.transformation_mode, self.transformation_parameters)
+                    data = self.pre_transform(
+                        data,
+                        self.transformation_mode,
+                        self.transformation_parameters,
+                        mol=mol
+                    )
 
                 # create label
                 data.y = torch.tensor(row[target_col])
