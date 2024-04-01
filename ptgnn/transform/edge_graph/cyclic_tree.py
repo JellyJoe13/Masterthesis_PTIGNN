@@ -48,26 +48,18 @@ def cyclic_tree_edge(
         if len(edge_idx_ring_a) and len(edge_idx_ring_b):
             ptree_ring = {
                 "P": [{
-                    "C": [
-                        list(edge_idx_ring_a)
-                    ]
+                    "C": list(edge_idx_ring_a)
                 }, {
-                    "C": [
-                        list(edge_idx_ring_b)
-                    ]
+                    "C": list(edge_idx_ring_b)
                 }]
             }
         elif len(edge_idx_ring_a):
             ptree_ring = {
-                "C": [
-                    edge_idx_ring_a
-                ]
+                "C": edge_idx_ring_a
             }
         elif len(edge_idx_ring_b):
             ptree_ring = {
-                "C": [
-                    edge_idx_ring_b
-                ]
+                "C": edge_idx_ring_b
             }
         else:
             continue

@@ -29,9 +29,7 @@ def cyclic_tree_vertex(
 
         # prepare tree
         ptree_ring = {
-            "C": [
-                list(ring)
-            ]
+            "C": list(ring)
         }
 
         # add node
@@ -82,6 +80,6 @@ def cyclic_tree_vertex(
                 temp_tree["S"].append({
                     "P": in_rings
                 })
-        data.ptree[i] = json.dumps(temp_tree)
+                data.ptree[i] = json.dumps(temp_tree)
 
     return data
