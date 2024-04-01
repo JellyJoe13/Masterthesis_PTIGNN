@@ -169,8 +169,8 @@ def classification_multilabel(
     )
 
     return {
-        f'{prefix}_accuracy-0_5': rounding_fn(original_acc.item()),
-        f'{prefix}_accuracy-0_0': rounding_fn(normal_acc.item()),
+        f'{prefix}_accuracy-0_0': rounding_fn(original_acc.item()),
+        f'{prefix}_accuracy-0_5': rounding_fn(normal_acc.item()),
         f'{prefix}_ap': rounding_fn(ap.item()),
         f'{prefix}_auc': rounding_fn(auroc.item()),
     }
