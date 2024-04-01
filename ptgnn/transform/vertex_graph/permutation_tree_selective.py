@@ -8,6 +8,7 @@ from ptgnn.transform.edge_graph.permutation_tree_selective import custom_to_edge
 from ptgnn.transform.detect_chem_structures import fetch_cis_trans_edges, detect_possible_axial_chiral_edges
 from ptgnn.transform.multi_stereo_center import calc_edges_multiple_stereo_centers
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
+from ptgnn.transform.tree_separation import separate_tree_into_subtrees
 
 
 def get_cis_trans_ordering(data, node_a, node_b):
@@ -53,7 +54,8 @@ def permutation_tree_vertex_transformation(
         cis_trans_edges_select_potential: bool = False,
         create_order_matrix: bool = True,
         axial_chirality: bool = False,
-        multi_stereo_center_dia: bool = False
+        multi_stereo_center_dia: bool = False,
+        separate_tree: bool = False
 ) -> torch_geometric.data.Data:
     # get the edge graph transformation
     # required for some permutation tree creations (due to circle index needed from edges)
@@ -218,6 +220,9 @@ def permutation_tree_vertex_transformation(
 
     # register permutation trees in data object
     data.ptree = permutation_trees
+
+    if separate_tree:
+        data = separate_tree_into_subtrees(data)
 
     if create_order_matrix:
         # generate order matrix

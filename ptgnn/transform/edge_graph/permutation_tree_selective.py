@@ -12,6 +12,7 @@ from ptgnn.transform.edge_graph.chienn.get_circle_index import get_circle_index
 from ptgnn.transform.edge_graph.permutation_tree_special import get_cistrans_tree
 from ptgnn.transform.multi_stereo_center import calc_edges_multiple_stereo_centers
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
+from ptgnn.transform.tree_separation import separate_tree_into_subtrees
 
 
 def custom_to_edge_graph(data):
@@ -268,7 +269,8 @@ def permutation_tree_transformation(
         cis_trans_edges_select_potential: bool = False,
         axial_chirality: bool = False,
         create_order_matrix: bool = True,
-        multi_stereo_center_dia: bool = False
+        multi_stereo_center_dia: bool = False,
+        separate_tree: bool = False
 ) -> torch_geometric.data.Data:
     # transform to edge graph using custom function
     edge_graph, node_mapping = custom_to_edge_graph(
@@ -399,6 +401,9 @@ def permutation_tree_transformation(
                 node_mapping[(source_a, target_b)] = len(node_mapping)
                 edge_graph.x = torch.cat([edge_graph.x, torch.zeros(1, edge_graph.x.shape[-1])], dim=0)
                 edge_graph.ptree.append(json.dumps(temp_tree))
+
+    if separate_tree:
+        edge_graph = separate_tree_into_subtrees(edge_graph)
 
     if create_order_matrix:
         # generate order matrix
