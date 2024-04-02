@@ -405,7 +405,7 @@ def permutation_tree_transformation(
                 edge_graph.ptree.append(json.dumps(temp_tree))
 
     if add_cyclic_trees:
-        edge_graph = cyclic_tree_edge(data, mol, node_mapping)
+        edge_graph = cyclic_tree_edge(edge_graph, mol, node_mapping)
 
     if separate_tree:
         edge_graph = separate_tree_into_subtrees(edge_graph)
