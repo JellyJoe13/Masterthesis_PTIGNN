@@ -84,9 +84,16 @@ def fetch_cis_trans_edges(
             check_list += [Chem.rdchem.BondStereo.STEREOANY]
         # random (cis or trans)
         if bond.GetBondType() == Chem.rdchem.BondType.DOUBLE and bond.GetStereo() in CIS_TRANS_STEREO_LIST:
-            # fetch ends of the bond
-            node_a = bond.GetBeginAtom().GetIdx()
-            node_b = bond.GetEndAtom().GetIdx()
+            # fetch ends of the bond and check correct number of bonds
+            node_a = bond.GetBeginAtom()
+            if node_a.GetDegree() != 3:
+                continue
+            node_a = node_a.GetIdx()
+
+            node_b = bond.GetEndAtom()
+            if node_b.GetDegree() != 3:
+                continue
+            node_b = node_b.GetIdx()
 
             # check if first direction edge is in node mapping
             if (node_a, node_b) in node_mapping:
