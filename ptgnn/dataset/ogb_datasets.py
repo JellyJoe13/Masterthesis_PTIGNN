@@ -162,7 +162,7 @@ class OGBDataset(InMemoryDataset):
 
                 return smiles, data
 
-            with Pool(processes=os.cpu_count()) as p:
+            with Pool(processes=max(os.cpu_count(), 32)) as p:
                 data_list = list(p.imap(
                     worker,
                     tqdm(
