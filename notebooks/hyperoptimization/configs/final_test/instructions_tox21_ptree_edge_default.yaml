@@ -1,0 +1,9 @@
+loading_dir: results/tox21_ptree/edge/default
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/datasets/tox21.yaml
+  - configs/models/ptree_default.yaml
+  - configs/general.yaml
+
+n_best: 3
