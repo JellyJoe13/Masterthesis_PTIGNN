@@ -9,7 +9,8 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
             self,
             k: int,
             hidden_dim: int,
-            batch_norm: bool = False
+            batch_norm: bool = False,
+            use_separate_inv: bool = False
     ):
         # set super
         super(AdvancedPermutationTreeLayer, self).__init__()
@@ -36,6 +37,26 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
             for _ in range(self.k)
         ])
         self.s_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+
+        if use_separate_inv:
+            # z2_layer
+            self.z2_layer = torch.nn.ModuleList([
+                torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+                for _ in range(self.k)
+            ])
+            self.z2_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+
+            # s2_layer
+            self.s2_layer = torch.nn.ModuleList([
+                torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+                for _ in range(self.k)
+            ])
+            self.s2_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+        else:
+            self.z2_layer = self.z_layer
+            self.z2_final_layer = self.z_final_layer
+            self.s2_layer = self.s_layer
+            self.s2_final_layer = self.s_final_layer
 
         # init elu
         self.elu = torch.nn.ELU()
@@ -177,6 +198,87 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
                     after_s = self.elu(after_s)
                     # apply layer
                     after_s = self.s_final_layer(after_s)
+
+                    # masked cleaning empty entries
+                    after_s = torch.masked_fill(
+                        after_s,
+                        mask_order_matrix_empty_extended.all(dim=0)[:after_s.shape[0]],
+                        0.0
+                    )
+
+                    # global sum pooling
+                    after_s = torch_geometric.nn.global_add_pool(after_s, current_layer_pooling[node_type_mask])
+                    # apply elu
+                    after_s = self.elu(after_s)
+
+                    # do batch norm
+                    if self.do_batch_norm:
+                        after_s = self.batch_norm(after_s)
+
+                    # put into layer output
+                    layer_output[node_type_mask_after] = layer_output[node_type_mask_after] + after_s[node_type_mask_after[:after_s.shape[0]]]
+
+                # TYPE 2 HANDLING IN CASE C AND Q ARE USED IN THIS WAY
+                elif node_type == "Z2":
+                    # shift stack
+                    after_z = torch.stack([
+                        self.z2_layer[i](data_array[i, node_type_mask])
+                        for i in range(self.k)
+                    ], dim=0)
+
+                    # masked cleaning empty entries
+                    after_z = torch.masked_fill(
+                        after_z,
+                        mask_order_matrix_empty_extended[:, node_type_mask],
+                        0.0
+                    )
+
+                    # sum
+                    after_z = torch.sum(after_z, dim=0)
+                    # apply elu
+                    after_z = self.elu(after_z)
+                    # linear layer
+                    after_z = self.z2_final_layer(after_z)
+
+                    # masked cleaning empty entries
+                    after_z = torch.masked_fill(
+                        after_z,
+                        mask_order_matrix_empty_extended.all(dim=0)[:after_z.shape[0]],
+                        0.0
+                    )
+
+                    # global sum pooling
+                    after_z = torch_geometric.nn.global_add_pool(after_z, current_layer_pooling[node_type_mask])
+                    # apply elu
+                    after_z = self.elu(after_z)
+
+                    # do batch norm
+                    if self.do_batch_norm:
+                        after_z = self.batch_norm(after_z)
+
+                    # put into layer output
+                    layer_output[node_type_mask_after] = layer_output[node_type_mask_after] + after_z[node_type_mask_after[:after_z.shape[0]]]
+
+                elif node_type == "S2":
+                    # shift stack
+                    after_s = torch.stack([
+                        self.s2_layer[i](data_array[i, node_type_mask])
+                        for i in range(self.k)
+                    ], dim=0)
+
+                    # masked cleaning empty entries
+                    after_s = torch.masked_fill(
+                        after_s,
+                        mask_order_matrix_empty_extended[:, node_type_mask],
+                        0.0
+                    )
+
+                    # sum
+                    after_s = torch.sum(after_s, dim=0)
+                    # apply elu
+                    after_s = self.elu(after_s)
+                    # apply layer
+                    after_s = self.s2_final_layer(after_s)
 
                     # masked cleaning empty entries
                     after_s = torch.masked_fill(

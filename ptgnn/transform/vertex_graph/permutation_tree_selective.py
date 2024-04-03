@@ -1,5 +1,6 @@
 import json
 
+import rdkit
 import torch
 import torch_geometric
 from rdkit.Chem import AllChem
@@ -45,9 +46,9 @@ def get_cis_trans_ordering(data, node_a, node_b):
 
 
 def permutation_tree_vertex_transformation(
-        data,
-        mol,
-        k,
+        data: torch_geometric.data.Data,
+        mol: rdkit.Chem.rdchem.Mol,
+        k: int,
         tetrahedral_chiral: bool = True,
         chiral_center_selective: bool = False,
         chiral_center_select_potential: bool = True,
@@ -57,7 +58,8 @@ def permutation_tree_vertex_transformation(
         axial_chirality: bool = False,
         multi_stereo_center_dia: bool = False,
         separate_tree: bool = False,
-        add_cyclic_trees: bool = False
+        add_cyclic_trees: bool = False,
+        use_new_inv: bool = False
 ) -> torch_geometric.data.Data:
     # get the edge graph transformation
     # required for some permutation tree creations (due to circle index needed from edges)
@@ -231,6 +233,6 @@ def permutation_tree_vertex_transformation(
 
     if create_order_matrix:
         # generate order matrix
-        data = permutation_tree_to_order_matrix(data, k)
+        data = permutation_tree_to_order_matrix(data, k, use_new_inv)
 
     return data

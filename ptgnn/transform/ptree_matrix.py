@@ -6,7 +6,9 @@ import typing
 type_dict = {
     "P": 1,
     "Z": 2,
-    "S": 3
+    "S": 3,
+    "Z2": 4,
+    "S2": 5
 }
 
 
@@ -39,26 +41,26 @@ def get_matrix(tree, depth, idx_prefix: list = [], type_prefix: list = []) -> li
         return [-1]
 
 
-def remove_inverted_through_p(perm_tree: dict):
+def remove_inverted_through_p(perm_tree: dict, use_new_inv: bool = False):
     if isinstance(perm_tree, int):
         return perm_tree
     elif isinstance(perm_tree, list):
         # no inverting happening here, this is meant for normal types
-        return [remove_inverted_through_p(subtree) for subtree in perm_tree]
+        return [remove_inverted_through_p(subtree, use_new_inv) for subtree in perm_tree]
 
     key = next(iter(perm_tree.keys()))
     if key == "Q":
         return {
             "P": [
                 {
-                    "S": [
-                        remove_inverted_through_p(subtree)
+                    f"S{2 if use_new_inv else ''}": [
+                        remove_inverted_through_p(subtree, use_new_inv)
                         for subtree in perm_tree[key]
                     ]
                 },
                 {
-                    "S": [
-                             remove_inverted_through_p(subtree)
+                    f"S{2 if use_new_inv else ''}": [
+                             remove_inverted_through_p(subtree, use_new_inv)
                              for subtree in perm_tree[key]
                          ][::-1]
                 }
@@ -68,21 +70,28 @@ def remove_inverted_through_p(perm_tree: dict):
         return {
             "P": [
                 {
-                    "Z": perm_tree[key]
+                    f"Z{2 if use_new_inv else ''}": [
+                        remove_inverted_through_p(subtree, use_new_inv)
+                        for subtree in perm_tree[key]
+                    ]
                 },
                 {
-                    "Z": [
-                             remove_inverted_through_p(subtree)
+                    f"Z{2 if use_new_inv else ''}": [
+                             remove_inverted_through_p(subtree, use_new_inv)
                              for subtree in perm_tree[key]
                          ][::-1]
                 }
             ]
         }
     else:
-        return {key: remove_inverted_through_p(value) for key, value in perm_tree.items()}
+        return {key: remove_inverted_through_p(value, use_new_inv) for key, value in perm_tree.items()}
 
 
-def permutation_tree_to_matrix(ptree_string_list: typing.List[str], k: int = 3):
+def permutation_tree_to_matrix(
+        ptree_string_list: typing.List[str],
+        k: int = 3,
+        use_new_inv: bool = False
+):
     # transform to dict
     permutation_trees = [
         json.loads(p_string)
@@ -91,7 +100,7 @@ def permutation_tree_to_matrix(ptree_string_list: typing.List[str], k: int = 3):
 
     # replace C, Q by P(Z,Z) and P(S,S)
     permutation_trees = [
-        remove_inverted_through_p(tree)
+        remove_inverted_through_p(tree, use_new_inv)
         for tree in permutation_trees
     ]
 
@@ -110,9 +119,13 @@ def permutation_tree_to_matrix(ptree_string_list: typing.List[str], k: int = 3):
     return idx_matrix, type_matrix
 
 
-def permutation_tree_to_order_matrix(batch, k): # can also be data object as long as it has ptree argument
+def permutation_tree_to_order_matrix(
+        batch,
+        k,
+        use_new_inv: bool = False
+):  # can also be data object as long as it has ptree argument
     # get matrices
-    idx_matrix, type_matrix = permutation_tree_to_matrix(batch.ptree, k)
+    idx_matrix, type_matrix = permutation_tree_to_matrix(batch.ptree, k, use_new_inv)
 
     # get structure to orient to
     idx_structure = idx_matrix[:, :-1]

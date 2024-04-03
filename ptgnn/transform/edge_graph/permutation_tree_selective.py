@@ -2,6 +2,7 @@ import copy
 import json
 from collections import defaultdict
 
+import rdkit
 import torch_geometric
 import torch
 
@@ -259,9 +260,9 @@ def remove_duplicate_edges_function(data, node_mapping):
 
 
 def permutation_tree_transformation(
-        data,
-        mol,
-        k,
+        data: torch_geometric.data.Data,
+        mol: rdkit.Chem.rdchem.Mol,
+        k: int,
         tetrahedral_chiral: bool = True,
         chiral_center_selective: bool = False,
         chiral_center_select_potential: bool = True,
@@ -272,7 +273,8 @@ def permutation_tree_transformation(
         create_order_matrix: bool = True,
         multi_stereo_center_dia: bool = False,
         separate_tree: bool = False,
-        add_cyclic_trees: bool = False
+        add_cyclic_trees: bool = False,
+        use_new_inv: bool = False
 ) -> torch_geometric.data.Data:
     # transform to edge graph using custom function
     edge_graph, node_mapping = custom_to_edge_graph(
@@ -412,7 +414,7 @@ def permutation_tree_transformation(
 
     if create_order_matrix:
         # generate order matrix
-        edge_graph = permutation_tree_to_order_matrix(edge_graph, k)
+        edge_graph = permutation_tree_to_order_matrix(edge_graph, k, use_new_inv)
 
     return edge_graph
 
