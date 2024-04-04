@@ -2,7 +2,7 @@ output_dir: results/tox21_ptree/edge/cistrans
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
-  - configs/chem/cistrans.yaml
+  - configs/chem/cis_trans.yaml
   - configs/datasets/tox21.yaml
   - configs/models/ptree_default.yaml
   - configs/general.yaml

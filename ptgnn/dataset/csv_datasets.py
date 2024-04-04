@@ -300,7 +300,13 @@ class Tox21Dataset(InMemoryDataset):
     def processed_dir(self) -> str:
         name = self.graph_mode if self.graph_mode else ''
         name += "+" + self.transformation_mode if self.transformation_mode else ''
-        return os.path.join(self.root, name, self.task_type, 'processed')
+        return os.path.join(
+            self.root,
+            name,
+            self.task_type,
+            dict_to_storage_path(self.transformation_parameters),
+            'processed'
+        )
 
     @property
     def processed_file_names(self) -> typing.Union[str, typing.List[str], typing.Tuple[str, ...]]:
