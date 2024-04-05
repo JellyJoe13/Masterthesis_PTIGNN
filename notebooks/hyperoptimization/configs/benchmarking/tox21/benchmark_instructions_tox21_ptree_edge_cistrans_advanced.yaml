@@ -1,4 +1,4 @@
-output_dir: results/tox21_ptree/edge/cistrans/advanced
+output_dir: results/tox21_ptree/edge/cistrans_advanced
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
