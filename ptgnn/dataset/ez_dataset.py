@@ -161,7 +161,8 @@ class EZDataset(pyg.data.InMemoryDataset):
             return idx, entry, len(bonds)
 
         # run first worker
-        with Pool(processes=os.cpu_count()) as p:
+        count = max(os.cpu_count(), 30)
+        with Pool(processes=count) as p:
             df_collection = list(p.imap(
                 worker_filter_one_four_const_stereo,
                 tqdm(split_df.iterrows(), total=len(split_df), desc=f"{self.split}: filter")
@@ -211,7 +212,7 @@ class EZDataset(pyg.data.InMemoryDataset):
             })
 
         # generate all e/z isomers of each element (then merge and drop duplicates)
-        with Pool(processes=os.cpu_count()) as p:
+        with Pool(processes=count) as p:
             df_collection = pd.concat(
                 list(p.imap(
                     worker_create_all_ez_isomers,
@@ -254,7 +255,7 @@ class EZDataset(pyg.data.InMemoryDataset):
             return entry
 
         # execute worker
-        with Pool(processes=os.cpu_count()) as p:
+        with Pool(processes=count) as p:
             df_collection = list(p.imap(
                 worker_gen_labels,
                 tqdm(df_collection.iterrows(), total=len(df_collection), desc=f"{self.split}: label generation")
