@@ -1,7 +1,8 @@
-output_dir: results/ez_ptree
+output_dir: results/ez_ptree/edge/cistrans
 
 config_files:
   - configs/hyper_param_opt/epoch_reduction.yaml
+  - configs/chem/cis_trans.yaml
   - configs/datasets/ez_dataset.yaml
   - configs/models/ptree_default.yaml
   - configs/general.yaml

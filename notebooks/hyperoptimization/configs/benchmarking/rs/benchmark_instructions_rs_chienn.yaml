@@ -2,7 +2,6 @@ output_dir: results/rs_chienn
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
-  - configs/hyper_param_opt/epoch_reduction.yaml
   - configs/datasets/rs_dataset.yaml
   - configs/models/chienn.yaml
   - configs/general.yaml
@@ -19,7 +18,7 @@ hyper_settings:
     reduction_factor: 3
     brackets: 1
   max_concurrent_trials: 2
-  num_samples: 4 # set to this as this optimization is quite simplistic
+  num_samples: 6 # set to this as this optimization is quite simplistic
   stopper:
     num_results: 3
-    metric_threshold: 0.98
+    metric_threshold: 0.95
