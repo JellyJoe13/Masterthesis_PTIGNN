@@ -19,7 +19,7 @@ hyper_settings:
     reduction_factor: 3
     brackets: 1
   max_concurrent_trials: 2
-  num_samples: 8 # set to this as this optimization is quite simplistic
+  num_samples: 6 # set to this as this optimization is quite simplistic
   stopper:
-    num_results: 3
-    metric_threshold: 0.98
+    num_results: 5
+    metric_threshold: 0.95
