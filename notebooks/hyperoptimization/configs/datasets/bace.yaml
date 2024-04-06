@@ -1,7 +1,7 @@
 data:
   dataset:
     type: bace
-    mask_chiral_tasks: True
+    mask_chiral_tags: True
     task_type: classification
   loader:
     general:

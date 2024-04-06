@@ -25,7 +25,7 @@ class BindingAffinityDataset(InMemoryDataset):
             root: str = "src/bindingaffinity",
             single_conformer: bool = True,
             single_enantiomer: bool = False,
-            mask_chiral_tags: bool = False,
+            mask_chiral_tags: bool = True,
             split: str = "train",
             graph_mode: str = "edge",
             transformation_mode: str = "default",

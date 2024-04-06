@@ -1,7 +1,7 @@
 data:
   dataset:
     type: ba
-    mask_chiral_tasks: True
+    mask_chiral_tags: True
     single_conformer: True
     single_enantiomer: False
   loader:

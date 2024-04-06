@@ -1,7 +1,7 @@
 data:
   dataset:
     type: ez
-    mask_chiral_tasks: True
+    mask_chiral_tags: True
   loader:
     general:
       n_neighbors_in_circle: 3

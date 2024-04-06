@@ -26,7 +26,7 @@ class BaceDataset(InMemoryDataset):
             self,
             root: str = "src/bace",
             task_type: str = 'regression',  # or 'classification_multilabel'
-            mask_chiral_tags: bool = False,
+            mask_chiral_tags: bool = True,
             split: str = "train",
             graph_mode: str = "edge",
             transformation_mode: str = "default",
@@ -250,7 +250,7 @@ class Tox21Dataset(InMemoryDataset):
             self,
             root: str = "src/tox21",
             task_type: str = 'regression',  # or 'classification_multilabel'
-            mask_chiral_tags: bool = False,
+            mask_chiral_tags: bool = True,
             split: str = "train",
             graph_mode: str = "edge",
             transformation_mode: str = "default",

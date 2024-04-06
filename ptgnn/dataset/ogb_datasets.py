@@ -25,7 +25,7 @@ class OGBDataset(InMemoryDataset):
             ds_name: str = "hiv",
             root: str = "src/ogb",
             task_type: str = 'regression',  # or 'classification_multilabel'
-            mask_chiral_tags: bool = False,
+            mask_chiral_tags: bool = True,
             split: str = "train",
             graph_mode: str = "edge",
             transformation_mode: str = "default",

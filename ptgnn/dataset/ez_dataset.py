@@ -23,7 +23,7 @@ class EZDataset(pyg.data.InMemoryDataset):
             self,
             root: str = "src/ez",
             single_conformer: bool = True,
-            mask_chiral_tags: bool = False,
+            mask_chiral_tags: bool = True,
             split: str = "train",
             graph_mode: str = "edge",
             transformation_mode: str = "default",
