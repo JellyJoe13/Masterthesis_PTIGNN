@@ -1,7 +1,7 @@
 data:
   dataset:
     type: tox21
-    mask_chiral_tasks: True
+    mask_chiral_tags: True
     task_type: classification_multilabel
   loader:
     general:
