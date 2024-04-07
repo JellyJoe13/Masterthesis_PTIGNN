@@ -22,6 +22,7 @@ hyper_settings:
   scheduler:
     grace_period: 5
     reduction_factor: 3
+
     brackets: 1
   max_concurrent_trials: 5
-  num_samples: 50
+  num_samples: 30
