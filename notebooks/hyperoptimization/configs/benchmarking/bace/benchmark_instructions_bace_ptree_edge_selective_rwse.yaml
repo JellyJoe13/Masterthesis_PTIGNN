@@ -1,7 +1,9 @@
-output_dir: results/bace_ptree/edge/default
+output_dir: results/bace_ptree/edge/selective_rwse
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
+  - configs/chem/tetra_selective.yaml
+  - configs/add_rwse.yaml
   - configs/datasets/bace.yaml
   - configs/models/ptree_default.yaml
   - configs/general.yaml
@@ -22,5 +24,5 @@ hyper_settings:
     grace_period: 5
     reduction_factor: 3
     brackets: 1
-  max_concurrent_trials: 4
+  max_concurrent_trials: 3
   num_samples: 50
