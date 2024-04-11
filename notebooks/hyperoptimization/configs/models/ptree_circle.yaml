@@ -4,7 +4,7 @@ data:
     transformation_mode: permutation_tree
     transformation_parameters:
       k: 4
-      cis_trans_edges: True
+      use_new_inv: True
 
 model:
   mode: custom
