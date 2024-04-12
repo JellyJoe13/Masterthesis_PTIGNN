@@ -5,7 +5,7 @@ config_files:
   - configs/chem/cyclic_trees.yaml
   - configs/vertex_mode.yaml
   - configs/datasets/tox21.yaml
-  - configs/models/ptree_default.yaml
+  - configs/models/ptree_circle.yaml
   - configs/general.yaml
 
 search_space:
