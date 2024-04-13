@@ -8,7 +8,8 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
     def __init__(
             self,
             hidden_dim: int,
-            k: int
+            k: int,
+            apply_p_elu: bool = False
     ):
         super(RecursiveSimplePtreeLayer, self).__init__()
         self.hidden_dim = hidden_dim
@@ -25,6 +26,7 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         # p layer
         self.p_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
         self.p_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+        self.p_elu = torch.nn.ELU() if apply_p_elu else lambda x: x
 
         # c layer
         # uses layers of z.
@@ -78,7 +80,7 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         # sum up
         after_p = torch.sum(after_p, dim=0)
         # put through final linear layer
-        after_p = self.p_final_layer(after_p)
+        after_p = self.p_final_layer(self.p_elu(after_p))
 
         return after_p
 

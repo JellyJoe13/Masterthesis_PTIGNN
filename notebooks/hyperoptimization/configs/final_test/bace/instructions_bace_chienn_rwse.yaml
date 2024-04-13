@@ -1,0 +1,10 @@
+loading_dir: results/bace_chienn_rwse
+
+config_files:
+  - configs/add_rwse.yaml
+  - configs/add_test_set.yaml
+  - configs/datasets/bace.yaml
+  - configs/models/chienn.yaml
+  - configs/general.yaml
+
+n_best: 3

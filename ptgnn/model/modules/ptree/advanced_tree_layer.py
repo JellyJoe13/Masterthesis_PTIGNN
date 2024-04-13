@@ -10,7 +10,8 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
             k: int,
             hidden_dim: int,
             batch_norm: bool = False,
-            use_separate_inv: bool = False
+            use_separate_inv: bool = False,
+            apply_p_elu: bool = False
     ):
         # set super
         super(AdvancedPermutationTreeLayer, self).__init__()
@@ -23,6 +24,7 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
         # p_layer
         self.p_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
         self.p_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
+        self.p_elu = torch.nn.ELU() if apply_p_elu else lambda x: x
 
         # z_layer
         self.z_layer = torch.nn.ModuleList([
@@ -129,7 +131,7 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
                     # sum up
                     after_p = torch_geometric.nn.global_add_pool(after_p, current_layer_pooling[node_type_mask])
                     # put through final layer
-                    after_p = self.p_final_layer(after_p)
+                    after_p = self.p_final_layer(self.p_elu(after_p))
 
                     # do batch norm
                     if self.do_batch_norm:
