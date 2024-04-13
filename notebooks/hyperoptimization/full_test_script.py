@@ -6,15 +6,11 @@ import pandas as pd
 import ray
 from ray import tune, train
 from ray.tune import CLIReporter
-from ray.tune.schedulers import ASHAScheduler
-from ray.tune.search.hyperopt import HyperOptSearch
-from ray.tune.stopper import TrialPlateauStopper
-
-from ptgnn.runtime_config.final_test_suggester import FinalSearcher
 
 sys.path.append("../../")
 from ptgnn.runtime_config.config import import_as, export_as
 from ptgnn.runtime_config.config_helpers import load_and_merge_default_configs, run_config_adapter
+from ptgnn.runtime_config.final_test_suggester import FinalSearcher
 
 
 def do_parsing():
