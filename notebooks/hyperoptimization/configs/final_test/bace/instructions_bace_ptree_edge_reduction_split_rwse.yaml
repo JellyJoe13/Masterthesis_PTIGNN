@@ -1,0 +1,12 @@
+loading_dir: results/bace_ptree/edge/split/reduction_rwse
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/chem/remove_duplicate_edges.yaml
+  - configs/chem/separate_tree.yaml
+  - configs/add_rwse.yaml
+  - configs/datasets/bace.yaml
+  - configs/models/ptree_default.yaml
+  - configs/general.yaml
+
+n_best: 3

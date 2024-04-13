@@ -187,16 +187,13 @@ if __name__ == '__main__':
     # save results dataframe
     results.get_dataframe().to_csv(os.path.join(output_dir, "results.csv"), index=None)
 
-    # create reverse trial dict mapping
-    reverse_mapping = dict(zip(searcher.my_configurations.values(), searcher.my_configurations.keys()))
-
     # for each trial save results
     for result in results:
         # get metrics
         trial_metrics = result.metrics_dataframe
 
         # get trial id
-        trial_id = reverse_mapping[trial_metrics.trial_id[0]]
+        trial_id = searcher.mapping[trial_metrics.trial_id[0]]
 
         # get config
         trial_config = result.config

@@ -24,3 +24,8 @@ class FinalSearcher(Searcher):
                     return value
 
             raise Exception("reached end")
+
+    def on_trial_complete(
+        self, trial_id: str, result: typing.Optional[typing.Dict] = None, error: bool = False
+    ) -> None:
+        pass
