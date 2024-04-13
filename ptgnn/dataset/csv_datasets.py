@@ -194,7 +194,7 @@ class BaceDataset(InMemoryDataset):
                 data.y = convert_target_for_task(data.y, self.task_type)
                 return smiles, data
 
-            with Pool(processes=max(os.cpu_count(), 32)) as p:
+            with Pool(processes=min(os.cpu_count(), 24)) as p:
                 data_list = list(p.imap(
                     worker,
                     tqdm(
@@ -418,7 +418,7 @@ class Tox21Dataset(InMemoryDataset):
                 data.y = convert_target_for_task(data.y, self.task_type)
                 return smiles, data
 
-            with Pool(processes=max(os.cpu_count(), 32)) as p:
+            with Pool(processes=min(os.cpu_count(), 24)) as p:
                 data_list = list(p.imap(
                     worker,
                     tqdm(
