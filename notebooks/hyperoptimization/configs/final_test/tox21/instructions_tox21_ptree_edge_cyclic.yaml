@@ -1,0 +1,10 @@
+logging_dir: results/tox21_ptree/edge/cyclic
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/chem/cyclic_trees.yaml
+  - configs/datasets/tox21.yaml
+  - configs/models/ptree_circle.yaml
+  - configs/general.yaml
+
+n_best: 3
