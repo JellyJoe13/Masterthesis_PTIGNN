@@ -1,10 +1,10 @@
-output_dir: results/tox21_ptree/edge/cyclic_reduced
+output_dir: results/ba_ptree/edge/cyclic
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
   - configs/chem/cyclic_trees.yaml
-  - configs/chem/remove_duplicate_edges.yaml
-  - configs/datasets/tox21.yaml
+  - configs/add_rwse.yaml
+  - configs/datasets/binding_affinity.yaml
   - configs/models/ptree_circle.yaml
   - configs/general.yaml
 
