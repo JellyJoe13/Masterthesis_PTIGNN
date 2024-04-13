@@ -217,13 +217,13 @@ def training_procedure(
         # val
         metric_dict = eval_epoch(metric_dict, device, df_dict, loss_function, model, out_dim, task_type, val_loader, 'val', verbose=verbose)
 
-        # reporting to ray train
-        if report:
-            train.report(metric_dict)
-
         # test
         if use_test_set:
             metric_dict = eval_epoch(metric_dict, device, df_dict, loss_function, model, out_dim, task_type, test_loader, 'test', verbose=verbose)
+
+        # reporting to ray train
+        if report:
+            train.report(metric_dict)
 
         # append metric dict to list
         metric_storage.append(metric_dict)
