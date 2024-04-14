@@ -10,7 +10,7 @@ from ptgnn.transform.detect_chem_structures import get_chiral_center_node_mask, 
     detect_possible_axial_chiral_edges
 from ptgnn.transform.edge_graph.basic_permutation_tree import _circle_index_to_primordial_tree
 from ptgnn.transform.edge_graph.chienn.get_circle_index import get_circle_index
-from ptgnn.transform.edge_graph.cyclic_tree import cyclic_tree_edge
+from ptgnn.transform.edge_graph.cyclic_tree import cyclic_tree_edge, cyclic_tree_edge_minimal, cyclic_tree_edge_light
 from ptgnn.transform.edge_graph.permutation_tree_special import get_cistrans_tree
 from ptgnn.transform.multi_stereo_center import calc_edges_multiple_stereo_centers
 from ptgnn.transform.ptree_matrix import permutation_tree_to_order_matrix
@@ -274,6 +274,7 @@ def permutation_tree_transformation(
         multi_stereo_center_dia: bool = False,
         separate_tree: bool = False,
         add_cyclic_trees: bool = False,
+        cyclic_tree_mode: str = "complex",  # alt: light, minimal
         use_new_inv: bool = False
 ) -> torch_geometric.data.Data:
     # transform to edge graph using custom function
@@ -407,7 +408,14 @@ def permutation_tree_transformation(
                 edge_graph.ptree.append(json.dumps(temp_tree))
 
     if add_cyclic_trees:
-        edge_graph = cyclic_tree_edge(edge_graph, mol, node_mapping)
+        if cyclic_tree_mode == "complex":
+            edge_graph = cyclic_tree_edge(edge_graph, mol, node_mapping)
+        elif cyclic_tree_mode == "light":
+            edge_graph = cyclic_tree_edge_light(edge_graph, mol, node_mapping)
+        elif cyclic_tree_mode == "minimal":
+            edge_graph = cyclic_tree_edge_minimal(edge_graph, mol, node_mapping)
+        else:
+            raise NotImplementedError(f"cyclic tree mode {cyclic_tree_mode} is not implemented.")
 
     if separate_tree:
         edge_graph = separate_tree_into_subtrees(edge_graph)

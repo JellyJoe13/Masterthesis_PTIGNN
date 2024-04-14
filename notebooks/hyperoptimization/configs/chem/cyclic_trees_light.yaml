@@ -1,0 +1,5 @@
+data:
+  dataset:
+    transformation_parameters:
+      add_cyclic_trees: True
+      cyclic_tree_mode: light
