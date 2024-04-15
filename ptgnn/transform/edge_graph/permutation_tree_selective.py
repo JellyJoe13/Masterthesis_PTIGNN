@@ -274,7 +274,7 @@ def permutation_tree_transformation(
         multi_stereo_center_dia: bool = False,
         separate_tree: bool = False,
         add_cyclic_trees: bool = False,
-        cyclic_tree_mode: str = "complex",  # alt: light, minimal
+        cyclic_tree_mode: str = "complex",  # alternatives: light, minimal
         use_new_inv: bool = False
 ) -> torch_geometric.data.Data:
     # transform to edge graph using custom function

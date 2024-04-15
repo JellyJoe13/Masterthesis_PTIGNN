@@ -27,10 +27,12 @@ class AdvancedPermutationTreeLayerRNN(torch.nn.Module):
         self.p_elu = torch.nn.ELU() if apply_p_elu else lambda x: x
 
         # z_layer
-        self.z_layer = torch.nn.ModuleList([
-            torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
-            for _ in range(self.k)
-        ])
+        self.z_layer = torch.nn.RNN(
+            input_size=self.hidden_dim,
+            hidden_size=self.hidden_dim,
+            batch_first=False,
+            bias=False
+        )
         self.z_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
 
         # s_layer
@@ -44,10 +46,12 @@ class AdvancedPermutationTreeLayerRNN(torch.nn.Module):
 
         if use_separate_inv:
             # z2_layer
-            self.z2_layer = torch.nn.ModuleList([
-                torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
-                for _ in range(self.k)
-            ])
+            self.z2_layer = torch.nn.RNN(
+                input_size=self.hidden_dim,
+                hidden_size=self.hidden_dim,
+                batch_first=False,
+                bias=False
+            )
             self.z2_final_layer = torch.nn.Linear(self.hidden_dim, self.hidden_dim, bias=False)
 
             # s2_layer
@@ -145,21 +149,10 @@ class AdvancedPermutationTreeLayerRNN(torch.nn.Module):
                     layer_output[node_type_mask_after] = layer_output[node_type_mask_after] + after_p[node_type_mask_after[:after_p.shape[0]]]
 
                 elif node_type == "Z":
-                    # shift stack
-                    after_z = torch.stack([
-                        self.z_layer[i](data_array[i, node_type_mask])
-                        for i in range(self.k)
-                    ], dim=0)
+                    # apply rnn
+                    _, after_z = self.z_layer(data_array[:, node_type_mask])
+                    after_z = after_z.squeeze(0)
 
-                    # masked cleaning empty entries
-                    after_z = torch.masked_fill(
-                        after_z,
-                        mask_order_matrix_empty_extended[:, node_type_mask],
-                        0.0
-                    )
-
-                    # sum
-                    after_z = torch.sum(after_z, dim=0)
                     # apply elu
                     after_z = self.elu(after_z)
                     # linear layer
@@ -215,21 +208,10 @@ class AdvancedPermutationTreeLayerRNN(torch.nn.Module):
 
                 # TYPE 2 HANDLING IN CASE C AND Q ARE USED IN THIS WAY
                 elif node_type == "Z2":
-                    # shift stack
-                    after_z = torch.stack([
-                        self.z2_layer[i](data_array[i, node_type_mask])
-                        for i in range(self.k)
-                    ], dim=0)
+                    # apply rnn
+                    _, after_z = self.z2_layer(data_array[:, node_type_mask])
+                    after_z = after_z.squeeze(0)
 
-                    # masked cleaning empty entries
-                    after_z = torch.masked_fill(
-                        after_z,
-                        mask_order_matrix_empty_extended[:, node_type_mask],
-                        0.0
-                    )
-
-                    # sum
-                    after_z = torch.sum(after_z, dim=0)
                     # apply elu
                     after_z = self.elu(after_z)
                     # linear layer
