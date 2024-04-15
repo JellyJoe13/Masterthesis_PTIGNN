@@ -1,0 +1,27 @@
+data:
+  dataset:
+    graph_mode: edge
+    transformation_mode: permutation_tree
+    transformation_parameters:
+      k: 3
+
+model:
+  mode: custom
+  hidden_dim: 128
+  modules:
+    0:
+      type: graph_embedding
+      parameter:
+        node_type: linear
+        edge_type: linear
+    1:
+      type: gps_layer
+      parameter:
+        local_model: permutation_tree_rnn
+        local_model_params:
+          k: 3
+      times: 5
+  head:
+    type: san_head
+    n_layer: 3
+    pool_function: add
