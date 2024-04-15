@@ -1,9 +1,8 @@
-output_dir: results/bace_ptree/vertex/rnn_rwse
+output_dir: results/bace_ptree/edge/rnn_rwse
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
   - configs/add_rwse.yaml
-  - configs/vertex_mode.yaml
   - configs/datasets/bace.yaml
   - configs/models/ptree_rnn.yaml
   - configs/general.yaml

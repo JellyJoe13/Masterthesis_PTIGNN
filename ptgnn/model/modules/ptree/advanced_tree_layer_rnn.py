@@ -186,7 +186,7 @@ class AdvancedPermutationTreeLayerRNN(torch.nn.Module):
 
                 elif node_type == "S":
                     # apply rnn
-                    after_s = self.s_layer(data_array[:, node_type_mask])
+                    _, after_s = self.s_layer(data_array[:, node_type_mask])
                     after_s = after_s.squeeze(0)
 
                     # apply elu
@@ -256,7 +256,7 @@ class AdvancedPermutationTreeLayerRNN(torch.nn.Module):
 
                 elif node_type == "S2":
                     # apply rnn
-                    after_s = self.s2_layer(data_array[:, node_type_mask])
+                    _, after_s = self.s2_layer(data_array[:, node_type_mask])
                     after_s = after_s.squeeze(0)
 
                     # apply elu

@@ -1,10 +1,9 @@
-output_dir: results/bace_ptree/vertex/rnn_rwse
+output_dir: results/tox21_ptree/vertex/rnn
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
-  - configs/add_rwse.yaml
   - configs/vertex_mode.yaml
-  - configs/datasets/bace.yaml
+  - configs/datasets/tox21.yaml
   - configs/models/ptree_rnn.yaml
   - configs/general.yaml
 
@@ -23,6 +22,7 @@ hyper_settings:
   scheduler:
     grace_period: 5
     reduction_factor: 3
+
     brackets: 1
-  max_concurrent_trials: 3
-  num_samples: 50
+  max_concurrent_trials: 5
+  num_samples: 30
