@@ -5,6 +5,7 @@ from torch_geometric.nn import GraphNorm
 
 from ptgnn.model.chienn.chienn_layer import ChiENNLayer
 from ptgnn.model.modules.ptree.advanced_tree_layer import AdvancedPermutationTreeLayer
+from ptgnn.model.modules.ptree.advanced_tree_layer_rnn import AdvancedPermutationTreeLayerRNN
 
 
 class CustomGPSLayer(torch.nn.Module):
@@ -34,6 +35,11 @@ class CustomGPSLayer(torch.nn.Module):
             )
         elif local_model == 'permutation_tree':
             self.local_model = AdvancedPermutationTreeLayer(
+                hidden_dim=self.hidden_dim,
+                **local_model_params
+            )
+        elif local_model == 'permutation_tree_rnn':
+            self.local_model = AdvancedPermutationTreeLayerRNN(
                 hidden_dim=self.hidden_dim,
                 **local_model_params
             )
