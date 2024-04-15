@@ -1,0 +1,10 @@
+loading_dir: results/ez_ptree/edge/cistrans
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/chem/cis_trans.yaml
+  - configs/datasets/ez_dataset.yaml
+  - configs/models/ptree_default.yaml
+  - configs/general.yaml
+
+n_best: 2
