@@ -1,0 +1,10 @@
+loading_dir: results/br_chienn_rwse
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/add_rwse.yaml
+  - configs/datasets/binding_rank.yaml
+  - configs/models/chienn.yaml
+  - configs/general.yaml
+
+n_best: 1
