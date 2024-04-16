@@ -229,11 +229,11 @@ def permutation_tree_vertex_transformation(
 
     if add_cyclic_trees:
         if cyclic_tree_mode == "complex":
-            edge_graph = cyclic_tree_vertex(edge_graph, mol, node_mapping)
+            data = cyclic_tree_vertex(data, mol)
         elif cyclic_tree_mode == "light":
-            edge_graph = cyclic_tree_vertex_light(edge_graph, mol, node_mapping)
+            data = cyclic_tree_vertex_light(data, mol)
         elif cyclic_tree_mode == "minimal":
-            edge_graph = cyclic_tree_vertex_minimal(edge_graph, mol, node_mapping)
+            data = cyclic_tree_vertex_minimal(data, mol)
         else:
             raise NotImplementedError(f"cyclic tree mode {cyclic_tree_mode} is not implemented.")
 
