@@ -46,7 +46,7 @@ METRICS_DICT_TORCHMETRICS = {
 
 
 def rounding_fn(score):
-    return round(score, 2)
+    return round(score, 5)
 
 
 def classification_binary(
