@@ -1,4 +1,4 @@
-output_dir: results/ba_ptree/edge/cyclic_reduced_rwse
+loading_dir: results/ba_ptree/edge/cyclic_reduced_rwse
 
 config_files:
   - configs/add_test_set.yaml
