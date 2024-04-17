@@ -14,10 +14,19 @@ data:
       n_neighbors_in_circle: 3
       num_workers: 0
     test:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
       sampler: full_batch
     train:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
       sampler: full_batch
     val:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
       sampler: full_batch
   subset_size: 10000
 model:
@@ -52,7 +61,7 @@ scheduler:
 training:
   clip_grad_norm: true
   loss_function: cross_entropy
-  n_max_epochs: 3
+  n_max_epochs: 100
   optimization_metric: auc
   optimization_metric_mode: max
   task_type: classification_multilabel
