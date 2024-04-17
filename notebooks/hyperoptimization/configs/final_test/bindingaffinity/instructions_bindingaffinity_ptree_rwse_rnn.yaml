@@ -1,0 +1,10 @@
+loading_dir: results/ba_ptree/edge/rwse_rnn
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/add_rwse.yaml
+  - configs/datasets/binding_affinity.yaml
+  - configs/models/ptree_rnn.yaml
+  - configs/general.yaml
+
+n_best: 3
