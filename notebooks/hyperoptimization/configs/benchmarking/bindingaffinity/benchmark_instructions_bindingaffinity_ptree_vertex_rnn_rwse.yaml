@@ -25,4 +25,4 @@ hyper_settings:
     reduction_factor: 3
     brackets: 1
   max_concurrent_trials: 5
-  num_samples: 30 # reduced as first run failed due to technical error and best result was achieved very early
+  num_samples: 20 # reduced as first run failed due to technical error and best result was achieved very early
