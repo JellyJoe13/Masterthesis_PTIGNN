@@ -17,8 +17,6 @@ from ptgnn.runtime_config.config import priority_merge_config, optional_fetch
 from ptgnn.runtime_config.loss import l1_loss, graphgym_cross_entropy_loss
 from ptgnn.runtime_config.metrics import metric_system
 
-from ray import train
-
 
 def fetch_loaders(
         data_config: typing.Dict[str, typing.Any],
@@ -227,6 +225,7 @@ def training_procedure(
 
         # reporting to ray train
         if report:
+            from ray import train
             train.report(metric_dict)
 
         # append metric dict to list
