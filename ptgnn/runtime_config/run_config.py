@@ -22,7 +22,8 @@ from ray import train
 
 def fetch_loaders(
         data_config: typing.Dict[str, typing.Any],
-        verbose: bool = True
+        verbose: bool = True,
+        use_multiprocess: bool = True
 ) -> typing.Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     """
     Function used to build the loaders based on the parameters passed in the config dict object.
@@ -31,15 +32,18 @@ def fetch_loaders(
     :type data_config: typing.Dict[str, typing.Any]
     :param verbose: Whether or not progress should be plotted to output
     :type verbose: bool
+    :param use_multiprocess: Parameter capable of turning off multiprocessing after Linux was discovered to behave
+        strangely when enabled (although still working)
+    :type use_multiprocess: bool
     :return: train, validation and test loaders
     :rtype: typing.Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader]
     """
     dataset_config = data_config['dataset']
     # load dataset
     ds_type = DATASET_DICT.get(dataset_config['type'])
-    train_ds = ds_type(**dataset_config, split='train')
-    test_ds = ds_type(**dataset_config, split="test")
-    val_ds = ds_type(**dataset_config, split="val")
+    train_ds = ds_type(**dataset_config, split='train', use_multiprocess=use_multiprocess)
+    test_ds = ds_type(**dataset_config, split="test", use_multiprocess=use_multiprocess)
+    val_ds = ds_type(**dataset_config, split="val", use_multiprocess=use_multiprocess)
 
     # subset data
     if 'subset_size' in data_config:

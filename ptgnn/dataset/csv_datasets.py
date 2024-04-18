@@ -33,6 +33,7 @@ class BaceDataset(InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            use_multiprocess: bool = True,
             **kwargs
     ):
         # connection to dataset download
@@ -55,6 +56,7 @@ class BaceDataset(InMemoryDataset):
         self.masking = MASKING_MAPPING.get(self.graph_mode)
         self.max_atoms = max_atoms
         self.max_attempts = max_attempts
+        self.use_multiprocess = use_multiprocess
 
         # starts procedure of downloading and processing
         super().__init__(
@@ -194,15 +196,25 @@ class BaceDataset(InMemoryDataset):
                 data.y = convert_target_for_task(data.y, self.task_type)
                 return smiles, data
 
-            with Pool(processes=min(os.cpu_count(), 24)) as p:
-                data_list = list(p.imap(
-                    worker,
-                    tqdm(
+            if self.use_multiprocess:
+                with Pool(processes=min(os.cpu_count(), 24)) as p:
+                    data_list = list(p.imap(
+                        worker,
+                        tqdm(
+                            split_df.iterrows(),
+                            total=len(split_df),
+                            desc=f"Split: {split}"
+                        )
+                    ))
+            else:
+                data_list = [
+                    worker(entry)
+                    for entry in tqdm(
                         split_df.iterrows(),
                         total=len(split_df),
                         desc=f"Split: {split}"
                     )
-                ))
+                ]
 
             # extract data list and remove elements to remove (from previous list)
             data_list = [
@@ -257,6 +269,7 @@ class Tox21Dataset(InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            use_multiprocess: bool = True,
             **kwargs
     ):
         # connection to dataset download
@@ -280,6 +293,7 @@ class Tox21Dataset(InMemoryDataset):
         self.masking = MASKING_MAPPING.get(self.graph_mode)
         self.max_atoms = max_atoms
         self.max_attempts = max_attempts
+        self.use_multiprocess = use_multiprocess
 
         # starts procedure of downloading and processing
         super().__init__(
@@ -418,15 +432,25 @@ class Tox21Dataset(InMemoryDataset):
                 data.y = convert_target_for_task(data.y, self.task_type)
                 return smiles, data
 
-            with Pool(processes=min(os.cpu_count(), 24)) as p:
-                data_list = list(p.imap(
-                    worker,
-                    tqdm(
+            if self.use_multiprocess:
+                with Pool(processes=min(os.cpu_count(), 24)) as p:
+                    data_list = list(p.imap(
+                        worker,
+                        tqdm(
+                            split_df.iterrows(),
+                            total=len(split_df),
+                            desc=f"Split: {split}"
+                        )
+                    ))
+            else:
+                data_list = [
+                    worker(entry)
+                    for entry in tqdm(
                         split_df.iterrows(),
                         total=len(split_df),
                         desc=f"Split: {split}"
                     )
-                ))
+                ]
 
             # extract data list and remove elements to remove (from previous list)
             data_list = [

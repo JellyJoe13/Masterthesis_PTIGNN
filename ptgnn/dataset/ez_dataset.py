@@ -30,6 +30,7 @@ class EZDataset(pyg.data.InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            use_multiprocess: bool = True,
             **kwargs
     ):
         """
@@ -67,6 +68,7 @@ class EZDataset(pyg.data.InMemoryDataset):
         self.masking = MASKING_MAPPING.get(self.graph_mode)
         self.max_atoms = max_atoms
         self.max_attempts = max_attempts
+        self.use_multiprocess = use_multiprocess
 
         # starts procedure of downloading and processing
         super().__init__(
@@ -161,11 +163,17 @@ class EZDataset(pyg.data.InMemoryDataset):
             return idx, entry, len(bonds)
 
         # run first worker
-        with Pool(processes=min(os.cpu_count(), 24)) as p:
-            df_collection = list(p.imap(
-                worker_filter_one_four_const_stereo,
-                tqdm(split_df.iterrows(), total=len(split_df), desc=f"{self.split}: filter")
-            ))
+        if self.use_multiprocess:
+            with Pool(processes=min(os.cpu_count(), 24)) as p:
+                df_collection = list(p.imap(
+                    worker_filter_one_four_const_stereo,
+                    tqdm(split_df.iterrows(), total=len(split_df), desc=f"{self.split}: filter")
+                ))
+        else:
+            df_collection = [
+                worker_filter_one_four_const_stereo(entry)
+                for entry in tqdm(split_df.iterrows(), total=len(split_df), desc=f"{self.split}: filter")
+            ]
 
         # filter and extract elements from df_collection
         df_collection = pd.DataFrame([
@@ -211,12 +219,24 @@ class EZDataset(pyg.data.InMemoryDataset):
             })
 
         # generate all e/z isomers of each element (then merge and drop duplicates)
-        with Pool(processes=min(os.cpu_count(), 24)) as p:
+        if self.use_multiprocess:
+            with Pool(processes=min(os.cpu_count(), 24)) as p:
+                df_collection = pd.concat(
+                    list(p.imap(
+                        worker_create_all_ez_isomers,
+                        tqdm(df_collection.iterrows(), total=len(df_collection), desc=f"{self.split}: isomer creation")
+                    ))
+                )
+        else:
             df_collection = pd.concat(
-                list(p.imap(
-                    worker_create_all_ez_isomers,
-                    tqdm(df_collection.iterrows(), total=len(df_collection), desc=f"{self.split}: isomer creation")
-                ))
+                [
+                    worker_create_all_ez_isomers(entry)
+                    for entry in tqdm(
+                        df_collection.iterrows(),
+                        total=len(df_collection),
+                        desc=f"{self.split}: isomer creation"
+                    )
+                ]
             )
 
         df_collection.reset_index(inplace=True, drop='index')
@@ -254,11 +274,17 @@ class EZDataset(pyg.data.InMemoryDataset):
             return entry
 
         # execute worker
-        with Pool(processes=min(os.cpu_count(), 24)) as p:
-            df_collection = list(p.imap(
-                worker_gen_labels,
-                tqdm(df_collection.iterrows(), total=len(df_collection), desc=f"{self.split}: label generation")
-            ))
+        if self.use_multiprocess:
+            with Pool(processes=min(os.cpu_count(), 24)) as p:
+                df_collection = list(p.imap(
+                    worker_gen_labels,
+                    tqdm(df_collection.iterrows(), total=len(df_collection), desc=f"{self.split}: label generation")
+                ))
+        else:
+            df_collection = [
+                worker_gen_labels(entry)
+                for entry in tqdm(df_collection.iterrows(), total=len(df_collection), desc=f"{self.split}: label generation")
+            ]
 
         # filter out None elements (if molecule could not be rendered)
         df_collection = pd.DataFrame(
@@ -326,15 +352,25 @@ class EZDataset(pyg.data.InMemoryDataset):
 
             return index, smiles_nonstereo, data
 
-        with Pool(processes=min(os.cpu_count(), 24)) as p:
-            data_list = list(p.imap(
-                worker,
-                tqdm(
+        if self.use_multiprocess:
+            with Pool(processes=min(os.cpu_count(), 24)) as p:
+                data_list = list(p.imap(
+                    worker,
+                    tqdm(
+                        split_df.iterrows(),
+                        total=len(split_df),
+                        desc=f"Split: {self.split}"
+                    )
+                ))
+        else:
+            data_list = [
+                worker(entry)
+                for entry in tqdm(
                     split_df.iterrows(),
                     total=len(split_df),
                     desc=f"Split: {self.split}"
                 )
-            ))
+            ]
 
         # re-create ordering before multiprocessing
         data_list = sorted(data_list, key=lambda x: x[0])

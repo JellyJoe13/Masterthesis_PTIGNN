@@ -31,6 +31,7 @@ class RSDataset(pyg.data.InMemoryDataset):
             transformation_parameters: typing.Dict[str, typing.Any] = {},
             max_atoms: int = 100,
             max_attempts: int = 100,  # significantly decreased - 5000 is way too much!
+            use_multiprocess: bool = True,
             **kwargs
     ):
         """
@@ -68,6 +69,7 @@ class RSDataset(pyg.data.InMemoryDataset):
         self.masking = MASKING_MAPPING.get(self.graph_mode)
         self.max_atoms = max_atoms
         self.max_attempts = max_attempts
+        self.use_multiprocess = use_multiprocess
 
         # starts procedure of downloading and processing
         super().__init__(
@@ -163,15 +165,25 @@ class RSDataset(pyg.data.InMemoryDataset):
 
             return index, smiles_nonstereo, data
 
-        with Pool(processes=min(os.cpu_count(), 24)) as p:
-            data_list = list(p.imap(
-                worker,
-                tqdm(
+        if self.use_multiprocess:
+            with Pool(processes=min(os.cpu_count(), 24)) as p:
+                data_list = list(p.imap(
+                    worker,
+                    tqdm(
+                        split_df.iterrows(),
+                        total=len(split_df),
+                        desc=f"Split: {self.split}"
+                    )
+                ))
+        else:
+            data_list = [
+                worker(entry)
+                for entry in tqdm(
                     split_df.iterrows(),
                     total=len(split_df),
                     desc=f"Split: {self.split}"
                 )
-            ))
+            ]
 
         # re-create ordering before multiprocessing
         data_list = sorted(data_list, key=lambda x: x[0])

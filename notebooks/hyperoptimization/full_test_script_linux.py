@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
         print("Begin initial dataset loading/creation:")
         # load/create dataset in one process
-        _, _, _ = fetch_loaders(config['data'], verbose=True)
+        _, _, _ = fetch_loaders(config['data'], verbose=True, use_multiprocess=False)
 
         print("Finished initial dataset loading/creation")
         return
