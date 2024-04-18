@@ -2,6 +2,8 @@ import argparse
 import os
 
 import pandas as pd
+import sys
+sys.path.append("../../")
 
 from ptgnn.runtime_config.config import import_as, priority_merge_config, export_as
 from ptgnn.runtime_config.config_helpers import load_and_merge_default_configs
