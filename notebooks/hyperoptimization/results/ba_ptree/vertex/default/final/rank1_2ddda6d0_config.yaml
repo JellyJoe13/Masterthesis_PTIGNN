@@ -1,0 +1,70 @@
+data:
+  dataset:
+    graph_mode: vertex
+    mask_chiral_tags: true
+    root: /media/data/urbanj00dm/Masterthesis_PTGNN/notebooks/hyperoptimization/src/ba
+    single_conformer: true
+    single_enantiomer: false
+    transformation_mode: permutation_tree
+    transformation_parameters:
+      k: 3
+    type: ba
+  loader:
+    general:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+    test:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: full_batch
+    train:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: full_batch
+    val:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: full_batch
+model:
+  head:
+    n_layer: 3
+    pool_function: add
+    type: san_head
+  hidden_dim: 128
+  hidden_dimension: 256
+  mode: custom
+  modules:
+    0:
+      parameter:
+        edge_type: linear
+        node_type: linear
+      type: graph_embedding
+    1:
+      parameter:
+        dropout: 0.0
+        local_model: permutation_tree
+        local_model_params:
+          k: 3
+      times: 6
+      type: gps_layer
+  out_dim: 1
+optimizer:
+  base_learning_rate: 0.0001
+  type: adam_w
+  weight_decay: 1.0e-05
+scheduler:
+  max_epochs: 100
+  num_warmup_epochs: 10
+  type: cosine_with_warmup
+training:
+  clip_grad_norm: true
+  loss_function: l1
+  n_max_epochs: 100
+  optimization_metric: mae
+  optimization_metric_mode: min
+  task_type: regression
+  use_test_set: true
