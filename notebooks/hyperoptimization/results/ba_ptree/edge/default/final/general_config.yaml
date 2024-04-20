@@ -2,7 +2,7 @@ data:
   dataset:
     graph_mode: edge
     mask_chiral_tags: true
-    root: /media/data/urbanj00dm/Masterthesis_PTGNN/notebooks/hyperoptimization/src/ba
+    root: /mnt/data/urbanj00dm/Masterthesis_PTGNN/notebooks/hyperoptimization/src/ba
     single_conformer: true
     single_enantiomer: false
     transformation_mode: permutation_tree
