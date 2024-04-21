@@ -5,6 +5,9 @@ from ptgnn.transform.ptree_matrix import type_dict
 
 
 class AdvancedPermutationTreeLayerRNN(torch.nn.Module):
+    """
+    Advanced permutation tree invariant layer that uses RNNs instead of ChiENN's techniques.
+    """
     def __init__(
             self,
             k: int,
@@ -13,6 +16,22 @@ class AdvancedPermutationTreeLayerRNN(torch.nn.Module):
             use_separate_inv: bool = False,
             apply_p_elu: bool = False
     ):
+        """
+        Init function of the advanced permutation tree layer - rnn version
+
+        :param k: Number of elements to set into context at once, basically irrelevant for this model, only for
+            auxiliary information and future use.
+        :type k: int
+        :param hidden_dim: hidden dimension
+        :type hidden_dim: int
+        :param batch_norm: Whether to use the batch norm or not
+        :type batch_norm: bool
+        :param use_separate_inv: Add separate modules for S and Z type nodes - specified through S2 and Z2 in the
+            permutation tree definition.
+        :type use_separate_inv: bool
+        :param apply_p_elu: Whether to use ELU between the two linear layers realizing a p type layer
+        :type apply_p_elu: bool
+        """
         # set super
         super(AdvancedPermutationTreeLayerRNN, self).__init__()
 

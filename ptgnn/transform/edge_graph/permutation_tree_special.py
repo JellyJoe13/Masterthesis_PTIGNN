@@ -4,6 +4,20 @@ import torch
 
 
 def get_cistrans_tree(vertex_graph, node_a, node_b, node_mapping):
+    """
+    Produce cistrans permutation tree for edge between two nodes.
+
+    :param vertex_graph: vertex graph
+    :type vertex_graph: torch_geometric.data.Data
+    :param node_a: one of the nodes of the double bond in question
+    :type node_a: int
+    :param node_b: the other of the two nodes of the double bond in question
+    :type node_b: int
+    :param node_mapping: node mapping between node pairs to edges (in the course of edge graph transformation)
+    :type node_mapping: dict
+    :return: permutation tree
+    :rtype: str
+    """
     # get neighbors
     neighbors = vertex_graph.edge_index[:, vertex_graph.edge_index[1] == node_a]
     neighbors = neighbors[:, neighbors[0] != node_b]

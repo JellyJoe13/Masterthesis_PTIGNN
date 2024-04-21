@@ -16,8 +16,28 @@ def custom_loader(
         precompute_pos_enc: list = []
 ) -> UniversalLoader:
     """
+    Fetches the loader for elements in project. Currently one single loader for all elements.
+
     Adapted from
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L99
+
+    :param dataset: Dataset which to wrap in a loader
+    :param n_neighbors_in_circle: number of neighbors in circle in case of ChiENN cycle index setting.
+    :type n_neighbors_in_circle: int
+    :param batch_size: batch size
+    :type batch_size: int
+    :param sampler: Whether to use the full batch or single conformer sampling method
+    :type sampler: str
+    :param shuffle: Whether to shuffle the data or not
+    :type shuffle: bool
+    :param dataframe: dataframe which to use in single conformer sampling
+    :type dataframe: pd.DataFrame
+    :param num_workers: How many workers to use in the loader
+    :type num_workers: int
+    :param verbose: Whether to print information to command line/system out
+    :type verbose: bool
+    :param precompute_pos_enc: List of positional embeddings to calculate for the contents in advance
+    :type precompute_pos_enc: list
     """
     if sampler == "single_conformer_sampler":
         # select dataframe

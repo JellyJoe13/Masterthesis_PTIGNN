@@ -16,7 +16,14 @@ from ptgnn.features.chiro.embedding_functions import embedConformerWithAllPaths
 
 def download_url_to_path(url, path):
     """
-     https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/utils.py
+    Adapted from https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/utils.py
+
+    :param url: URL from which to download the dataset file(s).
+    :type url: str
+    :param path: Path to which to save the file(s)
+    :type path: str
+    :return: path to which the files were saved
+    :rtype: Path
     """
     path = Path(path)
     if path.exists():
@@ -35,7 +42,14 @@ def download_url_to_path(url, path):
 
 def get_positions(mol: rdkit.Chem.Mol):
     """
-    From: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L65
+    Fetches the positions of the atoms in the passed molecules and returns it as a numpy array.
+    Adapted from:
+    https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L65
+
+    :param mol: Molecule from which to get the positions for all atoms
+    :type mol: rdkit.Chem.Mol
+    :return: positions
+    :rtype: np.ndarray[float]
     """
     conf = mol.GetConformer()
     return np.array(
@@ -53,8 +67,13 @@ def get_positions(mol: rdkit.Chem.Mol):
 def get_chiro_data_from_mol(mol: rdkit.Chem.Mol):
     """
     From: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L65
-    Copied from `ChIRo.model.datasets_samplers.MaskedGraphDataset.process_mol`. It encoded molecule with some basic
+    Copied from `ChIRo.model.datasets_samplers.MaskedGraphDataset.process_mol`. It encodes a molecule with some basic
     chemical features. It also provides chiral tag, which can be then masked in `graphgps.dataset.rs_dataset.RS`.
+
+    :param mol: Molecule for which to generate the features
+    :type mol: rdkit.Chem.Mol
+    :return: data object generated from the passed molecule
+    :rtype: torch_geometric.data.Data
     """
     atom_symbols, edge_index, edge_features, node_features, bond_distances, bond_distance_index, bond_angles, bond_angle_index, dihedral_angles, dihedral_angle_index = embedConformerWithAllPaths(
         mol, repeats=False)
@@ -83,7 +102,19 @@ def convert_target_for_task(
         scale_label: float = 1.0
 ) -> torch.Tensor:
     """
-    From: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L142
+    Modifies the label to match the task prediction type.
+
+    Adapted from:
+    https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L142
+
+    :param target: label to modify
+    :type target: torch.Tensor
+    :param task_type: Task type to which to fit the label to
+    :type task_type: str
+    :param scale_label: Parameter by which the label is to scale in case of regression
+    :type scale_label: float
+    :return: modified label
+    :rtype: torch.Tensor
     """
     if task_type in ['regression', 'regression_rank']:
         return target.float() * scale_label

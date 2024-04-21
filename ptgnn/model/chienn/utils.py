@@ -25,6 +25,18 @@ def _build_single_embedding_layer(in_dim: int, out_dim: int, name: str):
 
 
 def build_embedding_layer(in_dim: int, out_dim: int, name: str):
+    """
+    Function to build a pytorch embedding layer from a string that defines which type and if it is a composite type.
+
+    :param in_dim: input dimension
+    :type in_dim: int
+    :param out_dim: output dimension
+    :type out_dim: int
+    :param name: name of the pytorch element(s)
+    :type name: str
+    :return: Embedding layer
+    :rtype: torch.nn.Module
+    """
     sub_names = name.split('+')
     if len(sub_names) == 1:
         return _build_single_embedding_layer(in_dim, out_dim, sub_names[0])

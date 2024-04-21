@@ -3,6 +3,10 @@ import torch_geometric.data
 
 
 class GraphEmbedding(torch.nn.Module):
+    """
+    Embedding module for a graph. Applies node and edge level embeddings and thus embed both of them to different sizes,
+    normally hidden dimension.
+    """
     def __init__(
             self,
             node_in_dim: int,
@@ -14,6 +18,25 @@ class GraphEmbedding(torch.nn.Module):
             rwse_params: dict = {},
             **kwargs
     ):
+        """
+        Init function of GraphEmbedding class
+
+        :param node_in_dim: node input dimension
+        :type node_in_dim: int
+        :param node_out_dim: node output dimension
+        :type node_out_dim: int
+        :param edge_in_dim: edge input dimension
+        :type edge_in_dim: int
+        :param edge_out_dim: edge output dimension
+        :type edge_out_dim: int
+        :param node_type: type of embedding for the nodes
+        :type node_type: str
+        :param edge_type: type of embedding for the edges
+        :type edge_type: str
+        :param rwse_params: parameters of the RWSE embedding (if applicable)
+        :type rwse_params: dict
+        :param kwargs: Auxiliary parameters
+        """
         # model init
         super(GraphEmbedding, self).__init__()
 

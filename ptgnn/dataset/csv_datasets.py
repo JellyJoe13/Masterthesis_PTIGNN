@@ -36,6 +36,45 @@ class BaceDataset(InMemoryDataset):
             use_multiprocess: bool = True,
             **kwargs
     ):
+        """
+        Init of the BACE dataset class. Starts the downloading and processing if the corresponding files are not present
+        . Uses multiprocess library to speed up computation by using all CPU cores.
+
+        :param root: Path to which the dataset should be downloaded/saved.
+        :type root: str
+        :param single_conformer: Filtering option removing duplicate entries using stereo-SMILES entry in data.
+        :type single_conformer: bool
+        :param single_enantiomer: Controls whether only one enantiomer should be in dataset. This means that the
+            non-stereo SMILES string is used to sample one element. Counterproductive for the use in this project, so
+            always ``False``.
+        :type single_enantiomer: bool
+        :param mask_chiral_tags: Whether or not to mask the chiral tags in the nodes and edges. Default ``True`` as
+            it is of interest whether or not the model can learn the stereo-properties without having direct access
+            to them. Should infer them using neighbor order.
+        :type mask_chiral_tags: bool
+        :param split: Specifies which dataset split to load for this class. Options: ``"train"``, ``"val"`` and ``test``
+        :type split: str
+        :param graph_mode: Mode of the graph. Either ``"edge"`` or ``"vertex"``. Controls whether an edge graph
+            transformation should take place or not. For PTGNN both options are possible, for ChiENN only edge graph
+            is possible or else their 'cycle_index' will not work.
+        :type graph_mode: str
+        :param transformation_mode: Specifies the mode of transformation. Currently available: ``"default"``=``chienn``,
+            ``"permutation_tree"``.
+        :type transformation_mode: str
+        :param transformation_parameters: Configurable options of the transformation.
+        :type transformation_parameters: typing.Dict[str, typing.Any]
+        :param max_atoms: Max number of atoms - required for creating embedding
+        :type max_atoms: int
+        :param max_attempts: Maximal attempts of creating a 3d version of the molecule. Warning: Do not set too high
+            as some molecules cannot be 'rendered' in reasonable time.
+        :type max_attempts: int
+        :param use_multiprocess: Whether or not the generation should be parallelized using the multiprocess framework.
+            Use with caution on Linux - for some reason it uses significantly more cores on Linux, maybe some reason
+            the default process uses multiple CPUs already...
+        :type use_multiprocess: bool
+        :param kwargs: Catches access arguments which are not specified for all datasets. CAUTION: make sure the
+            parameters have the correct name as a mis-spelling will not cause an error.
+        """
         # connection to dataset download
         self.link_storage = {
             'url': 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/bace.csv',
@@ -272,6 +311,39 @@ class Tox21Dataset(InMemoryDataset):
             use_multiprocess: bool = True,
             **kwargs
     ):
+        """
+        Init of the Tox21 dataset class. Starts the downloading and processing if the corresponding files are not
+        present. Uses multiprocess library to speed up computation by using all CPU cores.
+
+        :param root: Path to which the dataset should be downloaded/saved.
+        :type root: str
+        :param mask_chiral_tags: Whether or not to mask the chiral tags in the nodes and edges. Default ``True`` as
+            it is of interest whether or not the model can learn the stereo-properties without having direct access
+            to them. Should infer them using neighbor order.
+        :type mask_chiral_tags: bool
+        :param split: Specifies which dataset split to load for this class. Options: ``"train"``, ``"val"`` and ``test``
+        :type split: str
+        :param graph_mode: Mode of the graph. Either ``"edge"`` or ``"vertex"``. Controls whether an edge graph
+            transformation should take place or not. For PTGNN both options are possible, for ChiENN only edge graph
+            is possible or else their 'cycle_index' will not work.
+        :type graph_mode: str
+        :param transformation_mode: Specifies the mode of transformation. Currently available: ``"default"``=``chienn``,
+            ``"permutation_tree"``.
+        :type transformation_mode: str
+        :param transformation_parameters: Configurable options of the transformation.
+        :type transformation_parameters: typing.Dict[str, typing.Any]
+        :param max_atoms: Max number of atoms - required for creating embedding
+        :type max_atoms: int
+        :param max_attempts: Maximal attempts of creating a 3d version of the molecule. Warning: Do not set too high
+            as some molecules cannot be 'rendered' in reasonable time.
+        :type max_attempts: int
+        :param use_multiprocess: Whether or not the generation should be parallelized using the multiprocess framework.
+            Use with caution on Linux - for some reason it uses significantly more cores on Linux, maybe some reason
+            the default process uses multiple CPUs already...
+        :type use_multiprocess: bool
+        :param kwargs: Catches access arguments which are not specified for all datasets. CAUTION: make sure the
+            parameters have the correct name as a mis-spelling will not cause an error.
+        """
         # connection to dataset download
         self.link_storage = {
             'url': 'https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/tox21.csv.gz',

@@ -9,6 +9,17 @@ def export_as(
         path: str,
         save_type: str = "json"
 ):
+    """
+    Export config dictionary to a file.
+
+    :param dict_to_save: config dict to save
+    :type dict_to_save: dict
+    :param path: path to which to save to
+    :type path: str
+    :param save_type: file type, either ``"json"`` or ``"yaml"``
+    :type save_type: str
+    :return: Nothing.
+    """
     if save_type == 'json':
         with open(path, "w") as f:
             json.dump(dict_to_save, f, indent=4)
@@ -23,6 +34,16 @@ def import_as(
         path: str,
         loading_type: str = None
 ):
+    """
+    Import config dict from file (path)
+
+    :param path: Path from which to load from
+    :type path: str
+    :param loading_type: type of file to load. If not provided will be inferred from file ending
+    :type loading_type: str
+    :return: loaded config dict
+    :rtype: dict
+    """
     # infer type if not provided
     if loading_type is None:
         if ".yaml" in path or ".yml" in path:
@@ -48,6 +69,19 @@ def priority_merge_config(
         dict2: dict,
         in_place: bool = True
 ) -> dict:
+    """
+    Merges two config dicts. Priority in this case means that the first dicts configs take precedence over the second
+    dict. This means that if both dicts have different values for an entry, the first will be prioritized.
+
+    :param dict1: first dict (higher priority)
+    :type dict1: dict
+    :param dict2: second dict (lower priority)
+    :type dict2: dict
+    :param in_place: Whether or not the contents should be merged into the first dictionary
+    :type in_place: bool
+    :return: Merged dict
+    :rtype: dict
+    """
     if in_place:
         merged_dict = dict1
     else:
@@ -79,6 +113,16 @@ def optional_fetch(
         config_dict: dict,
         key: str
 ) -> dict:
+    """
+    Optional fetch from config dict. Else empty dictionarity is returned.
+
+    :param config_dict: config dict from which to optionally fetch
+    :type config_dict: dict
+    :param key: key which is to be fetched
+    :type key: str
+    :return: fetched value/dict
+    :rtype: dict
+    """
     if key in config_dict:
         return config_dict[key]
     else:

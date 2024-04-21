@@ -15,6 +15,17 @@ from ptgnn.transform.vertex_graph.cyclic_tree import cyclic_tree_vertex, cyclic_
 
 
 def get_cis_trans_ordering(data, node_a, node_b):
+    """
+    Produce ordering of the four constituents of the cis/trans double bond. Is then used in a C type node.
+
+    :param data: graph
+    :type data: torch_geometric.data.Data
+    :param node_a: one node
+    :type node_a: int
+    :param node_b: other node
+    :type node_b: int
+    :return: typing.List[int]
+    """
     # get neighbors
     neighbors = data.edge_index[:, data.edge_index[1] == node_a]
     neighbors = neighbors[:, neighbors[0] != node_b]
@@ -63,6 +74,33 @@ def permutation_tree_vertex_transformation(
         cyclic_tree_mode: str = "complex",  # alt: light, minimal
         use_new_inv: bool = False
 ) -> torch_geometric.data.Data:
+    """
+    Function with many bool control variables. Determines how the permutation tree is constructed and to which
+    stereoisomer to be sensitive to.
+
+    :param data: vertex graph
+    :param mol: molecule which corresponds to vertex graph
+    :param k: number of neighbors to set into context. Not always necessary.
+    :param tetrahedral_chiral: Sensitive to tetrahedral chiral centers if enabled
+    :param chiral_center_selective: Sensitive to only marked tetrahedral chiral centers (and not by default to all
+        nodes/atoms)
+    :param chiral_center_select_potential: Sensitive also to potential stereocenters (if selective is true)
+    :param cis_trans_edges: enable cis/trans trees (only selective)
+    :param cis_trans_edges_select_potential: enable cis/trans trees also for unmarked but potential cis/trans bonds
+    :param axial_chirality: Enable axial chirality - requires that rdkit has correct position values stored (is not true
+        by default for version 2023.*.*)
+    :param create_order_matrix: whether or not to create the order matrix.
+    :param multi_stereo_center_dia: Whether or not do multiple stereo center enantiomer invariance. Not advisable as
+        model can distinguish these stereoisomers (see master thesis) but difference is 10^(-4) which is too small.
+    :param separate_tree: Whether to separate tree - make simplest trees with only one internal node for each ptree
+        for each node.
+    :param add_cyclic_trees: Add cyclic trees for graph - extra nodes, and more connections
+    :param cyclic_tree_mode: Mode of the cylcic trees. Either complex, light or minimal - see master thesis
+    :type cyclic_tree_mode: str
+    :param use_new_inv: Whether or not to separate C and Q types into P(Z,Z) & P(S,S) (if false) else P(Z2,Z2) & P(S2,S2)
+    :return: transformed graph
+    :rtype: torch_geometric.data.Data
+    """
     # get the edge graph transformation
     # required for some permutation tree creations (due to circle index needed from edges)
     edge_graph, node_mapping = custom_to_edge_graph(

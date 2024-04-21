@@ -5,6 +5,11 @@ from ptgnn.transform.ptree_matrix import type_dict
 
 
 class ComplexPtreeLayer(torch.nn.Module):
+    """
+    Predecessor of the Advanced Permutation tree invariant model - implements logic, however does not work, probably
+    due to internal working where setting values is not working properly. Instead adding results to zero value tensor
+    is to be used. (and other masking methods)
+    """
     def __init__(
             self,
             k: int,

@@ -24,6 +24,27 @@ class UniversalLoader(DataLoader):
             verbose: bool = True,
             **kwargs
     ):
+        """
+        Universal Loader init function. Capable of loading all data types/datasets in this project.
+
+        :param dataset: dataset which to load with the loader
+        :type dataset: Union[Dataset, List[BaseData]]
+        :param batch_size: batch size
+        :type batch_size: int
+        :param shuffle: Whether or not to shuffle the dataset
+        :type shuffle: bool
+        :param follow_batch: Follow batch parameter of Collater
+        :type follow_batch: Optional[List[str]]
+        :param exclude_keys: Exclude keys parameter of Collater
+        :type exclude_keys: Optional[List[str]]
+        :param n_neighbors_in_circle: number of neighbors in cycle - relevant for ChiENN model
+        :type n_neighbors_in_circle: Optional[int]
+        :param precompute_pos_enc: list of positional embeddings to compute
+        :type precompute_pos_enc: list
+        :param verbose: Whether or not to print intermediary output/progress
+        :type verbose: bool
+        :param kwargs: Excessive parameters
+        """
         super().__init__(
             dataset=dataset,
             batch_size=batch_size,

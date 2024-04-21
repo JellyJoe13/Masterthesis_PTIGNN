@@ -2,16 +2,31 @@ import torch.nn.functional
 
 
 def graphgym_cross_entropy_loss(
-        pred,
-        true,
-        reduction='mean',
+        pred: torch.Tensor,
+        true: torch.Tensor,
+        reduction: str = 'mean',
         is_multilabel: bool = False,
         **kwargs
-):
+) -> torch.Tensor:
     """
-    Adapted from https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/graphgym/loss.html
+    Cross entropy loss function adapted from graphgym:
+    https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/graphgym/loss.html
+
+    Makes distinction whether the task is multilabel or binary label classification.
+
+    :param pred: prediction tensor
+    :type pred: torch.Tensor
+    :param true: true label tensor
+    :type true: torch.Tensor
+    :param reduction: reduction method
+    :type reduction: str
+    :param is_multilabel: Whether or not the task is a multilabel prediction type
+    :type is_multilabel: bool
+    :return: loss
+    :rtype: torch.Tensor
     """
-    # catch  multilabel case: source https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loss/multilabel_classification_loss.py
+    # catch  multilabel case:
+    # source: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loss/multilabel_classification_loss.py
     if is_multilabel:
         bce_loss = torch.nn.BCEWithLogitsLoss()
         is_labeled = ~true.isnan()
@@ -39,6 +54,16 @@ def graphgym_cross_entropy_loss(
 
 
 def l1_loss(pred, true):
+    """
+    L1 loss function.
+
+    :param pred: prediction tensor
+    :type pred: torch.Tensor
+    :param true: true label tensor
+    :type true: torch.Tensor
+    :return: loss
+    :rtype: torch.Tensor
+    """
     # default manipulation for pred and true
     # can be skipped if special loss computation is needed
     pred = pred.squeeze(-1) if pred.ndim > 1 else pred

@@ -10,7 +10,7 @@ class SingleConformerSampler(torch.utils.data.Sampler):
     """
     Adapted from
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L261
-    to reproduce training procedure to some extent
+    to reproduce training procedure to some extent. Samples number of positive and negative conformers for one batch
     """
 
     def __init__(

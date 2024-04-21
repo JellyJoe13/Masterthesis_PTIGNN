@@ -1,8 +1,7 @@
 """
 Source of this file is https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/chienn/data/featurization/mol_to_data.py#L27
+Originally adapted from https://github.com/keiradams/ChIRo/blob/main/model/embedding_functions.py
 """
-# Adapted from https://github.com/keiradams/ChIRo/blob/main/model/embedding_functions.py
-
 import numpy as np
 import rdkit
 import torch
@@ -10,6 +9,7 @@ from rdkit.Chem import rdMolTransforms, Mol, Atom, Bond
 from torch_geometric.data import Data
 from typing import List
 
+# define atom/edge features
 atom_types = ['H', 'C', 'B', 'N', 'O', 'F', 'Si', 'P', 'S', 'Cl', 'Br', 'I']
 formal_charges = [-1, -2, 1, 2, 0]
 degree = [0, 1, 2, 3, 4, 5, 6]

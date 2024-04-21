@@ -11,6 +11,8 @@ from ptgnn.model.modules.ptree.advanced_tree_layer_rnn import AdvancedPermutatio
 class CustomGPSLayer(torch.nn.Module):
     """
     Adapted from https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/layer/gps_layer.py#L17
+
+    Model with residual connection around stored layer and a feed forward network (also with residual connection)
     """
     def __init__(
             self,
@@ -22,6 +24,24 @@ class CustomGPSLayer(torch.nn.Module):
             norm_type: str = "batch",
             **kwargs
     ):
+        """
+        Init function of CustomGPSLayer
+
+        :param hidden_dim: hidden dimension
+        :type hidden_dim: int
+        :param local_model: local model of the GPS layer, i.e. to wrap with a residual connection
+        :type local_model: str
+        :param local_model_params: parameters to pass to the init of the local model
+        :type local_model_params: dict
+        :param global_model: global model of the GPS model - not implemented, ignore it. (Original model had option to
+            use a global model, i.e. Transformer and it was not clear whether this will be added or not).
+        :type global_model: str
+        :param dropout: dropout rate
+        :type dropout: float
+        :param norm_type: defines which norm to use. Either batch or layer
+        :type norm_type: str
+        :param kwargs: Auxiliary parameters
+        """
         super(CustomGPSLayer, self).__init__()
         # local parameters
         self.hidden_dim = hidden_dim

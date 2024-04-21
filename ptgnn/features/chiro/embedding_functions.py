@@ -1,6 +1,8 @@
 """
 The contents of this file are from
 https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/embedding_functions.py#L24
+
+Original files did not contain docstring, docstring information is inferred from functionality
 """
 import rdkit
 from rdkit.Chem import rdMolTransforms
@@ -26,7 +28,17 @@ hybridization = [
 bondTypes = ['SINGLE', 'DOUBLE', 'TRIPLE', 'AROMATIC']
 
 
-def one_hot_embedding(value, options):
+def one_hot_embedding(
+        value,
+        options
+):
+    """
+    Transform an integer value to a one hot embedding/encoding.
+
+    :param value: Current value to be transformed to one hot embedding
+    :param options: All possible options for the one hot embedding
+    :return: one hot embedding
+    """
     embedding = [0] * (len(options) + 1)
     index = options.index(value) if value in options else -1
     embedding[index] = 1
@@ -34,6 +46,13 @@ def one_hot_embedding(value, options):
 
 
 def adjacency_to_undirected_edge_index(adj):
+    """
+    Transform adjacency matrix to edge index (undirected).
+
+    :param adj: adjacency matrix
+    :type adj: Array, most likely np.ndarray
+    :return:
+    """
     adj = np.triu(np.array(adj, dtype=int))  # keeping just upper triangular entries from sym matrix
     array_adj = np.array(np.nonzero(adj), dtype=int)  # indices of non-zero values in adj matrix
     edge_index = np.zeros((2, 2 * array_adj.shape[1]), dtype=int)  # placeholder for undirected edge list
@@ -42,8 +61,20 @@ def adjacency_to_undirected_edge_index(adj):
     return edge_index
 
 
-def get_all_paths(G, N=3):
-    # adapted from: https://stackoverflow.com/questions/28095646/finding-all-paths-walks-of-given-length-in-a-networkx-graph
+def get_all_paths(
+        G,
+        N=3
+):
+    """
+    Get all edge paths of length N in the graph.
+
+    Originally adapted from:
+    https://stackoverflow.com/questions/28095646/finding-all-paths-walks-of-given-length-in-a-networkx-graph
+
+    :param G: graph
+    :param N: length of paths to find
+    :return: list of all paths
+    """
 
     def findPaths(G, u, n):
         if n == 0:
@@ -58,7 +89,17 @@ def get_all_paths(G, N=3):
     return allpaths
 
 
-def getNodeFeatures(list_rdkit_atoms, owningMol):
+def getNodeFeatures(
+        list_rdkit_atoms,
+        owningMol
+):
+    """
+    Get node features of the atoms passed in the parameters.
+
+    :param list_rdkit_atoms: atoms for which to calculate the node features
+    :param owningMol: molecule from which the atoms are from
+    :return: node features
+    """
     F_v = (len(atomTypes) + 1) + \
           (len(degree) + 1) + \
           (len(formalCharge) + 1) + \
@@ -104,6 +145,12 @@ def getNodeFeatures(list_rdkit_atoms, owningMol):
 
 
 def getEdgeFeatures(list_rdkit_bonds):
+    """
+    Calculate features of passed bonds.
+
+    :param list_rdkit_bonds: List of Bonds for which to generate the features
+    :return: features of the bonds
+    """
     F_e = (len(bondTypes) + 1) + 2 + (6 + 1)  # 14
 
     edge_features = np.zeros((len(list_rdkit_bonds) * 2, F_e))

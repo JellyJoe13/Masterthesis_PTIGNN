@@ -12,8 +12,21 @@ def cosine_with_warmup_scheduler(
         **kwargs
 ):
     """
+    Helper function that builds cosine with warmup scheduler.
+
     Adapted from
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/optimizer/extra_optimizers.py
+
+    :param optimizer: Optimizer for which the learning rate is to be controlled
+    :type optimizer: torch.optim.Optimizer
+    :param num_warmup_epochs: Number of warmup epochs
+    :type num_warmup_epochs: int
+    :param max_epochs: Maximal epochs (diminishes learning rate when nearing end
+    :type max_epochs: int
+    :param last_epoch: Specifies last epoch
+    :type last_epoch: int
+    :param num_cycles: number of cycles in cosine behavior
+    :type num_cycles: float
     """
     def lr_lambda(current_step):
         if current_step < num_warmup_epochs:

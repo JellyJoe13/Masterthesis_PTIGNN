@@ -23,6 +23,11 @@ def custom_to_edge_graph(data):
 
     Original source:
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/chienn/data/edge_graph/to_edge_graph.py#L12
+
+    :param data: vertex graph
+    :type data: torch_geometric.data.Data
+    :return: edge graph
+    :rtype: torch_geometric.data.Data
     """
     # make sure that edges are undirected (in chemical context necessary)
     if torch_geometric.utils.is_undirected(data.edge_index):
@@ -123,6 +128,14 @@ def custom_to_edge_graph(data):
 
 
 def remove_duplicate_edges_function(data, node_mapping):
+    """
+    Function to remove duplicate nodes
+
+    :param data:
+    :param node_mapping:
+    :return: transformed graph, new node mapping
+    :rtype: typing.Tuple[torch_geometric.data.Data, dict]
+    """
 
     # determine which nodes to keep and which to discard
     keep_nodes = []
@@ -277,6 +290,34 @@ def permutation_tree_transformation(
         cyclic_tree_mode: str = "complex",  # alternatives: light, minimal
         use_new_inv: bool = False
 ) -> torch_geometric.data.Data:
+    """
+    Function with many bool control variables. Determines how the permutation tree is constructed and to which
+    stereoisomer to be sensitive to.
+
+    :param data: vertex graph
+    :param mol: molecule which corresponds to vertex graph
+    :param k: number of neighbors to set into context. Not always necessary.
+    :param tetrahedral_chiral: Sensitive to tetrahedral chiral centers if enabled
+    :param chiral_center_selective: Sensitive to only marked tetrahedral chiral centers (and not by default to all
+        nodes/atoms)
+    :param chiral_center_select_potential: Sensitive also to potential stereocenters (if selective is true)
+    :param remove_duplicate_edges: remove duplicate edges and reduce complexity - also often called reduction
+    :param cis_trans_edges: enable cis/trans trees (only selective)
+    :param cis_trans_edges_select_potential: enable cis/trans trees also for unmarked but potential cis/trans bonds
+    :param axial_chirality: Enable axial chirality - requires that rdkit has correct position values stored (is not true
+        by default for version 2023.*.*)
+    :param create_order_matrix: whether or not to create the order matrix.
+    :param multi_stereo_center_dia: Whether or not do multiple stereo center enantiomer invariance. Not advisable as
+        model can distinguish these stereoisomers (see master thesis) but difference is 10^(-4) which is too small.
+    :param separate_tree: Whether to separate tree - make simplest trees with only one internal node for each ptree
+        for each node.
+    :param add_cyclic_trees: Add cyclic trees for graph - extra nodes, and more connections
+    :param cyclic_tree_mode: Mode of the cylcic trees. Either complex, light or minimal - see master thesis
+    :type cyclic_tree_mode: str
+    :param use_new_inv: Whether or not to separate C and Q types into P(Z,Z) & P(S,S) (if false) else P(Z2,Z2) & P(S2,S2)
+    :return: transformed graph
+    :rtype: torch_geometric.data.Data
+    """
     # transform to edge graph using custom function
     edge_graph, node_mapping = custom_to_edge_graph(
         data=data,

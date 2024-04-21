@@ -12,7 +12,8 @@ type_dict = {
 }
 
 
-def permutation_tree_depth(tree):
+def permutation_tree_depth(tree) -> int:
+    """Calculates the maximal depth of tree"""
     if isinstance(tree, list):
         return max(map(permutation_tree_depth, tree))
     if isinstance(tree, dict):
@@ -21,6 +22,15 @@ def permutation_tree_depth(tree):
 
 
 def get_matrix(tree, depth, idx_prefix: list = [], type_prefix: list = []) -> list:
+    """
+    Constructs the order and type matrix of permutation tree
+
+    :param tree: current tree
+    :param depth: depth of tree
+    :param idx_prefix: prefix of idx (important if called recursively, else ignore)
+    :param type_prefix: prefix of type (important if called recursively, else ignore)
+    :return: idx_matrix, type_matrix
+    """
     if isinstance(tree, list):
         idx_matrix, type_matrix = zip(*[
             get_matrix(child, depth, idx_prefix + [idx], type_prefix)
@@ -41,7 +51,14 @@ def get_matrix(tree, depth, idx_prefix: list = [], type_prefix: list = []) -> li
         return [-1]
 
 
-def remove_inverted_through_p(perm_tree: dict, use_new_inv: bool = False):
+def remove_inverted_through_p(perm_tree: dict, use_new_inv: bool = False) -> dict:
+    """
+    Replaces Q and C type internal nodes with P(S,S) and P(Z,Z).
+
+    :param perm_tree: permutation tree as python dict
+    :param use_new_inv: Whether or not to use S2 and Z2 instead of S and Z
+    :return: dict of transformed tree
+    """
     if isinstance(perm_tree, int):
         return perm_tree
     elif isinstance(perm_tree, list):
@@ -91,7 +108,16 @@ def permutation_tree_to_matrix(
         ptree_string_list: typing.List[str],
         k: int = 3,
         use_new_inv: bool = False
-):
+) -> typing.Tuple[torch.Tensor, torch.Tensor]:
+    """
+    Computes control matrices based on permutation tree. Control matrices required for advanced permutation tree model.
+
+    :param ptree_string_list: List of permutation trees as string
+    :param k: k parameter - how many elements to set into context. Not used, kept for potential future use.
+    :param use_new_inv: Whether or not to split Q and C into different S and Z or not
+    :return: idx_matrix, type_matrix
+    :rtype: typing.Tuple[torch.Tensor, torch.Tensor]
+    """
     # transform to dict
     permutation_trees = [
         json.loads(p_string)
@@ -123,7 +149,15 @@ def permutation_tree_to_order_matrix(
         batch,
         k,
         use_new_inv: bool = False
-):  # can also be data object as long as it has ptree argument
+):
+    """
+    Create the control matrices for a batch object (or data object).
+
+    :param batch: batch object or data object. Needs to have ptree field.
+    :param k: k parameter, number of elements to set into context
+    :param use_new_inv: whether or not to split C and Q into separate S and Z nodes
+    :return: modified batch or data object
+    """
     # get matrices
     idx_matrix, type_matrix = permutation_tree_to_matrix(batch.ptree, k, use_new_inv)
 

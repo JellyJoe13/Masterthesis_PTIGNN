@@ -3,6 +3,12 @@ import torch_geometric as pyg
 
 
 class SANHead(torch.nn.Module):
+    """
+    Head (Element that reduced graph object to graph level prediction), in this case simplified SANHead.
+
+    Simplified reproduction of
+    https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/head/san_graph.py
+    """
     def __init__(
             self,
             in_dim: int,
@@ -11,6 +17,19 @@ class SANHead(torch.nn.Module):
             n_layer: int = 3,
             **kwargs
     ):
+        """
+        Init function of SANHead
+
+        :param in_dim: input dimension
+        :type in_dim: int
+        :param out_dim: output dimension
+        :type out_dim: int
+        :param pool_function: Pool aggregation function - needs to be permutation invariant
+        :type pool_function: str
+        :param n_layer: number of layers
+        :type n_layer: int
+        :param kwargs: Auxiliary parameters
+        """
         super(SANHead, self).__init__()
 
         # select pooling function

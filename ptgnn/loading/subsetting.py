@@ -20,6 +20,12 @@ def subset_dataset(
     """
     Rework of code from
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loader/master_loader.py#L697
+
+    Subselects a part of dataset to make hyperparameter optimization for huge datasets feasible.
+
+    :param dataset: dataset to subselect
+    :param subset_size: (maximal) size of the dataset after subsetting
+    :type subset_size: int
     """
     if hasattr(dataset, 'dataframe'):
         # extract dataframe

@@ -5,6 +5,9 @@ import torch_geometric.data
 
 
 class RecursiveSimplePtreeLayer(torch.nn.Module):
+    """
+    Basic permutation tree invariant model that is implemented using recursive function calls. Tremendously inefficient
+    """
     def __init__(
             self,
             hidden_dim: int,
