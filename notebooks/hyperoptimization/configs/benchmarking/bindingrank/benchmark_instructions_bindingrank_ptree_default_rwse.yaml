@@ -1,4 +1,4 @@
-output_dir: results/br_ptree/default_rwse
+output_dir: results/br_ptree/edge/default_rwse
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
