@@ -1,34 +1,42 @@
 data:
   dataset:
-    graph_mode: edge
+    graph_mode: vertex
     mask_chiral_tags: true
     root: /media/data/urbanj00dm/Masterthesis_PTGNN/notebooks/hyperoptimization/src/ba
     single_conformer: true
     single_enantiomer: false
     transformation_mode: permutation_tree
     transformation_parameters:
+      chiral_center_selective: true
       k: 3
-      remove_duplicate_edges: true
     type: ba
   loader:
     general:
       batch_size: 32
       n_neighbors_in_circle: 3
       num_workers: 0
+      precompute_pos_enc:
+      - RWSE
     test:
       batch_size: 32
       n_neighbors_in_circle: 3
       num_workers: 0
+      precompute_pos_enc:
+      - RWSE
       sampler: full_batch
     train:
       batch_size: 32
       n_neighbors_in_circle: 3
       num_workers: 0
+      precompute_pos_enc:
+      - RWSE
       sampler: full_batch
     val:
       batch_size: 32
       n_neighbors_in_circle: 3
       num_workers: 0
+      precompute_pos_enc:
+      - RWSE
       sampler: full_batch
 model:
   head:
@@ -36,23 +44,28 @@ model:
     pool_function: add
     type: san_head
   hidden_dim: 128
+  hidden_dimension: 64
   mode: custom
   modules:
     0:
       parameter:
         edge_type: linear
-        node_type: linear
+        node_type: linear+RWSE
+        rwse_params:
+          dim_pos_enc: 28
+          norm_type: batchnorm
       type: graph_embedding
     1:
       parameter:
+        dropout: 0.0
         local_model: permutation_tree
         local_model_params:
           k: 3
-      times: 5
+      times: 3
       type: gps_layer
   out_dim: 1
 optimizer:
-  base_learning_rate: 0.001
+  base_learning_rate: 0.0001
   type: adam_w
   weight_decay: 1.0e-05
 scheduler:
