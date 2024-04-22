@@ -7,7 +7,9 @@ data:
     single_enantiomer: false
     transformation_mode: permutation_tree
     transformation_parameters:
+      add_cyclic_trees: true
       k: 3
+      remove_duplicate_edges: true
     type: ba
   loader:
     general:
