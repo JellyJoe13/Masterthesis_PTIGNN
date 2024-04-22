@@ -2,7 +2,7 @@ data:
   dataset:
     graph_mode: edge
     mask_chiral_tags: true
-    root: Z:\Daten_Johannes\Masterthesis_PTGNN\notebooks\hyperoptimization\src\tox21
+    root: D:\DATEN\Masterarbeit_PTGNN\notebooks\hyperoptimization\src\tox21
     task_type: classification_multilabel
     transformation_mode: permutation_tree
     transformation_parameters:
