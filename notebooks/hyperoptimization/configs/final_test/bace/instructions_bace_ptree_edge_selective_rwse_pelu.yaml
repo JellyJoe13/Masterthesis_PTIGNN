@@ -1,0 +1,12 @@
+loading_dir: results/bace_ptree/edge/selective_rwse_pelu
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/chem/tetra_selective.yaml
+  - configs/add_rwse.yaml
+  - configs/datasets/bace.yaml
+  - configs/enable_p_elu.yaml
+  - configs/models/ptree_default.yaml
+  - configs/general.yaml
+
+n_best: 3

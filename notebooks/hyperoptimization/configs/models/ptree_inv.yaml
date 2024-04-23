@@ -21,6 +21,7 @@ model:
         local_model_params:
           k: 3
           use_separate_inv: True
+          apply_p_elu: False
       times: 5
   head:
     type: san_head

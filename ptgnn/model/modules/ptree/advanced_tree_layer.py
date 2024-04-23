@@ -15,7 +15,7 @@ class AdvancedPermutationTreeLayer(torch.nn.Module):
             hidden_dim: int,
             batch_norm: bool = False,
             use_separate_inv: bool = False,
-            apply_p_elu: bool = False
+            apply_p_elu: bool = True
     ):
         """
         Init function of the advanced permutation tree layer
