@@ -353,7 +353,12 @@ class MCDataset(InMemoryDataset):
                     ))
                     df_collection = pd.DataFrame([elem for elem in df_collection if elem is not None])
 
-                    data_list = list(p.imap(
+                    data_list = [
+                        worker(elem)
+                        for elem in tqdm(df_collection.iterrows(), total=len(df_collection))
+                    ]
+
+                    data_list = list(p.map(
                         worker,
                         tqdm(
                             df_collection.iterrows(),

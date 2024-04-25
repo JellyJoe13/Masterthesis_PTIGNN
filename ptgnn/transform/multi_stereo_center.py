@@ -76,6 +76,8 @@ def calc_paths(
 
     # if empty list then return current path
     if len(pred):
+        return calc_paths(current_path + [pred[0]], predecessors)
+        # disabled as producing significant problems
         return list(chain.from_iterable([
             calc_paths(current_path + [next_node], predecessors)
             for next_node in pred
