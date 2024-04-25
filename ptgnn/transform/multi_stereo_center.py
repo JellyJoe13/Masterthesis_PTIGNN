@@ -51,7 +51,7 @@ def limited_bfs_stereo_path_search(
                 predecessors[i].append(elem)
 
             # check and add
-            next_layer += [next_layer_cand]
+            next_layer.extend(next_layer_cand)
 
         # set new layer nodes to visited (so that they cannot be visited anymore
         visited_nodes[next_layer] = True
