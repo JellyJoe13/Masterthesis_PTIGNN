@@ -1,0 +1,11 @@
+loading_dir: results/mc_ptree/edge/dia
+
+config_files:
+  - configs/chem/diastereomer_enantiomer.yaml
+  - configs/add_test_set.yaml
+  - configs/datasets/mc_dataset.yaml
+  - configs/enable_p_elu.yaml
+  - configs/models/ptree_default.yaml
+  - configs/general.yaml
+
+n_best: 3

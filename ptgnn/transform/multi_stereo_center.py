@@ -51,7 +51,7 @@ def limited_bfs_stereo_path_search(
                 predecessors[i].append(elem)
 
             # check and add
-            next_layer += [next_layer_cand]
+            next_layer.extend(next_layer_cand)
 
         # set new layer nodes to visited (so that they cannot be visited anymore
         visited_nodes[next_layer] = True
@@ -76,6 +76,8 @@ def calc_paths(
 
     # if empty list then return current path
     if len(pred):
+        return calc_paths(current_path + [pred[0]], predecessors)
+        # disabled as producing significant problems
         return list(chain.from_iterable([
             calc_paths(current_path + [next_node], predecessors)
             for next_node in pred
