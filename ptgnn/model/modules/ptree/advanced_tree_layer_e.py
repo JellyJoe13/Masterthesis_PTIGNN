@@ -105,14 +105,46 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
             temp
         ], dim=0)
 
-        # waaaaaaaaaaaaaaaaaay to inefficient
-        for i, edge in enumerate(edges.T):
-            a = torch.where(batch.edge_index[0] == edge[0])[0]
-            b = torch.where(batch.edge_index[1] == edge[1])[0]
-            index = a[torch.isin(a,b)]
+        # # Version 1
+        # # waaaaaaaaaaaaaaaaaay to inefficient but whyyyyyyyyyyyyyyyyyyyyy
+        # for i, edge in enumerate(edges.T):
+        #     a = torch.where(batch.edge_index[0] == edge[0])[0]
+        #     b = torch.where(batch.edge_index[1] == edge[1])[0]
+        #     index = a[torch.isin(a,b)]
+        #
+        #     if len(index):
+        #         data_array[i] = data_array[i] + batch.edge_attr[index]
 
-            if len(index):
-                data_array[i] = data_array[i] + batch.edge_attr[index]
+        # Version 2
+        if hasattr(batch, "edge_instructions"):
+            edge_instructions = getattr(batch, "edge_instructions")
+        else:
+            edge_instructions = torch.zeros(
+                len(data_array),
+                device=data_array.device,
+                requires_grad=False,
+                dtype=int
+            )
+            for i, edge in enumerate(edges.T):
+                a = torch.where(batch.edge_index[0] == edge[0])[0]
+                b = torch.where(batch.edge_index[1] == edge[1])[0]
+                index = a[torch.isin(a, b)]
+
+                if len(index):
+                    edge_instructions[i] = index + 1
+                else:
+                    edge_instructions[i] = 0
+            batch['edge_instructions'] = edge_instructions
+
+        # fetch edges
+        data_edges = batch.edge_attr
+        data_edges = torch.cat([
+            torch.zeros(1, self.hidden_dim, device=data_array.device, requires_grad=False),
+            data_edges
+        ], dim=0)
+
+        # fuze
+        data_array = data_array + data_edges[edge_instructions]
 
         # iterate over layers
         for layer_idx in range(batch.num_layer):
