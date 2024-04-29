@@ -1,0 +1,10 @@
+loading_dir: results/mc_ptree/edge/default
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/datasets/mc_dataset.yaml
+  - configs/enable_p_elu.yaml
+  - configs/models/ptree_default.yaml
+  - configs/general.yaml
+
+n_best: 3

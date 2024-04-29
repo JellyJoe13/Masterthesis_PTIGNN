@@ -1,0 +1,9 @@
+model:
+  hidden_dimension: 32
+  modules:
+    1:
+      parameter:
+        dropout: 0.0
+      times: 3
+optimizer:
+  base_learning_rate: 1.0e-05

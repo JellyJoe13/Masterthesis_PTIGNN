@@ -1,0 +1,68 @@
+data:
+  dataset:
+    graph_mode: edge
+    mask_chiral_tags: true
+    root: D:\DATEN\Masterarbeit_PTGNN\notebooks\hyperoptimization\src\rs
+    transformation_mode: permutation_tree
+    transformation_parameters:
+      chiral_center_selective: true
+      k: 3
+    type: rs
+  loader:
+    general:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+    test:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: full_batch
+    train:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: single_conformer_sampler
+    val:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: full_batch
+model:
+  head:
+    n_layer: 3
+    pool_function: add
+    type: san_head
+  hidden_dim: 128
+  mode: custom
+  modules:
+    0:
+      parameter:
+        edge_type: linear
+        node_type: linear
+      type: graph_embedding
+    1:
+      parameter:
+        local_model: permutation_tree
+        local_model_params:
+          apply_p_elu: true
+          k: 3
+      times: 5
+      type: gps_layer
+  out_dim: 1
+optimizer:
+  base_learning_rate: 0.001
+  type: adam_w
+  weight_decay: 1.0e-05
+scheduler:
+  max_epochs: 100
+  num_warmup_epochs: 10
+  type: cosine_with_warmup
+training:
+  clip_grad_norm: true
+  loss_function: cross_entropy
+  n_max_epochs: 10
+  optimization_metric: accuracy
+  optimization_metric_mode: max
+  task_type: classification
+  use_test_set: true
