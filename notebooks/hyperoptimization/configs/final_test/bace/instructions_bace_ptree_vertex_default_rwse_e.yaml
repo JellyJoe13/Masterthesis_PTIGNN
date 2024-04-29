@@ -1,4 +1,4 @@
-loading_dir: results/bace_ptree/vertex/default_rwse
+loading_dir: results/bace_ptree/vertex/default_rwse_e
 
 config_files:
   - configs/add_test_set.yaml

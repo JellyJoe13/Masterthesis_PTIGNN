@@ -1,4 +1,4 @@
-output_dir: results/bace_ptree/vertex/default_rwse
+output_dir: results/bace_ptree/vertex/default_rwse_e
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml

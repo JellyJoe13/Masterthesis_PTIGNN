@@ -20,7 +20,7 @@ model:
         local_model: permutation_tree_e
         local_model_params:
           k: 3
-          apply_p_elu: False
+          apply_p_elu: True
       times: 5
   head:
     type: san_head
