@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     # init ray
     ray.init(runtime_env={
-        "working_dir": "../../",
+        # "working_dir": "../../",
         "py_modules": ["../../ptgnn"]
     })
 
