@@ -149,9 +149,7 @@ if __name__ == '__main__':
             max_concurrent_trials=hyper_settings['max_concurrent_trials'],
         ),
         run_config=train.RunConfig(
-            # storage_path=pathlib.Path("D:/DATEN/Masterarbeit_PTGNN/notebooks/hyperoptimization/ray_temp/"),
-            # storage_path="D:/DATEN/Masterarbeit_PTGNN/notebooks/hyperoptimization/ray_temp/",
-            # local_dir=pathlib.Path("./ray_temp/"),
+            storage_path=os.path.abspath("ray_temp"),
             progress_reporter=CLIReporter(
                 metric_columns=[optimization_score],
             ),

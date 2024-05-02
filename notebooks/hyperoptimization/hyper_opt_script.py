@@ -131,6 +131,7 @@ if __name__ == '__main__':
             max_concurrent_trials=hyper_settings['max_concurrent_trials'],
         ),
         run_config=train.RunConfig(
+            storage_path=os.path.abspath("ray_temp"),
             progress_reporter=CLIReporter(
                 metric_columns=[optimization_score],
             ),
