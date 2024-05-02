@@ -1,0 +1,11 @@
+loading_dir: results/ba_ptree/vertex/default_rwse_e
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/add_rwse.yaml
+  - configs/vertex_mode.yaml
+  - configs/datasets/binding_affinity.yaml
+  - configs/models/ptree_e.yaml
+  - configs/general.yaml
+
+n_best: 3
