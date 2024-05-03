@@ -1,0 +1,11 @@
+loading_dir: results/ba_ptree/edge/cyclic_minimal
+
+config_files:
+  - configs/hyper_param_opt/subsetting.yaml
+  - configs/chem/cyclic_trees_minimal.yaml
+  - configs/add_rwse.yaml
+  - configs/datasets/binding_affinity.yaml
+  - configs/models/ptree_circle.yaml
+  - configs/general.yaml
+
+n_best: 3
