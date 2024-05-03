@@ -1,11 +1,12 @@
-loading_dir: results/ba_ptree/edge/cyclic_minimal
+loading_dir: results/ba_ptree/edge/cyclic_reduced_minimal_rwse
 
 config_files:
   - configs/add_test_set.yaml
   - configs/chem/cyclic_trees_minimal.yaml
   - configs/add_rwse.yaml
+  - configs/chem/remove_duplicate_edges.yaml
   - configs/datasets/binding_affinity.yaml
-  - configs/models/ptree_circle.yaml
+  - configs/models/ptree_default.yaml
   - configs/general.yaml
 
 n_best: 3
