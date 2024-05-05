@@ -1,0 +1,29 @@
+output_dir: results/ba_ptree/edge/cyclic_reduced_light_rwse
+
+config_files:
+  - configs/hyper_param_opt/subsetting.yaml
+  - configs/chem/cyclic_trees_light.yaml
+  - configs/add_rwse.yaml
+  - configs/chem/remove_duplicate_edges.yaml
+  - configs/datasets/binding_affinity.yaml
+  - configs/models/ptree_default.yaml
+  - configs/general.yaml
+
+search_space:
+  model:
+    hidden_dimension: tune.choice([64, 128, 256])
+    modules:
+      1:
+        times: tune.choice([3, 6, 10])
+        parameter:
+          dropout: tune.choice([0.0, 0.2, 0.5])
+  optimizer:
+    base_learning_rate: tune.choice([0.001, 0.0001, 0.00001])
+
+hyper_settings:
+  scheduler:
+    grace_period: 5
+    reduction_factor: 3
+    brackets: 1
+  max_concurrent_trials: 3
+  num_samples: 30
