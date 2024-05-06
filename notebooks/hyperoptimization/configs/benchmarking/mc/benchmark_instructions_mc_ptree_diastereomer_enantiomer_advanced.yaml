@@ -1,7 +1,6 @@
-output_dir: results/mc_ptree/edge/dia
+output_dir: results/mc_ptree/edge/dia_advanced
 
 config_files:
-  - configs/benchmarking/mc/old_mc_config_ext.yaml
   - configs/chem/diastereomer_enantiomer.yaml
   - configs/datasets/mc_dataset.yaml
   - configs/enable_p_elu.yaml
@@ -25,4 +24,4 @@ hyper_settings:
     reduction_factor: 3
     brackets: 1
   max_concurrent_trials: 5
-  num_samples: 50 # reduced as experience from bindingaffinity
+  num_samples: 50
