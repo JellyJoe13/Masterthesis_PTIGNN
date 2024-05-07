@@ -1,0 +1,4 @@
+data:
+  dataset:
+    transformation_parameters:
+      multi_stereo_center_dia_mode: 0

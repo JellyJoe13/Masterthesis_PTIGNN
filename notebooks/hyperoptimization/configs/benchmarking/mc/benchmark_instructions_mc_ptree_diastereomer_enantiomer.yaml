@@ -1,6 +1,7 @@
 output_dir: results/mc_ptree/edge/dia
 
 config_files:
+  - configs/benchmarking/mc/old_mc_config_ext.yaml
   - configs/chem/diastereomer_enantiomer.yaml
   - configs/datasets/mc_dataset.yaml
   - configs/enable_p_elu.yaml

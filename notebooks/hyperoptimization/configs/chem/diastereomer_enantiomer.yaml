@@ -3,3 +3,4 @@ data:
     transformation_parameters:
       tetrahedral_chiral: False
       multi_stereo_center_dia: True
+      multi_stereo_center_dia_mode: 1
