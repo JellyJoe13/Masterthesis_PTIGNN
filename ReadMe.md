@@ -22,3 +22,12 @@ pip install multiprocess==0.70.16
 - ptgnn: Related code realizing model, framework, etc. TODO: rename to ptignn
 - .gitignore: Prevent pushing of datasets to GitHub repo
 - ReadMe.md: General information and installation instructions
+
+## Notebook information:
+
+Notebooks have been opened and used with DataSpell and not directly with jupyter notebook/lab. Notebooks may require the following addition (should be included in most of them) to successfully import pt(i)gnn package from root folder:
+
+```python
+import sys
+sys.path.append("../") # or "../../" or more incase notebook is contained in a deeper subfolder structure 
+```
