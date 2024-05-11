@@ -285,6 +285,7 @@ def permutation_tree_transformation(
         axial_chirality: bool = False,
         create_order_matrix: bool = True,
         multi_stereo_center_dia: bool = False,
+        multi_stereo_center_dia_mode: int = 1,
         separate_tree: bool = False,
         add_cyclic_trees: bool = False,
         cyclic_tree_mode: str = "complex",  # alternatives: light, minimal
@@ -309,6 +310,8 @@ def permutation_tree_transformation(
     :param create_order_matrix: whether or not to create the order matrix.
     :param multi_stereo_center_dia: Whether or not do multiple stereo center enantiomer invariance. Not advisable as
         model can distinguish these stereoisomers (see master thesis) but difference is 10^(-4) which is too small.
+    :param multi_stereo_center_dia_mode: Mode that controls where to insert the MC trees. 0 creates new nodes that are
+        not connected to remaining graph, 1 overwrites existing edges
     :param separate_tree: Whether to separate tree - make simplest trees with only one internal node for each ptree
         for each node.
     :param add_cyclic_trees: Add cyclic trees for graph - extra nodes, and more connections
@@ -410,6 +413,7 @@ def permutation_tree_transformation(
     if multi_stereo_center_dia:
         # get stereo paths
         stereo_paths = calc_edges_multiple_stereo_centers(mol, chiral_center_select_potential)
+        #todo: pairwise connections between all stereo centers
 
         # iterate over stereo_paths
         for (source_a, source_b), (target_a, target_b) in stereo_paths:
@@ -435,18 +439,30 @@ def permutation_tree_transformation(
                 ]
             }
 
-            create_new_node = True
-            if (source_a, target_b) in node_mapping:
-                edge_graph.ptree[node_mapping[(source_a, target_b)]] = json.dumps(temp_tree)
-                create_new_node = False
-            if (target_b, source_a) in node_mapping:
-                edge_graph.ptree[node_mapping[(target_b, source_a)]] = json.dumps(temp_tree)
-                create_new_node = False
+            if multi_stereo_center_dia_mode == 0:
+                create_new_node = True
+                if (source_a, target_b) in node_mapping:
+                    edge_graph.ptree[node_mapping[(source_a, target_b)]] = json.dumps(temp_tree)
+                    create_new_node = False
+                if (target_b, source_a) in node_mapping:
+                    edge_graph.ptree[node_mapping[(target_b, source_a)]] = json.dumps(temp_tree)
+                    create_new_node = False
 
-            if create_new_node:
-                node_mapping[(source_a, target_b)] = len(node_mapping)
-                edge_graph.x = torch.cat([edge_graph.x, torch.zeros(1, edge_graph.x.shape[-1])], dim=0)
-                edge_graph.ptree.append(json.dumps(temp_tree))
+                if create_new_node:
+                    node_mapping[(source_a, target_b)] = len(node_mapping)
+                    edge_graph.x = torch.cat([edge_graph.x, torch.zeros(1, edge_graph.x.shape[-1])], dim=0)
+                    edge_graph.ptree.append(json.dumps(temp_tree))
+            elif multi_stereo_center_dia_mode == 1:
+                if (source_a, source_b) in node_mapping:
+                    tree = json.loads(edge_graph.ptree[node_mapping[(source_a, source_b)]])
+                    tree['S'][-1] = temp_tree
+                    edge_graph.ptree[node_mapping[(source_a, source_b)]] = json.dumps(tree)
+
+                if (target_b, target_a) in node_mapping:
+                    tree = json.loads(edge_graph.ptree[node_mapping[(target_b, target_a)]])
+                    tree['S'][-1] = temp_tree
+                    edge_graph.ptree[node_mapping[(target_b, target_a)]] = json.dumps(tree)
+
 
     if add_cyclic_trees:
         if cyclic_tree_mode == "complex":
