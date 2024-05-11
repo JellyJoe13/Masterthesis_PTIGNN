@@ -439,30 +439,39 @@ def permutation_tree_transformation(
                 ]
             }
 
+            # mode switch
             if multi_stereo_center_dia_mode == 0:
+                # Original mode: potential additional nodes created
                 create_new_node = True
+
+                # check whether one direction of the connection of stereocenters exist
                 if (source_a, target_b) in node_mapping:
                     edge_graph.ptree[node_mapping[(source_a, target_b)]] = json.dumps(temp_tree)
                     create_new_node = False
+                # check other direction
                 if (target_b, source_a) in node_mapping:
                     edge_graph.ptree[node_mapping[(target_b, source_a)]] = json.dumps(temp_tree)
                     create_new_node = False
 
+                # if both directions not available - create new node
                 if create_new_node:
                     node_mapping[(source_a, target_b)] = len(node_mapping)
                     edge_graph.x = torch.cat([edge_graph.x, torch.zeros(1, edge_graph.x.shape[-1])], dim=0)
                     edge_graph.ptree.append(json.dumps(temp_tree))
+
+            # other mode: overwrite existing nodes/edges
             elif multi_stereo_center_dia_mode == 1:
+                # attempts to overwrite first edge of path from center to center
                 if (source_a, source_b) in node_mapping:
                     tree = json.loads(edge_graph.ptree[node_mapping[(source_a, source_b)]])
                     tree['S'][-1] = temp_tree
                     edge_graph.ptree[node_mapping[(source_a, source_b)]] = json.dumps(tree)
 
+                # attempt to overwrite last edge of path
                 if (target_b, target_a) in node_mapping:
                     tree = json.loads(edge_graph.ptree[node_mapping[(target_b, target_a)]])
                     tree['S'][-1] = temp_tree
                     edge_graph.ptree[node_mapping[(target_b, target_a)]] = json.dumps(tree)
-
 
     if add_cyclic_trees:
         if cyclic_tree_mode == "complex":
