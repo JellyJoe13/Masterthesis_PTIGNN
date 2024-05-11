@@ -5,13 +5,13 @@ Author: Johannes P. Urban
 ## Installation procedure:
 (python 3.9)
 ```bash
-conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-conda install pyg -c pyg
-pip install rdkit
+conda install pytorch==2.2.2 torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+conda install pyg==2.5.2 -c pyg
+pip install rdkit==2023.9.5
 conda install jupyterlab numpy pandas matplotlib
-pip install chainer-chemistry
-conda install -c conda-forge torchmetrics
-pip install "ray[tune]" torch torchvision
-pip install hyperopt
-pip install multiprocess
+pip install chainer-chemistry==0.7.1
+conda install -c conda-forge torchmetrics==1.3.2
+pip install "ray[tune]==2.9.3" torch torchvision
+pip install hyperopt==0.2.7
+pip install multiprocess==0.70.16
 ```
