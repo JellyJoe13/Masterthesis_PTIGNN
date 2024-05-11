@@ -1,4 +1,4 @@
-# Master thesis - Permutation Tree Graph Neural Networks
+# Master thesis - Permutation Tree Invariant Graph Neural Networks
 ## Information
 Author: Johannes P. Urban
 
@@ -15,3 +15,10 @@ pip install "ray[tune]==2.9.3" torch torchvision
 pip install hyperopt==0.2.7
 pip install multiprocess==0.70.16
 ```
+
+## Content information:
+
+- notebooks: Experiments and notebooks, TODO: rename to experiments in the future
+- ptgnn: Related code realizing model, framework, etc. TODO: rename to ptignn
+- .gitignore: Prevent pushing of datasets to GitHub repo
+- ReadMe.md: General information and installation instructions
