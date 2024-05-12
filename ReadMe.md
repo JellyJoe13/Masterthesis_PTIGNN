@@ -1,17 +1,33 @@
-# Master thesis - Permutation Tree Graph Neural Networks
+# Master thesis - Permutation Tree Invariant Graph Neural Networks
 ## Information
 Author: Johannes P. Urban
 
 ## Installation procedure:
 (python 3.9)
 ```bash
-conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-conda install pyg -c pyg
-pip install rdkit
+conda install pytorch==2.2.2 torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+conda install pyg==2.5.2 -c pyg
+pip install rdkit==2023.9.5
 conda install jupyterlab numpy pandas matplotlib
-pip install chainer-chemistry
-conda install -c conda-forge torchmetrics
-pip install "ray[tune]" torch torchvision
-pip install hyperopt
-pip install multiprocess
+pip install chainer-chemistry==0.7.1
+conda install -c conda-forge torchmetrics==1.3.2
+pip install "ray[tune]==2.9.3" torch torchvision
+pip install hyperopt==0.2.7
+pip install multiprocess==0.70.16
+```
+
+## Content information:
+
+- notebooks: Experiments and notebooks, TODO: rename to experiments in the future
+- ptgnn: Related code realizing model, framework, etc. TODO: rename to ptignn
+- .gitignore: Prevent pushing of datasets to GitHub repo
+- ReadMe.md: General information and installation instructions
+
+## Notebook information:
+
+Notebooks have been opened and used with DataSpell and not directly with jupyter notebook/lab. Notebooks may require the following addition (should be included in most of them) to successfully import pt(i)gnn package from root folder:
+
+```python
+import sys
+sys.path.append("../") # or "../../" or more incase notebook is contained in a deeper subfolder structure 
 ```
