@@ -4,7 +4,7 @@ import typing
 import torch_geometric.data
 
 from ptgnn.model.chienn.chienn_layer import ChiENNLayer
-from ptgnn.model.modules.custom_wrapper import CustomWrapper
+from ptgnn.model.modules.custom_wrapper import CustomWrapper, InputOutputWrapper
 from ptgnn.model.modules.gps_layer import CustomGPSLayer
 from ptgnn.model.modules.graph_embedding import GraphEmbedding
 from ptgnn.model.modules.head_pooling import SANHead
@@ -101,6 +101,15 @@ class CustomModel(torch.nn.Module):
                                 hidden_dim=self.hidden_dim,
                                 **param_config
                             )
+                        )
+                    )
+                elif layer_type == "linear_dummy":
+                    modules.append(
+                        InputOutputWrapper(
+                            torch.nn.Sequential(*[
+                                torch.nn.Linear(self.hidden_dim, self.hidden_dim),
+                                torch.nn.ReLU()
+                            ])
                         )
                     )
                 else:
