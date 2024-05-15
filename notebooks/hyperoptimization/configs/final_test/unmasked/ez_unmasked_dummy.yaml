@@ -1,0 +1,10 @@
+loading_dir: results/ez_dummy_unmasked
+
+config_files:
+  - configs/unmasked.yaml
+  - configs/add_test_set.yaml
+  - configs/datasets/ez_dataset.yaml
+  - configs/models/dummy.yaml
+  - configs/general.yaml
+
+n_best: 2
