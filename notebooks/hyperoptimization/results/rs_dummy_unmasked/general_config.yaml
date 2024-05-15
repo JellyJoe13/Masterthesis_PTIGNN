@@ -1,0 +1,58 @@
+data:
+  dataset:
+    mask_chiral_tags: false
+    root: D:\DATEN\Masterarbeit_PTGNN\notebooks\hyperoptimization\src\rs
+    type: rs
+  loader:
+    general:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+    test:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: full_batch
+    train:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: single_conformer_sampler
+    val:
+      batch_size: 32
+      n_neighbors_in_circle: 3
+      num_workers: 0
+      sampler: full_batch
+  subset_size: 10000
+model:
+  head:
+    n_layer: 3
+    pool_function: add
+    type: san_head
+  hidden_dim: 128
+  mode: custom
+  modules:
+    0:
+      parameter:
+        edge_type: linear
+        node_type: linear
+      type: graph_embedding
+    1:
+      times: 5
+      type: linear_dummy
+  out_dim: 1
+optimizer:
+  base_learning_rate: 0.001
+  type: adam_w
+  weight_decay: 1.0e-05
+scheduler:
+  max_epochs: 100
+  num_warmup_epochs: 10
+  type: cosine_with_warmup
+training:
+  clip_grad_norm: true
+  loss_function: cross_entropy
+  n_max_epochs: 10
+  optimization_metric: accuracy
+  optimization_metric_mode: max
+  task_type: classification
