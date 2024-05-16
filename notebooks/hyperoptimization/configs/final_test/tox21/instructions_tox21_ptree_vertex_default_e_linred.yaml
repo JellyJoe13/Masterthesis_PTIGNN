@@ -1,0 +1,11 @@
+loading_dir: results/tox21_ptree/vertex/default_e_linred
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/linear_reduction.yaml
+  - configs/vertex_mode.yaml
+  - configs/datasets/tox21.yaml
+  - configs/models/ptree_e.yaml
+  - configs/general.yaml
+
+n_best: 3
