@@ -15,7 +15,8 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
             hidden_dim: int,
             batch_norm: bool = False,
             use_separate_inv: bool = False,
-            apply_p_elu: bool = True
+            apply_p_elu: bool = True,
+            edge_mode: str = "default"
     ):
         """
         Init function of the advanced permutation tree layer
@@ -31,6 +32,9 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
         :type use_separate_inv: bool
         :param apply_p_elu: Whether to use ELU between the two linear layers realizing a p type layer
         :type apply_p_elu: bool
+        :param edge_mode: Defines how the edge embedding are added to current embedding. Default means summing and
+            linear_reduction means reducing it using a linear layer
+        :type edge_mode: str
         """
         # set super
         super(AdvancedPermutationEdgeTreeLayer, self).__init__()
@@ -88,6 +92,10 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
         self.do_batch_norm = batch_norm
         self.batch_norm = torch.nn.BatchNorm1d(self.hidden_dim)
 
+        self.edge_mode = edge_mode
+        if self.edge_mode == "linear_reduction":
+            self.reduction_ll = torch.nn.Linear(2*self.hidden_dim, self.hidden_dim, bias=False)
+
     def forward(
             self,
             batch
@@ -144,7 +152,15 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
         ], dim=0)
 
         # fuze
-        data_array = data_array + data_edges[edge_instructions]
+        if self.edge_mode == "default":
+            data_array = data_array + data_edges[edge_instructions]
+        elif self.edge_mode == "linear_reduction":
+            data_array = self.reduction_ll(self.elu(torch.cat([
+                data_array,
+                data_edges[edge_instructions]
+            ], dim=-1)))
+        else:
+            raise NotImplementedError(f"mode {self.edge_mode} is not implemented.")
 
         # iterate over layers
         for layer_idx in range(batch.num_layer):

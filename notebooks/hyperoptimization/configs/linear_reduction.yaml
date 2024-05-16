@@ -1,0 +1,6 @@
+model:
+  modules:
+    1:
+      parameter:
+        local_model_params:
+          edge_mode: linear_reduction

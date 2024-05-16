@@ -1,0 +1,13 @@
+loading_dir: results/bace_ptree/vertex/selective_rwse_e_linred
+
+config_files:
+  - configs/add_test_set.yaml
+  - configs/linear_reduction.yaml
+  - configs/chem/tetra_selective.yaml
+  - configs/add_rwse.yaml
+  - configs/vertex_mode.yaml
+  - configs/datasets/bace.yaml
+  - configs/models/ptree_e.yaml
+  - configs/general.yaml
+
+n_best: 3
