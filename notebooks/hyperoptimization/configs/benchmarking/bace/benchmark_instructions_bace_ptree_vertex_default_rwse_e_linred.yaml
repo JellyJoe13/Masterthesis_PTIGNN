@@ -1,12 +1,11 @@
-output_dir: results/ba_ptree/vertex/selective_rwse_e_linred
+output_dir: results/bace_ptree/vertex/default_rwse_e_linred
 
 config_files:
   - configs/hyper_param_opt/subsetting.yaml
   - configs/linear_reduction.yaml
   - configs/add_rwse.yaml
-  - configs/chem/tetra_selective.yaml
   - configs/vertex_mode.yaml
-  - configs/datasets/binding_affinity.yaml
+  - configs/datasets/bace.yaml
   - configs/models/ptree_e.yaml
   - configs/general.yaml
 
@@ -26,5 +25,5 @@ hyper_settings:
     grace_period: 5
     reduction_factor: 3
     brackets: 1
-  max_concurrent_trials: 5
-  num_samples: 30 # reduced as first run failed due to technical error and best result was achieved very early
+  max_concurrent_trials: 3
+  num_samples: 30
