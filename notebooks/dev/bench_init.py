@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     # create absolute data path for dataset as hyperopt changes directory
     default_config['data']['dataset']['root'] = os.path.abspath(
-        os.path.join("src", default_config['data']['dataset']['type'])
+        os.path.join("../hyperoptimization/src", default_config['data']['dataset']['type'])
     )
     if verbose:
         print(default_config)
