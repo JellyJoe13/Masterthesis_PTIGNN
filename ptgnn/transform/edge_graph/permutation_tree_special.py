@@ -48,7 +48,7 @@ def get_cistrans_tree(vertex_graph, node_a, node_b, node_mapping):
     # calculate order by getting the nearest of the neighbors, then the next until finished
     order = calc_order(distances)
     neighbor_order = neighbors[:, order]
-    # todo: could add check if it first goes to its counterpart, currently [x, x, y, y,], could be checked for
+    # possible todo: add check if it first goes to its counterpart, currently [x, x, y, y,], could be checked for
 
     # fetch the correct nodes for the neighbors
     edge_list = [

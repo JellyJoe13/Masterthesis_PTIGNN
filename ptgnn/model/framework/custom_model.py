@@ -113,11 +113,6 @@ class CustomModel(torch.nn.Module):
                         )
                     )
                 else:
-                    # todo: add other layers and enable multiple additions of layers
-                    #  - type
-                    #  - params
-                    #  - times the layer is to be repeated
-                    #  maybe composite layer? specify number of layers for mixing architectures?
                     raise NotImplementedError(f"layer type {layer_type} not yet implemented.")
 
         # make list to module list and save in param

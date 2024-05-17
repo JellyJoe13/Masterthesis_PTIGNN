@@ -231,9 +231,7 @@ def training_procedure(
         # append metric dict to list
         metric_storage.append(metric_dict)
 
-    # todo:
-    #  - integration to hyperparameter opt framework
-    #  - checkpointing
+    # possible todo: checkpointing
 
     # return metric dict
     return pd.DataFrame(metric_storage)
@@ -292,7 +290,7 @@ def train_epoch(
         pred_storage.append(pred.detach().cpu())
         true_storage.append(true.detach().cpu())
     # calc metrics (pred is modified for binary results)
-    mode = 'train'  # todo: change when copying
+    mode = 'train'
     metric_dict.update(metric_system(
         pred=pred_storage,
         true=true_storage,
@@ -377,7 +375,6 @@ def run_config(
     train_loader, val_loader, test_loader = fetch_loaders(config_dict['data'], verbose=verbose)
 
     # get model
-    # todo: add intermediary layers (what to do with GPS? which version?)
     model = create_model(data_sizes=fetch_data_size(train_loader), model_config=config_dict['model'])
 
     # put model to device
@@ -410,5 +407,4 @@ def run_config(
         **config_dict['training']
     )
 
-    # todo: check functions
     return metric_dict

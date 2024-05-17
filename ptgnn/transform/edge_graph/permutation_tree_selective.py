@@ -52,8 +52,6 @@ def custom_to_edge_graph(data):
         # create the new position
         pos = torch.cat([data.pos[a], data.pos[b]])
 
-        # todo: add only one if duplicate edges/nodes are required
-        #   find solution for problem of embedding. either don't care and take one direction or sum up?
         # add to the storages
         node_mapping[(a, b)] = len(node_storage)
         node_storage.append({
@@ -413,7 +411,7 @@ def permutation_tree_transformation(
     if multi_stereo_center_dia:
         # get stereo paths
         stereo_paths = calc_edges_multiple_stereo_centers(mol, chiral_center_select_potential)
-        #todo: pairwise connections between all stereo centers
+        # possible todo: pairwise connections between all stereo centers instead of selective pairs
 
         # iterate over stereo_paths
         for (source_a, source_b), (target_a, target_b) in stereo_paths:

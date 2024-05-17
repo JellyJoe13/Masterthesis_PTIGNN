@@ -398,8 +398,4 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
 
             data_array = layer_output
 
-            # todo: maybe transfer pooling and after pooling layers here?
-            # apply global sum pooling
-            # apply layers after sum pooling
-
         return data_array
