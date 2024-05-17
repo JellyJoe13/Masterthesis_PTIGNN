@@ -4,4 +4,6 @@
 *.pyc
 *.pt
 *.csv
+*.zip
+*.tar.gz
 src/
