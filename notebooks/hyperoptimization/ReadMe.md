@@ -19,3 +19,40 @@ configurations.
 - Hyperoptimization-plotting.ipynb: Notebook to plot hyperoptimization validation metric results
 - load_old_results.ipynb: Notebook for loading aborted ray parameter optimization using intermediate results
 - run_test_script.py: Alternative final test script - does not use ray
+- windows_script.bat
+
+## Execution Procedure
+
+First of all the environment described in the top level ReadMe needs to be created. Then open a command line in the current folder and make sure that the environment is activated.
+
+In there you can use the following commands to execute the scripts:
+
+```bash
+CUDA_VISIBLE_DEVICES=x python script_name.py "config_path" --verbose -cpu y -gpu z -device d
+```
+x can be set to integers describing the devices that should be visible, this can be left out if no restriction is to be
+imposed. The script name can be freely set, substitute it for example with 'hyper_opt_script_v3.py' or 
+'full_test_script.py'. y and z are variables controlling how many cpus and gpus should be used for each (parallel) 
+execution. The 'config_path' is the path to the config file to use for the test script, this defines which dataset is to
+use and which configurations should be attempted, etc. d can be either cpu or cuda, depending on whether the gpu should
+be used or not.
+
+Example call:
+```bash
+python hyper_opt_script_v3.py "configs/benchmarking/tox21/benchmark_instructions_tox21_ptree_vertex_default_e_linred.yaml" --verbose -device cpu -cpu 5 -gpu 0
+```
+
+If parameters are unclear use 
+```bash
+python script_name.py --help
+```
+
+## Scripts
+
+There is an example of a possible windows bat script that is executing multiple python scripts after each other. 
+'windows_script.bat' first activates the conda environment, then asks for confirmation and then starts two python
+scripts before waiting for user input again. This can be similarly done for Linux, however in this case it is maybe
+easier to chain commands using ';', e.g.:
+```bash
+python script_a.py "path"; python scipt_b.py "path"
+```
