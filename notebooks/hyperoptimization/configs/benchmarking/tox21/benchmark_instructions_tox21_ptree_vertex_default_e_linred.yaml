@@ -25,5 +25,5 @@ hyper_settings:
     reduction_factor: 3
 
     brackets: 1
-  max_concurrent_trials: 5
+  max_concurrent_trials: 3
   num_samples: 30
