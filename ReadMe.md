@@ -19,7 +19,9 @@ pip install multiprocess==0.70.16
 ## Content information:
 
 - notebooks: Experiments and notebooks, TODO: rename to experiments in the future
-- ptgnn: Related code realizing model, framework, etc. TODO: rename to ptignn
+- ptgnn: Related code realizing model, framework, etc. Model name is technically Permutation Tree Invariant Graph Neural Network (PTIGNN),
+however, at the beginning of the project the general term PTGNN was chosen which does not specify whether th emodel is to be invariant or
+equivariant. (Changing it now would change almost every file which is guaranteed to cause errors, except everything is retested)
 - .gitignore: Prevent pushing of datasets to GitHub repo
 - ReadMe.md: General information and installation instructions
 
