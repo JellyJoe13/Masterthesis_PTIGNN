@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.loading package &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ptgnn.masking package" href="ptgnn.masking.html" />
+    <link rel="prev" title="ptgnn.features.chiro package" href="ptgnn.features.chiro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">ptgnn</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ptgnn.html">ptgnn package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="ptgnn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html">ptgnn.dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.html">ptgnn.features package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">ptgnn.loading package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-ptgnn.loading.chienn_collate">ptgnn.loading.chienn_collate module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.chienn_collate.collate_circle_index"><code class="docutils literal notranslate"><span class="pre">collate_circle_index()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.chienn_collate.collate_with_circle_index"><code class="docutils literal notranslate"><span class="pre">collate_with_circle_index()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="#module-ptgnn.loading.collate">ptgnn.loading.collate module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.collate.UniversalCollater"><code class="docutils literal notranslate"><span class="pre">UniversalCollater</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.collate.permutation_tree_batching"><code class="docutils literal notranslate"><span class="pre">permutation_tree_batching()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.collate.permutation_tree_collation"><code class="docutils literal notranslate"><span class="pre">permutation_tree_collation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="#module-ptgnn.loading.custom_assembly">ptgnn.loading.custom_assembly module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.custom_assembly.custom_loader"><code class="docutils literal notranslate"><span class="pre">custom_loader()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="#module-ptgnn.loading.load">ptgnn.loading.load module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.load.UniversalLoader"><code class="docutils literal notranslate"><span class="pre">UniversalLoader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="#module-ptgnn.loading.pos_enc">ptgnn.loading.pos_enc module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.pos_enc.get_rw_landing_probs"><code class="docutils literal notranslate"><span class="pre">get_rw_landing_probs()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.pos_enc.precompute_pos_enc_function"><code class="docutils literal notranslate"><span class="pre">precompute_pos_enc_function()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.pos_enc.transform_func"><code class="docutils literal notranslate"><span class="pre">transform_func()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="#module-ptgnn.loading.sampling">ptgnn.loading.sampling module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.sampling.SampleMapToNegatives"><code class="docutils literal notranslate"><span class="pre">SampleMapToNegatives</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#ptgnn.loading.sampling.SampleMapToNegatives.sample"><code class="docutils literal notranslate"><span class="pre">SampleMapToNegatives.sample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.sampling.SampleMapToPositives"><code class="docutils literal notranslate"><span class="pre">SampleMapToPositives</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#ptgnn.loading.sampling.SampleMapToPositives.sample"><code class="docutils literal notranslate"><span class="pre">SampleMapToPositives.sample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.sampling.SingleConformerSampler"><code class="docutils literal notranslate"><span class="pre">SingleConformerSampler</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="#module-ptgnn.loading.subsetting">ptgnn.loading.subsetting module</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.subsetting.dataset_select_indices"><code class="docutils literal notranslate"><span class="pre">dataset_select_indices()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.subsetting.sample_indices_simple"><code class="docutils literal notranslate"><span class="pre">sample_indices_simple()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.subsetting.sample_with_dataframe"><code class="docutils literal notranslate"><span class="pre">sample_with_dataframe()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.loading.subsetting.subset_dataset"><code class="docutils literal notranslate"><span class="pre">subset_dataset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="#module-ptgnn.loading">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.masking.html">ptgnn.masking package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.html">ptgnn.model package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.optimizing.html">ptgnn.optimizing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.runtime_config.html">ptgnn.runtime_config package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.html">ptgnn.transform package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.html#module-ptgnn">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">ptgnn</a></li>
+          <li class="breadcrumb-item"><a href="ptgnn.html">ptgnn package</a></li>
+      <li class="breadcrumb-item active">ptgnn.loading package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ptgnn.loading.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ptgnn-loading-package">
+<h1>ptgnn.loading package<a class="headerlink" href="#ptgnn-loading-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-ptgnn.loading.chienn_collate">
+<span id="ptgnn-loading-chienn-collate-module"></span><h2>ptgnn.loading.chienn_collate module<a class="headerlink" href="#module-ptgnn.loading.chienn_collate" title="Link to this heading"></a></h2>
+<p>Taken/Adapted from Chienn:
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/chienn/data/featurize.py#L30">https://github.com/gmum/ChiENN/blob/master/chienn/data/featurize.py#L30</a>
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/chienn/data/edge_graph/collate_circle_index.py#L9">https://github.com/gmum/ChiENN/blob/master/chienn/data/edge_graph/collate_circle_index.py#L9</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.chienn_collate.collate_circle_index">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.chienn_collate.</span></span><span class="sig-name descname"><span class="pre">collate_circle_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Data</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/ptgnn/loading/chienn_collate.html#collate_circle_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.chienn_collate.collate_circle_index" title="Link to this definition"></a></dt>
+<dd><p>Collates <cite>circle_index</cite> attribute of <cite>Data</cite> objects in <cite>batch</cite> into a single tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> – a list of <cite>Data</cite> objects.</p></li>
+<li><p><strong>k_neighbors</strong> – number of incoming neighbors to consider for each node (k in the paper).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tensor of shape (num_nodes, circle_size) containing the indices of the (non-parallel) neighbors in the
+pre-computed order. The first (k-1) indices for every atom are repeated, e.g. for k=3, the circle_index[0] may
+be (i_1, i_2, i_3, …, i_n, i_1, i_2). Therefore, <cite>circle_size</cite> = <cite>max_num_neighbors</cite> + k-1.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.chienn_collate.collate_with_circle_index">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.chienn_collate.</span></span><span class="sig-name descname"><span class="pre">collate_with_circle_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Data</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Batch</span></span></span><a class="reference internal" href="_modules/ptgnn/loading/chienn_collate.html#collate_with_circle_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.chienn_collate.collate_with_circle_index" title="Link to this definition"></a></dt>
+<dd><p>Collates a list of Data objects into a Batch object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_list</strong> – a list of Data objects. Each Data object must contain <cite>circle_index</cite> attribute.</p></li>
+<li><p><strong>k_neighbors</strong> – number of k consecutive neighbors to be used in the message passing step.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Batch object containing the collate attributes from data objects, including <cite>circle_index</cite> collated
+to shape (total_num_nodes, max_circle_size).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.loading.collate">
+<span id="ptgnn-loading-collate-module"></span><h2>ptgnn.loading.collate module<a class="headerlink" href="#module-ptgnn.loading.collate" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.loading.collate.UniversalCollater">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.loading.collate.</span></span><span class="sig-name descname"><span class="pre">UniversalCollater</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">follow_batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neighbors_in_circle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/collate.html#UniversalCollater"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.collate.UniversalCollater" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Inspiration/Extension of <a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/collate.py#L9">https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/collate.py#L9</a></p>
+<p>Collates all types of data used in this project so that it can be used in a batch. Differentiates based on the
+fields that are registered in the input pytorch geometric data.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.collate.permutation_tree_batching">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.collate.</span></span><span class="sig-name descname"><span class="pre">permutation_tree_batching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseData</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ptgnn/loading/collate.html#permutation_tree_batching"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.collate.permutation_tree_batching" title="Link to this definition"></a></dt>
+<dd><p>Utilized for permutation tree batching. This function increases the indices in the permutation trees so that
+they can be merged into one larger list of permutation trees - which would be an internal parameter for the batch
+object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_list</strong> (<em>List</em><em>[</em><em>BaseData</em><em>]</em>) – List of data objects with the trees to ‘batch’</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of permutation trees to insert into the batch object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>List</em>[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.collate.permutation_tree_collation">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.collate.</span></span><span class="sig-name descname"><span class="pre">permutation_tree_collation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseData</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Batch</span></span></span><a class="reference internal" href="_modules/ptgnn/loading/collate.html#permutation_tree_collation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.collate.permutation_tree_collation" title="Link to this definition"></a></dt>
+<dd><p>Collates data that is related to permutation tree data, i.e. contains a parameter with ptree and the order, type and
+pooling instruction matrices. Returns a batch object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_list</strong> (<em>List</em><em>[</em><em>BaseData</em><em>]</em>) – List of data objects to ‘batch’</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Batched permutation tree related data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.loading.custom_assembly">
+<span id="ptgnn-loading-custom-assembly-module"></span><h2>ptgnn.loading.custom_assembly module<a class="headerlink" href="#module-ptgnn.loading.custom_assembly" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.custom_assembly.custom_loader">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.custom_assembly.</span></span><span class="sig-name descname"><span class="pre">custom_loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neighbors_in_circle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'full_batch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompute_pos_enc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ptgnn.loading.load.UniversalLoader" title="ptgnn.loading.load.UniversalLoader"><span class="pre">UniversalLoader</span></a></span></span><a class="reference internal" href="_modules/ptgnn/loading/custom_assembly.html#custom_loader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.custom_assembly.custom_loader" title="Link to this definition"></a></dt>
+<dd><p>Fetches the loader for elements in project. Currently one single loader for all elements.</p>
+<p>Adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L99">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L99</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – Dataset which to wrap in a loader</p></li>
+<li><p><strong>n_neighbors_in_circle</strong> (<em>int</em>) – number of neighbors in circle in case of ChiENN cycle index setting.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – batch size</p></li>
+<li><p><strong>sampler</strong> (<em>str</em>) – Whether to use the full batch or single conformer sampling method</p></li>
+<li><p><strong>shuffle</strong> (<em>bool</em>) – Whether to shuffle the data or not</p></li>
+<li><p><strong>dataframe</strong> (<em>pd.DataFrame</em>) – dataframe which to use in single conformer sampling</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em>) – How many workers to use in the loader</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to print information to command line/system out</p></li>
+<li><p><strong>precompute_pos_enc</strong> (<em>list</em>) – List of positional embeddings to calculate for the contents in advance</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.loading.load">
+<span id="ptgnn-loading-load-module"></span><h2>ptgnn.loading.load module<a class="headerlink" href="#module-ptgnn.loading.load" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.loading.load.UniversalLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.loading.load.</span></span><span class="sig-name descname"><span class="pre">UniversalLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseData</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">follow_batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neighbors_in_circle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompute_pos_enc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/load.html#UniversalLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.load.UniversalLoader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code></p>
+<p>Inspired/adapted from <a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/dataloader.py">https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/dataloader.py</a></p>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.loading.pos_enc">
+<span id="ptgnn-loading-pos-enc-module"></span><h2>ptgnn.loading.pos_enc module<a class="headerlink" href="#module-ptgnn.loading.pos_enc" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.pos_enc.get_rw_landing_probs">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.pos_enc.</span></span><span class="sig-name descname"><span class="pre">get_rw_landing_probs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ksteps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/pos_enc.html#get_rw_landing_probs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.pos_enc.get_rw_landing_probs" title="Link to this definition"></a></dt>
+<dd><p>Compute Random Walk landing probabilities for given list of K steps.
+Source: <a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/posenc_stats.py#L176">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/posenc_stats.py#L176</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ksteps</strong> – List of k-steps for which to compute the RW landings</p></li>
+<li><p><strong>edge_index</strong> – PyG sparse representation of the graph</p></li>
+<li><p><strong>edge_weight</strong> – (optional) Edge weights</p></li>
+<li><p><strong>num_nodes</strong> – (optional) Number of nodes in the graph</p></li>
+<li><p><strong>space_dim</strong> – (optional) Estimated dimensionality of the space. Used to
+correct the random-walk diagonal by a factor <cite>k^(space_dim/2)</cite>.
+In euclidean space, this correction means that the height of
+the gaussian distribution stays almost constant across the number of
+steps, if <cite>space_dim</cite> is the dimension of the euclidean space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D Tensor with shape (num_nodes, len(ksteps)) with RW landing probs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.pos_enc.precompute_pos_enc_function">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.pos_enc.</span></span><span class="sig-name descname"><span class="pre">precompute_pos_enc_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompose_pos_enc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/pos_enc.html#precompute_pos_enc_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.pos_enc.precompute_pos_enc_function" title="Link to this definition"></a></dt>
+<dd><p>Adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/transforms.py#L8">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/transforms.py#L8</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.pos_enc.transform_func">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.pos_enc.</span></span><span class="sig-name descname"><span class="pre">transform_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pe_types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/pos_enc.html#transform_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.pos_enc.transform_func" title="Link to this definition"></a></dt>
+<dd><p>Adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/posenc_stats.py#L13">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/posenc_stats.py#L13</a></p>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.loading.sampling">
+<span id="ptgnn-loading-sampling-module"></span><h2>ptgnn.loading.sampling module<a class="headerlink" href="#module-ptgnn.loading.sampling" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.loading.sampling.SampleMapToNegatives">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.loading.sampling.</span></span><span class="sig-name descname"><span class="pre">SampleMapToNegatives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_sorted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/sampling.html#SampleMapToNegatives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.sampling.SampleMapToNegatives" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Adapted/copied from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L191">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L191</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.loading.sampling.SampleMapToNegatives.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">without_replacement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stratified</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/sampling.html#SampleMapToNegatives.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.sampling.SampleMapToNegatives.sample" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.loading.sampling.SampleMapToPositives">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.loading.sampling.</span></span><span class="sig-name descname"><span class="pre">SampleMapToPositives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_sorted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_anchor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/sampling.html#SampleMapToPositives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.sampling.SampleMapToPositives" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Adapted/copied from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L167">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L167</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.loading.sampling.SampleMapToPositives.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">without_replacement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/sampling.html#SampleMapToPositives.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.sampling.SampleMapToPositives.sample" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.loading.sampling.SingleConformerSampler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.loading.sampling.</span></span><span class="sig-name descname"><span class="pre">SingleConformerSampler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_conformer_ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">without_replacement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stratified</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/sampling.html#SingleConformerSampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.sampling.SingleConformerSampler" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sampler</span></code></p>
+<p>Adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L261">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L261</a>
+to reproduce training procedure to some extent. Samples number of positive and negative conformers for one batch</p>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.loading.subsetting">
+<span id="ptgnn-loading-subsetting-module"></span><h2>ptgnn.loading.subsetting module<a class="headerlink" href="#module-ptgnn.loading.subsetting" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.subsetting.dataset_select_indices">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.subsetting.</span></span><span class="sig-name descname"><span class="pre">dataset_select_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/subsetting.html#dataset_select_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.subsetting.dataset_select_indices" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.subsetting.sample_indices_simple">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.subsetting.</span></span><span class="sig-name descname"><span class="pre">sample_indices_simple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/subsetting.html#sample_indices_simple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.subsetting.sample_indices_simple" title="Link to this definition"></a></dt>
+<dd><p>Adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loader/master_loader.py#L862">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loader/master_loader.py#L862</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.subsetting.sample_with_dataframe">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.subsetting.</span></span><span class="sig-name descname"><span class="pre">sample_with_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/subsetting.html#sample_with_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.subsetting.sample_with_dataframe" title="Link to this definition"></a></dt>
+<dd><p>Adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loader/master_loader.py#L872">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loader/master_loader.py#L872</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.loading.subsetting.subset_dataset">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.loading.subsetting.</span></span><span class="sig-name descname"><span class="pre">subset_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/loading/subsetting.html#subset_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.loading.subsetting.subset_dataset" title="Link to this definition"></a></dt>
+<dd><p>Rework of code from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loader/master_loader.py#L697">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/loader/master_loader.py#L697</a></p>
+<p>Subselects a part of dataset to make hyperparameter optimization for huge datasets feasible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – dataset to subselect</p></li>
+<li><p><strong>subset_size</strong> (<em>int</em>) – (maximal) size of the dataset after subsetting</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.loading">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ptgnn.loading" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ptgnn.features.chiro.html" class="btn btn-neutral float-left" title="ptgnn.features.chiro package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ptgnn.masking.html" class="btn btn-neutral float-right" title="ptgnn.masking package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

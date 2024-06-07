@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.transform.ptree_matrix &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.transform.ptree_matrix</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.transform.ptree_matrix</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+
+<span class="n">type_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;Z2&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;S2&quot;</span><span class="p">:</span> <span class="mi">5</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="permutation_tree_depth">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.ptree_matrix.permutation_tree_depth">[docs]</a>
+<span class="k">def</span> <span class="nf">permutation_tree_depth</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the maximal depth of tree&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">permutation_tree_depth</span><span class="p">,</span> <span class="n">tree</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">permutation_tree_depth</span><span class="p">,</span> <span class="n">tree</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="k">if</span> <span class="n">tree</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="get_matrix">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.ptree_matrix.get_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">get_matrix</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">idx_prefix</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">type_prefix</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs the order and type matrix of permutation tree</span>
+
+<span class="sd">    :param tree: current tree</span>
+<span class="sd">    :param depth: depth of tree</span>
+<span class="sd">    :param idx_prefix: prefix of idx (important if called recursively, else ignore)</span>
+<span class="sd">    :param type_prefix: prefix of type (important if called recursively, else ignore)</span>
+<span class="sd">    :return: idx_matrix, type_matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">idx_matrix</span><span class="p">,</span> <span class="n">type_matrix</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+            <span class="n">get_matrix</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">idx_prefix</span> <span class="o">+</span> <span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">type_prefix</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">idx_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">type_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">get_matrix</span><span class="p">(</span><span class="n">tree</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx_prefix</span><span class="p">,</span> <span class="n">type_prefix</span><span class="o">=</span><span class="n">type_prefix</span> <span class="o">+</span> <span class="p">[</span><span class="n">type_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]])</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">idx_prefix</span> <span class="o">+</span> <span class="p">[</span><span class="n">tree</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">depth</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> \
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">type_prefix</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">depth</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="remove_inverted_through_p">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.ptree_matrix.remove_inverted_through_p">[docs]</a>
+<span class="k">def</span> <span class="nf">remove_inverted_through_p</span><span class="p">(</span><span class="n">perm_tree</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Replaces Q and C type internal nodes with P(S,S) and P(Z,Z).</span>
+
+<span class="sd">    :param perm_tree: permutation tree as python dict</span>
+<span class="sd">    :param use_new_inv: Whether or not to use S2 and Z2 instead of S and Z</span>
+<span class="sd">    :return: dict of transformed tree</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">perm_tree</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">perm_tree</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">perm_tree</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="c1"># no inverting happening here, this is meant for normal types</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">remove_inverted_through_p</span><span class="p">(</span><span class="n">subtree</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span> <span class="k">for</span> <span class="n">subtree</span> <span class="ow">in</span> <span class="n">perm_tree</span><span class="p">]</span>
+
+    <span class="n">key</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">perm_tree</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;Q&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">&quot;S</span><span class="si">{</span><span class="mi">2</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_new_inv</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="n">remove_inverted_through_p</span><span class="p">(</span><span class="n">subtree</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">subtree</span> <span class="ow">in</span> <span class="n">perm_tree</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="p">]</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">&quot;S</span><span class="si">{</span><span class="mi">2</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_new_inv</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[</span>
+                             <span class="n">remove_inverted_through_p</span><span class="p">(</span><span class="n">subtree</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">subtree</span> <span class="ow">in</span> <span class="n">perm_tree</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                         <span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">&quot;Z</span><span class="si">{</span><span class="mi">2</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_new_inv</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="n">remove_inverted_through_p</span><span class="p">(</span><span class="n">subtree</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">subtree</span> <span class="ow">in</span> <span class="n">perm_tree</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="p">]</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">&quot;Z</span><span class="si">{</span><span class="mi">2</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_new_inv</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[</span>
+                             <span class="n">remove_inverted_through_p</span><span class="p">(</span><span class="n">subtree</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">subtree</span> <span class="ow">in</span> <span class="n">perm_tree</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                         <span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">remove_inverted_through_p</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">perm_tree</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
+
+
+
+<div class="viewcode-block" id="permutation_tree_to_matrix">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.ptree_matrix.permutation_tree_to_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">permutation_tree_to_matrix</span><span class="p">(</span>
+        <span class="n">ptree_string_list</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">use_new_inv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes control matrices based on permutation tree. Control matrices required for advanced permutation tree model.</span>
+
+<span class="sd">    :param ptree_string_list: List of permutation trees as string</span>
+<span class="sd">    :param k: k parameter - how many elements to set into context. Not used, kept for potential future use.</span>
+<span class="sd">    :param use_new_inv: Whether or not to split Q and C into different S and Z or not</span>
+<span class="sd">    :return: idx_matrix, type_matrix</span>
+<span class="sd">    :rtype: typing.Tuple[torch.Tensor, torch.Tensor]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># transform to dict</span>
+    <span class="n">permutation_trees</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">p_string</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p_string</span> <span class="ow">in</span> <span class="n">ptree_string_list</span>
+    <span class="p">]</span>
+
+    <span class="c1"># replace C, Q by P(Z,Z) and P(S,S)</span>
+    <span class="n">permutation_trees</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">remove_inverted_through_p</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">permutation_trees</span>
+    <span class="p">]</span>
+
+    <span class="c1"># get number of layers</span>
+    <span class="n">num_layers</span> <span class="o">=</span> <span class="n">permutation_tree_depth</span><span class="p">(</span><span class="n">permutation_trees</span><span class="p">)</span>
+
+    <span class="c1"># fetch the matrix for the permutation trees</span>
+    <span class="n">idx_matrix</span><span class="p">,</span> <span class="n">type_matrix</span> <span class="o">=</span> <span class="n">get_matrix</span><span class="p">(</span><span class="n">permutation_trees</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">num_layers</span><span class="p">)</span>
+
+    <span class="c1"># fill -1 in matrix with last values</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">idx_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="c1"># get the -1 entry mask</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">idx_matrix</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">idx_matrix</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx_matrix</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">idx_matrix</span><span class="p">,</span> <span class="n">type_matrix</span></div>
+
+
+
+<div class="viewcode-block" id="permutation_tree_to_order_matrix">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.ptree_matrix.permutation_tree_to_order_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">permutation_tree_to_order_matrix</span><span class="p">(</span>
+        <span class="n">batch</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">,</span>
+        <span class="n">use_new_inv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the control matrices for a batch object (or data object).</span>
+
+<span class="sd">    :param batch: batch object or data object. Needs to have ptree field.</span>
+<span class="sd">    :param k: k parameter, number of elements to set into context</span>
+<span class="sd">    :param use_new_inv: whether or not to split C and Q into separate S and Z nodes</span>
+<span class="sd">    :return: modified batch or data object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get matrices</span>
+    <span class="n">idx_matrix</span><span class="p">,</span> <span class="n">type_matrix</span> <span class="o">=</span> <span class="n">permutation_tree_to_matrix</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">ptree</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span>
+
+    <span class="c1"># get structure to orient to</span>
+    <span class="n">idx_structure</span> <span class="o">=</span> <span class="n">idx_matrix</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">layer_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
+        <span class="c1"># get indexes for graph pooling</span>
+        <span class="n">idx_structure</span><span class="p">,</span> <span class="n">current_layer_pooling_counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">idx_structure</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># get indexes for graph pooling</span>
+        <span class="n">current_layer_pooling</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">repeat_interleave</span><span class="p">(</span><span class="n">current_layer_pooling_counts</span><span class="p">)</span>
+
+        <span class="c1"># init circling</span>
+        <span class="n">order_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_layer_pooling</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># create new type_matrix</span>
+        <span class="n">new_type_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">cur_pos</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">current_layer_pooling_counts</span><span class="p">:</span>
+            <span class="n">current_k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+            <span class="c1"># create the index to put into the order matrix</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">cur_pos</span><span class="p">,</span> <span class="n">cur_pos</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="c1"># get type</span>
+            <span class="n">new_type_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">type_matrix</span><span class="p">[</span><span class="n">cur_pos</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">type_matrix</span><span class="p">[</span><span class="n">cur_pos</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+            <span class="c1"># switch for node types</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">order_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">cur_pos</span><span class="p">:(</span><span class="n">cur_pos</span><span class="o">+</span><span class="n">current_k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:</span><span class="n">current_k</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                    <span class="n">order_matrix</span><span class="p">[:</span><span class="n">current_k</span><span class="p">,</span> <span class="n">cur_pos</span><span class="o">+</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">shifts</span><span class="o">=-</span><span class="n">j</span><span class="p">)[:</span><span class="n">current_k</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">current_k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">order_matrix</span><span class="p">[:</span><span class="n">current_k</span><span class="p">,</span> <span class="n">cur_pos</span><span class="o">+</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">shifts</span><span class="o">=-</span><span class="n">j</span><span class="p">)[:</span><span class="n">current_k</span><span class="p">]</span>
+
+            <span class="n">cur_pos</span> <span class="o">+=</span> <span class="n">i</span>
+
+        <span class="c1"># double list is a workaround for pyg auto collate function in datasets. Other way: hard coding tree depth</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;initial_map&quot;</span><span class="p">,</span> <span class="n">idx_matrix</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_order_matrix&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="n">order_matrix</span><span class="p">]])</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_type_mask&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="n">type_matrix</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]])</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_pooling&quot;</span><span class="p">,</span> <span class="p">[[</span><span class="n">current_layer_pooling</span><span class="p">]])</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;num_layer&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="n">type_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">new_type_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">batch</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

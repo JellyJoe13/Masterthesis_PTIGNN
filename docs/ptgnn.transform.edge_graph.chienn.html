@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.transform.edge_graph.chienn package &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ptgnn.transform.vertex_graph package" href="ptgnn.transform.vertex_graph.html" />
+    <link rel="prev" title="ptgnn.transform.edge_graph package" href="ptgnn.transform.edge_graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">ptgnn</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ptgnn.html">ptgnn package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="ptgnn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html">ptgnn.dataset package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.html">ptgnn.features package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.loading.html">ptgnn.loading package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.masking.html">ptgnn.masking package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.html">ptgnn.model package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.optimizing.html">ptgnn.optimizing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.runtime_config.html">ptgnn.runtime_config package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="ptgnn.transform.html">ptgnn.transform package</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="ptgnn.transform.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="ptgnn.transform.edge_graph.html">ptgnn.transform.edge_graph package</a><ul class="current">
+<li class="toctree-l7 current"><a class="reference internal" href="ptgnn.transform.edge_graph.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l8 current"><a class="current reference internal" href="#">ptgnn.transform.edge_graph.chienn package</a></li>
+</ul>
+</li>
+<li class="toctree-l7"><a class="reference internal" href="ptgnn.transform.edge_graph.html#submodules">Submodules</a></li>
+<li class="toctree-l7"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph.basic_permutation_tree">ptgnn.transform.edge_graph.basic_permutation_tree module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph.cyclic_tree">ptgnn.transform.edge_graph.cyclic_tree module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph.permutation_tree_selective">ptgnn.transform.edge_graph.permutation_tree_selective module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph.permutation_tree_special">ptgnn.transform.edge_graph.permutation_tree_special module</a></li>
+<li class="toctree-l7"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="ptgnn.transform.vertex_graph.html">ptgnn.transform.vertex_graph package</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.transform.html#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform.detect_chem_structures">ptgnn.transform.detect_chem_structures module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform.multi_stereo_center">ptgnn.transform.multi_stereo_center module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform.ptree_matrix">ptgnn.transform.ptree_matrix module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform.tree_separation">ptgnn.transform.tree_separation module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.html#module-ptgnn">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">ptgnn</a></li>
+          <li class="breadcrumb-item"><a href="ptgnn.html">ptgnn package</a></li>
+          <li class="breadcrumb-item"><a href="ptgnn.transform.html">ptgnn.transform package</a></li>
+          <li class="breadcrumb-item"><a href="ptgnn.transform.edge_graph.html">ptgnn.transform.edge_graph package</a></li>
+      <li class="breadcrumb-item active">ptgnn.transform.edge_graph.chienn package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ptgnn.transform.edge_graph.chienn.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ptgnn-transform-edge-graph-chienn-package">
+<h1>ptgnn.transform.edge_graph.chienn package<a class="headerlink" href="#ptgnn-transform-edge-graph-chienn-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-ptgnn.transform.edge_graph.chienn.get_circle_index">
+<span id="ptgnn-transform-edge-graph-chienn-get-circle-index-module"></span><h2>ptgnn.transform.edge_graph.chienn.get_circle_index module<a class="headerlink" href="#module-ptgnn.transform.edge_graph.chienn.get_circle_index" title="Link to this heading"></a></h2>
+<p>This files content is copied/adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/chienn/data/edge_graph/get_circle_index.py">https://github.com/gmum/ChiENN/blob/master/chienn/data/edge_graph/get_circle_index.py</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.transform.edge_graph.chienn.get_circle_index.angle_2d">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.transform.edge_graph.chienn.get_circle_index.</span></span><span class="sig-name descname"><span class="pre">angle_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/ptgnn/transform/edge_graph/chienn/get_circle_index.html#angle_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.transform.edge_graph.chienn.get_circle_index.angle_2d" title="Link to this definition"></a></dt>
+<dd><p>Computes angle from 2D vector a to b in a standard (counterclockwise) direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – a 2D vector of shape (2,).</p></li>
+<li><p><strong>b</strong> – a 2D vector of shape (2,).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Angle in radians.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.transform.edge_graph.chienn.get_circle_index.get_circle_index">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.transform.edge_graph.chienn.get_circle_index.</span></span><span class="sig-name descname"><span class="pre">get_circle_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clockwise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ptgnn/transform/edge_graph/chienn/get_circle_index.html#get_circle_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.transform.edge_graph.chienn.get_circle_index.get_circle_index" title="Link to this definition"></a></dt>
+<dd><p>Gets a list of indices for every node in data.</p>
+<p>For every node <cite>i</cite>, we create a <cite>circle_i</cite> - list of nodes sorted such that their order corresponds to a real
+3D circle around node <cite>i</cite>. If we imagine node <cite>i</cite> (which represents a directed edge) pointing towards us
+([0, 0, -1]), then the incoming nodes are sorted counterclockwise (or clockwise if <cite>clockwise</cite> flag is set to True)
+in <cite>circle_i</cite>. As we remove the parallel node from the circle, the length of circle <cite>c_i = max(0, in_degree(i) - 1)</cite>
+for all the nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – torch geometric graph with <cite>N</cite> nodes (which represent the directed edges) along with the corresponding
+edges (vectors) positions <cite>data.pos</cite> of shape (N, 6).</p></li>
+<li><p><strong>clockwise</strong> – flag indicating whether to sort nodes clockwise.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of N circles.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.transform.edge_graph.chienn.get_circle_index.sort_vectors_in_circle">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.transform.edge_graph.chienn.get_circle_index.</span></span><span class="sig-name descname"><span class="pre">sort_vectors_in_circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/ptgnn/transform/edge_graph/chienn/get_circle_index.html#sort_vectors_in_circle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.transform.edge_graph.chienn.get_circle_index.sort_vectors_in_circle" title="Link to this definition"></a></dt>
+<dd><p>Sorts vectors in a circle around a base vector. First, we translate and rotate the base and the vectors, so that
+the base starts in [0, 0, 0] and points towards [0, 0, -1]. Then the vectors are projected to xy space and sorted
+counterclockwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – a base of shape (6,) that the <cite>vectors</cite> will be sorted around.</p></li>
+<li><p><strong>vectors</strong> – vectors of shape (N, 6) to be sorted. All vectors should end on the beginning of the base vector and
+not be parallel to the base.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Indices of shape (N,) of the sorted vectors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.transform.edge_graph.chienn.get_circle_index.transform_vectors_to_base">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.transform.edge_graph.chienn.get_circle_index.</span></span><span class="sig-name descname"><span class="pre">transform_vectors_to_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vectors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/ptgnn/transform/edge_graph/chienn/get_circle_index.html#transform_vectors_to_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.transform.edge_graph.chienn.get_circle_index.transform_vectors_to_base" title="Link to this definition"></a></dt>
+<dd><p>Translates and rotates the base and the vectors, so that the base starts in [0, 0, 0] and points towards [0, 0, -1].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – a base vector of shape (6,) used as a reference vector for translation and rotation.</p></li>
+<li><p><strong>vectors</strong> – a vectors of shape (N, 6) to be rotated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed and rotated <cite>vectors</cite> of shape (N, 6).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.transform.edge_graph.chienn.to_edge_graph">
+<span id="ptgnn-transform-edge-graph-chienn-to-edge-graph-module"></span><h2>ptgnn.transform.edge_graph.chienn.to_edge_graph module<a class="headerlink" href="#module-ptgnn.transform.edge_graph.chienn.to_edge_graph" title="Link to this heading"></a></h2>
+<p>This files content is copied/adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/chienn/data/edge_graph/to_edge_graph.py">https://github.com/gmum/ChiENN/blob/master/chienn/data/edge_graph/to_edge_graph.py</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.transform.edge_graph.chienn.to_edge_graph.to_edge_graph">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.transform.edge_graph.chienn.to_edge_graph.</span></span><span class="sig-name descname"><span class="pre">to_edge_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Data</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Data</span></span></span><a class="reference internal" href="_modules/ptgnn/transform/edge_graph/chienn/to_edge_graph.html#to_edge_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.transform.edge_graph.chienn.to_edge_graph.to_edge_graph" title="Link to this definition"></a></dt>
+<dd><p>Converts the graph to a graph of edges. Every directed edge (a, b) with index i becomes a node (denoted with node’)
+with attribute of the form data.x[a] | data.edge_attr[i]. Then every node’ (x, a) incoming to node a is connected
+with node’ (a, b) with directed edge’. For compatibility with GINE, edge_attr’ of edge’ (a, b) -&gt; (b, c) are set
+to data.edge_attr[j], where j is the index of edge (a, b).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – torch geometric data with nodes attributes (x), edge attributes (edge_attr) and edge indices (edge_index)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Graph of edges.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.transform.edge_graph.chienn">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ptgnn.transform.edge_graph.chienn" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ptgnn.transform.edge_graph.html" class="btn btn-neutral float-left" title="ptgnn.transform.edge_graph package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ptgnn.transform.vertex_graph.html" class="btn btn-neutral float-right" title="ptgnn.transform.vertex_graph package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ptgnn.dataset package" href="ptgnn.dataset.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ptgnn</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html">ptgnn.dataset package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.features.html">ptgnn.features package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html">ptgnn.loading package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.masking.html">ptgnn.masking package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.html">ptgnn.model package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.optimizing.html">ptgnn.optimizing package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html">ptgnn.runtime_config package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html">ptgnn.transform package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ptgnn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">&lt;no title&gt;</a></li>
+      <li class="breadcrumb-item active">ptgnn</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ptgnn.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ptgnn">
+<h1>ptgnn<a class="headerlink" href="#ptgnn" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.dataset.html">ptgnn.dataset package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.bindingaffinity_dataset">ptgnn.dataset.bindingaffinity_dataset module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.bindingaffinity_dataset.BindingAffinityDataset"><code class="docutils literal notranslate"><span class="pre">BindingAffinityDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.bindingaffinity_dataset.BindingAffinityDataset.download"><code class="docutils literal notranslate"><span class="pre">BindingAffinityDataset.download()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.bindingaffinity_dataset.BindingAffinityDataset.process"><code class="docutils literal notranslate"><span class="pre">BindingAffinityDataset.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.bindingaffinity_dataset.BindingAffinityDataset.processed_dir"><code class="docutils literal notranslate"><span class="pre">BindingAffinityDataset.processed_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.bindingaffinity_dataset.BindingAffinityDataset.processed_file_names"><code class="docutils literal notranslate"><span class="pre">BindingAffinityDataset.processed_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.bindingaffinity_dataset.BindingAffinityDataset.raw_file_names"><code class="docutils literal notranslate"><span class="pre">BindingAffinityDataset.raw_file_names</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.chainer_chemistry_split">ptgnn.dataset.chainer_chemistry_split module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.chainer_chemistry_split.scaffold_split"><code class="docutils literal notranslate"><span class="pre">scaffold_split()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.csv_datasets">ptgnn.dataset.csv_datasets module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.BaceDataset"><code class="docutils literal notranslate"><span class="pre">BaceDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.BaceDataset.download"><code class="docutils literal notranslate"><span class="pre">BaceDataset.download()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.BaceDataset.process"><code class="docutils literal notranslate"><span class="pre">BaceDataset.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.BaceDataset.processed_dir"><code class="docutils literal notranslate"><span class="pre">BaceDataset.processed_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.BaceDataset.processed_file_names"><code class="docutils literal notranslate"><span class="pre">BaceDataset.processed_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.BaceDataset.raw_file_names"><code class="docutils literal notranslate"><span class="pre">BaceDataset.raw_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.BaceDataset.split_fn"><code class="docutils literal notranslate"><span class="pre">BaceDataset.split_fn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.Tox21Dataset"><code class="docutils literal notranslate"><span class="pre">Tox21Dataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.Tox21Dataset.download"><code class="docutils literal notranslate"><span class="pre">Tox21Dataset.download()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.Tox21Dataset.process"><code class="docutils literal notranslate"><span class="pre">Tox21Dataset.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.Tox21Dataset.processed_dir"><code class="docutils literal notranslate"><span class="pre">Tox21Dataset.processed_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.Tox21Dataset.processed_file_names"><code class="docutils literal notranslate"><span class="pre">Tox21Dataset.processed_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.Tox21Dataset.raw_file_names"><code class="docutils literal notranslate"><span class="pre">Tox21Dataset.raw_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.csv_datasets.Tox21Dataset.split_fn"><code class="docutils literal notranslate"><span class="pre">Tox21Dataset.split_fn()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.ez_dataset">ptgnn.dataset.ez_dataset module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ez_dataset.EZDataset"><code class="docutils literal notranslate"><span class="pre">EZDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ez_dataset.EZDataset.download"><code class="docutils literal notranslate"><span class="pre">EZDataset.download()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ez_dataset.EZDataset.process"><code class="docutils literal notranslate"><span class="pre">EZDataset.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ez_dataset.EZDataset.processed_dir"><code class="docutils literal notranslate"><span class="pre">EZDataset.processed_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ez_dataset.EZDataset.processed_file_names"><code class="docutils literal notranslate"><span class="pre">EZDataset.processed_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ez_dataset.EZDataset.raw_file_names"><code class="docutils literal notranslate"><span class="pre">EZDataset.raw_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ez_dataset.EZDataset.transform_to_ez"><code class="docutils literal notranslate"><span class="pre">EZDataset.transform_to_ez()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.mc_dataset">ptgnn.dataset.mc_dataset module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset"><code class="docutils literal notranslate"><span class="pre">MCDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.download"><code class="docutils literal notranslate"><span class="pre">MCDataset.download()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.process"><code class="docutils literal notranslate"><span class="pre">MCDataset.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.processed_dir"><code class="docutils literal notranslate"><span class="pre">MCDataset.processed_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.processed_file_names"><code class="docutils literal notranslate"><span class="pre">MCDataset.processed_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.raw_file_names"><code class="docutils literal notranslate"><span class="pre">MCDataset.raw_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.split_fn"><code class="docutils literal notranslate"><span class="pre">MCDataset.split_fn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.assign_lu_label"><code class="docutils literal notranslate"><span class="pre">assign_lu_label()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.filter_mc_tetra_mol"><code class="docutils literal notranslate"><span class="pre">filter_mc_tetra_mol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.mc_dataset.worker_create_all_combinations"><code class="docutils literal notranslate"><span class="pre">worker_create_all_combinations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.ogb_datasets">ptgnn.dataset.ogb_datasets module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ogb_datasets.OGBDataset"><code class="docutils literal notranslate"><span class="pre">OGBDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ogb_datasets.OGBDataset.download"><code class="docutils literal notranslate"><span class="pre">OGBDataset.download()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ogb_datasets.OGBDataset.process"><code class="docutils literal notranslate"><span class="pre">OGBDataset.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ogb_datasets.OGBDataset.processed_dir"><code class="docutils literal notranslate"><span class="pre">OGBDataset.processed_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ogb_datasets.OGBDataset.processed_file_names"><code class="docutils literal notranslate"><span class="pre">OGBDataset.processed_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.ogb_datasets.OGBDataset.raw_file_names"><code class="docutils literal notranslate"><span class="pre">OGBDataset.raw_file_names</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.rs_dataset">ptgnn.dataset.rs_dataset module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.rs_dataset.RSDataset"><code class="docutils literal notranslate"><span class="pre">RSDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.rs_dataset.RSDataset.download"><code class="docutils literal notranslate"><span class="pre">RSDataset.download()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.rs_dataset.RSDataset.process"><code class="docutils literal notranslate"><span class="pre">RSDataset.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.rs_dataset.RSDataset.processed_dir"><code class="docutils literal notranslate"><span class="pre">RSDataset.processed_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.rs_dataset.RSDataset.processed_file_names"><code class="docutils literal notranslate"><span class="pre">RSDataset.processed_file_names</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.rs_dataset.RSDataset.raw_file_names"><code class="docutils literal notranslate"><span class="pre">RSDataset.raw_file_names</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.utils">ptgnn.dataset.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.utils.dict_to_storage_path"><code class="docutils literal notranslate"><span class="pre">dict_to_storage_path()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset.utils_chienn">ptgnn.dataset.utils_chienn module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.utils_chienn.convert_target_for_task"><code class="docutils literal notranslate"><span class="pre">convert_target_for_task()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.utils_chienn.download_url_to_path"><code class="docutils literal notranslate"><span class="pre">download_url_to_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.utils_chienn.get_chiro_data_from_mol"><code class="docutils literal notranslate"><span class="pre">get_chiro_data_from_mol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html#ptgnn.dataset.utils_chienn.get_positions"><code class="docutils literal notranslate"><span class="pre">get_positions()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.dataset.html#module-ptgnn.dataset">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.features.html">ptgnn.features package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.features.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.features.chienn.html">ptgnn.features.chienn package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.chienn.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.chienn.html#module-ptgnn.features.chienn.mol_to_data">ptgnn.features.chienn.mol_to_data module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.chienn.html#module-ptgnn.features.chienn.molecule3d">ptgnn.features.chienn.molecule3d module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.chienn.html#module-ptgnn.features.chienn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.features.chiro.html">ptgnn.features.chiro package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.chiro.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.chiro.html#module-ptgnn.features.chiro.embedding_functions">ptgnn.features.chiro.embedding_functions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.features.chiro.html#module-ptgnn.features.chiro">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.features.html#module-ptgnn.features">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.loading.html">ptgnn.loading package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#module-ptgnn.loading.chienn_collate">ptgnn.loading.chienn_collate module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.chienn_collate.collate_circle_index"><code class="docutils literal notranslate"><span class="pre">collate_circle_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.chienn_collate.collate_with_circle_index"><code class="docutils literal notranslate"><span class="pre">collate_with_circle_index()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#module-ptgnn.loading.collate">ptgnn.loading.collate module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.collate.UniversalCollater"><code class="docutils literal notranslate"><span class="pre">UniversalCollater</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.collate.permutation_tree_batching"><code class="docutils literal notranslate"><span class="pre">permutation_tree_batching()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.collate.permutation_tree_collation"><code class="docutils literal notranslate"><span class="pre">permutation_tree_collation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#module-ptgnn.loading.custom_assembly">ptgnn.loading.custom_assembly module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.custom_assembly.custom_loader"><code class="docutils literal notranslate"><span class="pre">custom_loader()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#module-ptgnn.loading.load">ptgnn.loading.load module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.load.UniversalLoader"><code class="docutils literal notranslate"><span class="pre">UniversalLoader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#module-ptgnn.loading.pos_enc">ptgnn.loading.pos_enc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.pos_enc.get_rw_landing_probs"><code class="docutils literal notranslate"><span class="pre">get_rw_landing_probs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.pos_enc.precompute_pos_enc_function"><code class="docutils literal notranslate"><span class="pre">precompute_pos_enc_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.pos_enc.transform_func"><code class="docutils literal notranslate"><span class="pre">transform_func()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#module-ptgnn.loading.sampling">ptgnn.loading.sampling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.sampling.SampleMapToNegatives"><code class="docutils literal notranslate"><span class="pre">SampleMapToNegatives</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.sampling.SampleMapToNegatives.sample"><code class="docutils literal notranslate"><span class="pre">SampleMapToNegatives.sample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.sampling.SampleMapToPositives"><code class="docutils literal notranslate"><span class="pre">SampleMapToPositives</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.sampling.SampleMapToPositives.sample"><code class="docutils literal notranslate"><span class="pre">SampleMapToPositives.sample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.sampling.SingleConformerSampler"><code class="docutils literal notranslate"><span class="pre">SingleConformerSampler</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#module-ptgnn.loading.subsetting">ptgnn.loading.subsetting module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.subsetting.dataset_select_indices"><code class="docutils literal notranslate"><span class="pre">dataset_select_indices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.subsetting.sample_indices_simple"><code class="docutils literal notranslate"><span class="pre">sample_indices_simple()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.subsetting.sample_with_dataframe"><code class="docutils literal notranslate"><span class="pre">sample_with_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html#ptgnn.loading.subsetting.subset_dataset"><code class="docutils literal notranslate"><span class="pre">subset_dataset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.loading.html#module-ptgnn.loading">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.masking.html">ptgnn.masking package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.masking.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.masking.edge_graph.html">ptgnn.masking.edge_graph package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.masking.edge_graph.html#module-ptgnn.masking.edge_graph">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.masking.vertex_graph.html">ptgnn.masking.vertex_graph package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.masking.vertex_graph.html#module-ptgnn.masking.vertex_graph">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.masking.html#module-ptgnn.masking">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.model.html">ptgnn.model package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.chienn.html">ptgnn.model.chienn package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#module-ptgnn.model.chienn.chienn_layer">ptgnn.model.chienn.chienn_layer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#module-ptgnn.model.chienn.chienn_model">ptgnn.model.chienn.chienn_model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#module-ptgnn.model.chienn.utils">ptgnn.model.chienn.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#module-ptgnn.model.chienn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.framework.html">ptgnn.model.framework package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.framework.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.framework.html#module-ptgnn.model.framework.custom_model">ptgnn.model.framework.custom_model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.framework.html#module-ptgnn.model.framework">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.html">ptgnn.model.modules package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules.custom_wrapper">ptgnn.model.modules.custom_wrapper module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules.gps_layer">ptgnn.model.modules.gps_layer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules.graph_embedding">ptgnn.model.modules.graph_embedding module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules.head_pooling">ptgnn.model.modules.head_pooling module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.html#module-ptgnn.model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.optimizing.html">ptgnn.optimizing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.optimizing.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.optimizing.html#module-ptgnn.optimizing.optimizer">ptgnn.optimizing.optimizer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.optimizing.html#ptgnn.optimizing.optimizer.adam_w_optimizer"><code class="docutils literal notranslate"><span class="pre">adam_w_optimizer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.optimizing.html#module-ptgnn.optimizing.scheduler">ptgnn.optimizing.scheduler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.optimizing.html#ptgnn.optimizing.scheduler.cosine_with_warmup_scheduler"><code class="docutils literal notranslate"><span class="pre">cosine_with_warmup_scheduler()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.optimizing.html#module-ptgnn.optimizing">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.runtime_config.html">ptgnn.runtime_config package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.runtime_config.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.runtime_config.html#module-ptgnn.runtime_config.config">ptgnn.runtime_config.config module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.config.export_as"><code class="docutils literal notranslate"><span class="pre">export_as()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.config.import_as"><code class="docutils literal notranslate"><span class="pre">import_as()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.config.optional_fetch"><code class="docutils literal notranslate"><span class="pre">optional_fetch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.config.priority_merge_config"><code class="docutils literal notranslate"><span class="pre">priority_merge_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.runtime_config.html#module-ptgnn.runtime_config.config_helpers">ptgnn.runtime_config.config_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.config_helpers.load_and_merge_default_configs"><code class="docutils literal notranslate"><span class="pre">load_and_merge_default_configs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.config_helpers.run_config_adapter"><code class="docutils literal notranslate"><span class="pre">run_config_adapter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.runtime_config.html#module-ptgnn.runtime_config.final_test_suggester">ptgnn.runtime_config.final_test_suggester module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.final_test_suggester.FinalSearcher"><code class="docutils literal notranslate"><span class="pre">FinalSearcher</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.final_test_suggester.FinalSearcher.on_trial_complete"><code class="docutils literal notranslate"><span class="pre">FinalSearcher.on_trial_complete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.final_test_suggester.FinalSearcher.suggest"><code class="docutils literal notranslate"><span class="pre">FinalSearcher.suggest()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.runtime_config.html#module-ptgnn.runtime_config.loss">ptgnn.runtime_config.loss module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.loss.graphgym_cross_entropy_loss"><code class="docutils literal notranslate"><span class="pre">graphgym_cross_entropy_loss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.loss.l1_loss"><code class="docutils literal notranslate"><span class="pre">l1_loss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.runtime_config.html#module-ptgnn.runtime_config.metrics">ptgnn.runtime_config.metrics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.metrics.classification_binary"><code class="docutils literal notranslate"><span class="pre">classification_binary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.metrics.classification_multilabel"><code class="docutils literal notranslate"><span class="pre">classification_multilabel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.metrics.eval_spearmanr"><code class="docutils literal notranslate"><span class="pre">eval_spearmanr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.metrics.get_ranking_accuracies"><code class="docutils literal notranslate"><span class="pre">get_ranking_accuracies()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.metrics.metric_system"><code class="docutils literal notranslate"><span class="pre">metric_system()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.metrics.regression_fn"><code class="docutils literal notranslate"><span class="pre">regression_fn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.metrics.regression_rank"><code class="docutils literal notranslate"><span class="pre">regression_rank()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.metrics.rounding_fn"><code class="docutils literal notranslate"><span class="pre">rounding_fn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.runtime_config.html#module-ptgnn.runtime_config.run_config">ptgnn.runtime_config.run_config module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.create_model"><code class="docutils literal notranslate"><span class="pre">create_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.eval_epoch"><code class="docutils literal notranslate"><span class="pre">eval_epoch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.fetch_data_size"><code class="docutils literal notranslate"><span class="pre">fetch_data_size()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.fetch_loaders"><code class="docutils literal notranslate"><span class="pre">fetch_loaders()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.fetch_optimizer"><code class="docutils literal notranslate"><span class="pre">fetch_optimizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.fetch_scheduler"><code class="docutils literal notranslate"><span class="pre">fetch_scheduler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.run_config"><code class="docutils literal notranslate"><span class="pre">run_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.train_epoch"><code class="docutils literal notranslate"><span class="pre">train_epoch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html#ptgnn.runtime_config.run_config.training_procedure"><code class="docutils literal notranslate"><span class="pre">training_procedure()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.runtime_config.html#module-ptgnn.runtime_config">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.transform.html">ptgnn.transform package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.transform.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.edge_graph.html">ptgnn.transform.edge_graph package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.edge_graph.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.edge_graph.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph.basic_permutation_tree">ptgnn.transform.edge_graph.basic_permutation_tree module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph.cyclic_tree">ptgnn.transform.edge_graph.cyclic_tree module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph.permutation_tree_selective">ptgnn.transform.edge_graph.permutation_tree_selective module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph.permutation_tree_special">ptgnn.transform.edge_graph.permutation_tree_special module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.edge_graph.html#module-ptgnn.transform.edge_graph">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.vertex_graph.html">ptgnn.transform.vertex_graph package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.vertex_graph.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.vertex_graph.html#module-ptgnn.transform.vertex_graph.cyclic_tree">ptgnn.transform.vertex_graph.cyclic_tree module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.vertex_graph.html#module-ptgnn.transform.vertex_graph.permutation_tree_selective">ptgnn.transform.vertex_graph.permutation_tree_selective module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.transform.vertex_graph.html#module-ptgnn.transform.vertex_graph">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.transform.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform.detect_chem_structures">ptgnn.transform.detect_chem_structures module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.detect_chem_structures.detect_possible_axial_chiral_edges"><code class="docutils literal notranslate"><span class="pre">detect_possible_axial_chiral_edges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.detect_chem_structures.fetch_cis_trans_edges"><code class="docutils literal notranslate"><span class="pre">fetch_cis_trans_edges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.detect_chem_structures.get_chiral_center_node_mask"><code class="docutils literal notranslate"><span class="pre">get_chiral_center_node_mask()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform.multi_stereo_center">ptgnn.transform.multi_stereo_center module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.multi_stereo_center.calc_edges_multiple_stereo_centers"><code class="docutils literal notranslate"><span class="pre">calc_edges_multiple_stereo_centers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.multi_stereo_center.calc_paths"><code class="docutils literal notranslate"><span class="pre">calc_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.multi_stereo_center.limited_bfs_stereo_path_search"><code class="docutils literal notranslate"><span class="pre">limited_bfs_stereo_path_search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform.ptree_matrix">ptgnn.transform.ptree_matrix module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.ptree_matrix.get_matrix"><code class="docutils literal notranslate"><span class="pre">get_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.ptree_matrix.permutation_tree_depth"><code class="docutils literal notranslate"><span class="pre">permutation_tree_depth()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.ptree_matrix.permutation_tree_to_matrix"><code class="docutils literal notranslate"><span class="pre">permutation_tree_to_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.ptree_matrix.permutation_tree_to_order_matrix"><code class="docutils literal notranslate"><span class="pre">permutation_tree_to_order_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.ptree_matrix.remove_inverted_through_p"><code class="docutils literal notranslate"><span class="pre">remove_inverted_through_p()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform.tree_separation">ptgnn.transform.tree_separation module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html#ptgnn.transform.tree_separation.separate_tree_into_subtrees"><code class="docutils literal notranslate"><span class="pre">separate_tree_into_subtrees()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.transform.html#module-ptgnn.transform">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-ptgnn">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ptgnn" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ptgnn.dataset.html" class="btn btn-neutral float-right" title="ptgnn.dataset package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

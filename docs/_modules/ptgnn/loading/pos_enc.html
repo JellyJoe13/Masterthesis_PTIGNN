@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.loading.pos_enc &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.loading.pos_enc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.loading.pos_enc</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">to_dense_adj</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils.num_nodes</span> <span class="kn">import</span> <span class="n">maybe_num_nodes</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+
+<div class="viewcode-block" id="get_rw_landing_probs">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.pos_enc.get_rw_landing_probs">[docs]</a>
+<span class="k">def</span> <span class="nf">get_rw_landing_probs</span><span class="p">(</span><span class="n">ksteps</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">num_nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">space_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Random Walk landing probabilities for given list of K steps.</span>
+<span class="sd">    Source: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/posenc_stats.py#L176</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ksteps: List of k-steps for which to compute the RW landings</span>
+<span class="sd">        edge_index: PyG sparse representation of the graph</span>
+<span class="sd">        edge_weight: (optional) Edge weights</span>
+<span class="sd">        num_nodes: (optional) Number of nodes in the graph</span>
+<span class="sd">        space_dim: (optional) Estimated dimensionality of the space. Used to</span>
+<span class="sd">            correct the random-walk diagonal by a factor `k^(space_dim/2)`.</span>
+<span class="sd">            In euclidean space, this correction means that the height of</span>
+<span class="sd">            the gaussian distribution stays almost constant across the number of</span>
+<span class="sd">            steps, if `space_dim` is the dimension of the euclidean space.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        2D Tensor with shape (num_nodes, len(ksteps)) with RW landing probs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">edge_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">edge_weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">edge_index</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">edge_index</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">maybe_num_nodes</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">)</span>
+    <span class="n">source</span><span class="p">,</span> <span class="n">dest</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Initialize a dense tensor to accumulate the scattered values</span>
+    <span class="n">deg</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">edge_weight</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">edge_weight</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="c1"># Scatter the edge weights to the nodes</span>
+    <span class="n">deg</span><span class="o">.</span><span class="n">scatter_add_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">edge_weight</span><span class="p">)</span>
+
+    <span class="n">deg_inv</span> <span class="o">=</span> <span class="n">deg</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span>
+    <span class="n">deg_inv</span><span class="o">.</span><span class="n">masked_fill_</span><span class="p">(</span><span class="n">deg_inv</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">edge_index</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">edge_index</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># P = D^-1 * A</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">deg_inv</span><span class="p">)</span> <span class="o">@</span> <span class="n">to_dense_adj</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">max_num_nodes</span><span class="o">=</span><span class="n">num_nodes</span><span class="p">)</span>  <span class="c1"># 1 x (Num nodes) x (Num nodes)</span>
+    <span class="n">rws</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">ksteps</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">ksteps</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">ksteps</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+        <span class="c1"># Efficient way if ksteps are a consecutive sequence (most of the time the case)</span>
+        <span class="n">Pk</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">ksteps</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">ksteps</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">ksteps</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">rws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">Pk</span><span class="p">,</span> <span class="n">dim1</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim2</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> \
+                       <span class="p">(</span><span class="n">k</span> <span class="o">**</span> <span class="p">(</span><span class="n">space_dim</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+            <span class="n">Pk</span> <span class="o">=</span> <span class="n">Pk</span> <span class="o">@</span> <span class="n">P</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Explicitly raising P to power k for each k \in ksteps.</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ksteps</span><span class="p">:</span>
+            <span class="n">rws</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">dim1</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim2</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">k</span> <span class="o">**</span> <span class="p">(</span><span class="n">space_dim</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+    <span class="n">rw_landing</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">rws</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># (Num nodes) x (K steps)</span>
+
+    <span class="k">return</span> <span class="n">rw_landing</span></div>
+
+
+
+<div class="viewcode-block" id="transform_func">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.pos_enc.transform_func">[docs]</a>
+<span class="k">def</span> <span class="nf">transform_func</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">pe_types</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adapted from</span>
+<span class="sd">    https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/posenc_stats.py#L13</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Basic preprocessing of the input graph.</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;num_nodes&#39;</span><span class="p">):</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">num_nodes</span>  <span class="c1"># Explicitly given number of nodes, e.g. ogbg-ppa</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Number of nodes, including disconnected nodes.</span>
+
+    <span class="c1"># Random Walks.</span>
+    <span class="k">if</span> <span class="s1">&#39;RWSE&#39;</span> <span class="ow">in</span> <span class="n">pe_types</span><span class="p">:</span>
+
+        <span class="n">rw_landing</span> <span class="o">=</span> <span class="n">get_rw_landing_probs</span><span class="p">(</span>
+            <span class="n">ksteps</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
+            <span class="n">edge_index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span>
+            <span class="n">num_nodes</span><span class="o">=</span><span class="n">N</span>
+        <span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">pestat_RWSE</span> <span class="o">=</span> <span class="n">rw_landing</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="precompute_pos_enc_function">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.pos_enc.precompute_pos_enc_function">[docs]</a>
+<span class="k">def</span> <span class="nf">precompute_pos_enc_function</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">precompose_pos_enc</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adapted from</span>
+<span class="sd">    https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/transform/transforms.py#L8</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">iter_loop</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">iter_loop</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">iter_loop</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;generating positional encoding(s)&quot;</span><span class="p">)</span>
+
+    <span class="n">data_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">transform_func</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>
+            <span class="n">pe_types</span><span class="o">=</span><span class="n">precompose_pos_enc</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">iter_loop</span>
+    <span class="p">]</span>
+
+    <span class="n">data_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">data_list</span><span class="p">))</span>
+
+    <span class="n">dataset</span><span class="o">.</span><span class="n">_indices</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">_data_list</span> <span class="o">=</span> <span class="n">data_list</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">slices</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">collate</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

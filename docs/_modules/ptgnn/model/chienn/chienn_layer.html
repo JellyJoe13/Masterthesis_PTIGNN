@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.model.chienn.chienn_layer &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.model.chienn.chienn_layer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.model.chienn.chienn_layer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The contents of this file are adapted from</span>
+<span class="sd">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/chienn/model/chienn_layer.py</span>
+<span class="sd">and serve the purpose of comparing this projects model to a pre-existing model.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Batch</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">build_embedding_layer</span>
+
+
+<div class="viewcode-block" id="ChiENNLayer">
+<a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNLayer">[docs]</a>
+<span class="k">class</span> <span class="nc">ChiENNLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ChiENN layer that embeds the messages in a chiral-sensitive manner and aggregates them.</span>
+<span class="sd">    The implementation of the eq. (4) from the paper.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
+            <span class="n">k_neighbors_embeddings_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">),</span>
+            <span class="n">message_final_embedding_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ELU+linear&#39;</span><span class="p">,</span>
+            <span class="n">self_embedding_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+            <span class="n">parallel_embedding_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+            <span class="n">aggregation_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sum&#39;</span><span class="p">,</span>
+            <span class="n">post_aggregation_embedding_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ELU&#39;</span><span class="p">,</span>
+            <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            hidden_dim: hidden dimension of the model.</span>
+<span class="sd">            k_neighbors_embeddings_names: a description of the embedding layers that will be used to embed the</span>
+<span class="sd">                k consecutive neighbors of each node. The length of this list determines the size of a window</span>
+<span class="sd">                sliding over the neighbors in the pre-computed order. Note that setting this to [&#39;linear&#39;] * k</span>
+<span class="sd">                is equivalent to concatenating the embeddings of the k neighbors and pplying a linear layer to the</span>
+<span class="sd">                concatenated vector (as in the paper formulation). Default list describes the `W_4` matrix from the</span>
+<span class="sd">                eq. (4), while the length of the list corresponds `k`.</span>
+<span class="sd">            message_final_embedding_name: a description of the embedding layer that will applied to the message obtained</span>
+<span class="sd">                from the k consecutive neighbors. Default `ELU+linear` embedding is denoted by `W_3\sigma` in the eq. (4).</span>
+<span class="sd">            self_embedding_name: a description of the embedding layer that will be applied to the node itself. Default</span>
+<span class="sd">                linear embedding is denoted by `W_1` matrix in the eq. (4).</span>
+<span class="sd">            parallel_embedding_name: a description of the embedding layer that will be applied to the parallel node.</span>
+<span class="sd">                Default linear embedding is denoted by `W_2` matrix in the eq. (4).</span>
+<span class="sd">            aggregation_name: aggregation of incoming messages. For the moment, only &#39;sum&#39; is supported.</span>
+<span class="sd">            post_aggregation_embedding_name: a description of the embedding layer that will be applied to the</span>
+<span class="sd">                aggregated messages. For simplicity, omitted in the paper.</span>
+<span class="sd">            dropout: dropout probability.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">ChiENNMessage</span><span class="p">(</span>
+            <span class="n">hidden_dim</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span>
+            <span class="n">k_neighbors_embeddings_names</span><span class="o">=</span><span class="n">k_neighbors_embeddings_names</span><span class="p">,</span>
+            <span class="n">final_embedding_name</span><span class="o">=</span><span class="n">message_final_embedding_name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">=</span> <span class="n">ChiENNAggregate</span><span class="p">(</span><span class="n">hidden_dim</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span>
+                                         <span class="n">self_embedding_name</span><span class="o">=</span><span class="n">self_embedding_name</span><span class="p">,</span>
+                                         <span class="n">post_aggregation_embedding_name</span><span class="o">=</span><span class="n">post_aggregation_embedding_name</span><span class="p">,</span>
+                                         <span class="n">parallel_embedding_name</span><span class="o">=</span><span class="n">parallel_embedding_name</span><span class="p">,</span>
+                                         <span class="n">aggregation_name</span><span class="o">=</span><span class="n">aggregation_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChiENNLayer.forward">
+<a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNLayer.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Batch</span><span class="p">):</span>
+        <span class="n">msg</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ChiENNMessage">
+<a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNMessage">[docs]</a>
+<span class="k">class</span> <span class="nc">ChiENNMessage</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A message module of ChiENN layer that embeds the messages in a chiral-sensitive manner.</span>
+<span class="sd">    The implementation of the k-ary message function `\psi^k` from the eq. (4) from the paper.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">k_neighbors_embeddings_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">final_embedding_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            hidden_dim: hidden dimension of the model.</span>
+<span class="sd">            k_neighbors_embeddings_names: a description of the embedding layers that will be used to embed the</span>
+<span class="sd">                k consecutive neighbors of each node. The length of this list determines the size of a window</span>
+<span class="sd">                sliding over the neighbors in the pre-computed order. Note that setting this to [&#39;linear&#39;] * k</span>
+<span class="sd">                is equivalent to concatenating the embeddings of the k neighbors and pplying a linear layer to the</span>
+<span class="sd">                concatenated vector (as in the paper formulation). Default list describes the `W_4` matrix from the</span>
+<span class="sd">                eq. (4), while the length of the list corresponds `k`.</span>
+<span class="sd">            final_embedding_name: a description of the embedding layer that will applied to the message obtained</span>
+<span class="sd">                from the k consecutive neighbors. Default `ELU+linear` embedding is denoted by `W_3\sigma` in the eq. (4).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings_list</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span>
+            <span class="n">build_embedding_layer</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">k_neighbors_embeddings_names</span>
+        <span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embeddings_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_embedding</span> <span class="o">=</span> <span class="n">build_embedding_layer</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">final_embedding_name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChiENNMessage.forward">
+<a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNMessage.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Batch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Embeds the messages in a chiral-sensitive manner.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch: a batch of data containing the following attributes:</span>
+<span class="sd">                - `x` - node features of shape (num_nodes, hidden_dim).</span>
+<span class="sd">                - `circle_index` - a tensor of shape (num_nodes, circle_size) containing the indices of the</span>
+<span class="sd">                    (non-parallel) neighbors in the pre-computed order. To simplify the implementation, the first (k-1)</span>
+<span class="sd">                    indices for every atom are repeated, e.g. for k=3, the circle_index[0] may</span>
+<span class="sd">                    be (i_1, i_2, i_3, ..., i_n, i_1, i_2). Therefore, `circle_size` = `max_num_neighbors` + k-1.</span>
+<span class="sd">                    The indices are padded with -1.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of two tensors:</span>
+<span class="sd">                - `msg` - a tensor of shape (num_nodes, max_num_neighbors, hidden_dim) containing the messages for each node.</span>
+<span class="sd">                - `mask` - a tensor of shape (num_nodes, max_num_neighbors) containing the neighbors mask for every node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">circle_index</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">circle_index</span>
+        <span class="n">num_nodes</span><span class="p">,</span> <span class="n">circle_size</span> <span class="o">=</span> <span class="n">circle_index</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1"># Embed all the nodes with all the embeddings form the embeddings list:</span>
+        <span class="n">embeddings_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">embed</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">embed</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">embeddings_list</span><span class="p">]</span>
+
+        <span class="c1"># Add a zero embedding to the beggining of each embedding list. It will be used for for retrieving padding</span>
+        <span class="c1"># values (could be as well done with masking):</span>
+        <span class="n">zeros</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">))</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">embeddings_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">zeros</span><span class="p">,</span> <span class="n">e</span><span class="p">])</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">embeddings_list</span><span class="p">]</span>
+
+        <span class="c1"># Retrieve the number of (non-parallel) neighbors for every node:</span>
+        <span class="n">wrapping_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">padding_size</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">circle_index</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">num_neighbors</span> <span class="o">=</span> <span class="n">circle_size</span> <span class="o">-</span> <span class="n">padding_size</span> <span class="o">-</span> <span class="n">wrapping_length</span>
+        <span class="n">num_neighbors</span><span class="p">[</span><span class="n">padding_size</span> <span class="o">==</span> <span class="n">circle_size</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Flatten the circle index:</span>
+        <span class="n">flatten_circle_index</span> <span class="o">=</span> <span class="n">circle_index</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (num_nodes * circle_size)</span>
+        <span class="n">flatten_circle_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">flatten_circle_index</span><span class="p">)</span>
+
+        <span class="c1"># Every -1 masking becomes 0 and matches appropriate index in `embeddings`:</span>
+        <span class="n">flatten_circle_index</span> <span class="o">=</span> <span class="n">flatten_circle_index</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Add k-1 zeros to the end of the flatten circle index to simplify some further calculations:</span>
+        <span class="n">padded_flatten_circle_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">flatten_circle_index</span><span class="p">,</span> <span class="n">zeros</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)[:</span> <span class="n">wrapping_length</span><span class="p">]])</span>  <span class="c1"># (flatten_circle_length + k-1)</span>
+
+        <span class="c1"># Create `shifted_embeddings` of shape (flatten_circle_length + k-1, k, hidden_dim), so that</span>
+        <span class="c1"># &#39;shifted_embeddings[i]&#39; contains embeddings of k consecutive neighbors that will be used to compute a single</span>
+        <span class="c1"># message with /psi^k function.</span>
+        <span class="n">shifted_embeddings_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">embedding_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">embeddings_list</span><span class="p">):</span>
+            <span class="n">shifted_indexes</span> <span class="o">=</span> <span class="n">padded_flatten_circle_index</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">flatten_circle_length</span><span class="p">]</span>
+            <span class="n">shifted_embedding</span> <span class="o">=</span> <span class="n">embedding_i</span><span class="p">[</span><span class="n">shifted_indexes</span><span class="p">]</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">num_neighbors</span> <span class="o">&lt;=</span> <span class="n">i</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">circle_size</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">shifted_embedding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">shifted_embedding</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">shifted_embeddings_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shifted_embedding</span><span class="p">)</span>
+        <span class="n">shifted_embeddings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">shifted_embeddings_list</span><span class="p">,</span>
+                                         <span class="n">dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># (flatten_circle_length + k-1, k, hidden_dim)</span>
+
+        <span class="c1"># Sum which is a proxy for concatenation operator `|` in eq. (4):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">shifted_embeddings</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">circle_size</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># (num_nodes, max_num_neighbors + k-1, hidden_dim)</span>
+
+        <span class="n">msg_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">circle_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">num_neighbors</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Cut unnecessary messages</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="n">wrapping_length</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># (num_nodes, max_num_neighbors, hidden_dim)</span>
+        <span class="n">msg_mask</span> <span class="o">=</span> <span class="n">msg_mask</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="n">wrapping_length</span><span class="p">]</span>  <span class="c1"># (num_nodes, max_num_neighbors)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">~</span><span class="n">msg_mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_embedding</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span><span class="p">,</span> <span class="n">msg_mask</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ChiENNAggregate">
+<a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNAggregate">[docs]</a>
+<span class="k">class</span> <span class="nc">ChiENNAggregate</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An aggregation module use in ChiENNLayer. It aggregates the messages from the incoming neighbors, the node itself</span>
+<span class="sd">    and the parallel node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">self_embedding_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">parallel_embedding_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">aggregation_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">post_aggregation_embedding_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            hidden_dim: hidden dimension of the model.</span>
+<span class="sd">            self_embedding_name: a description of the embedding layer that will be applied to the node itself. Default</span>
+<span class="sd">                linear embedding is denoted by `W_1` matrix in the eq. (4).</span>
+<span class="sd">            parallel_embedding_name: a description of the embedding layer that will be applied to the parallel node.</span>
+<span class="sd">                Default linear embedding is denoted by `W_2` matrix in the eq. (4).</span>
+<span class="sd">            aggregation_name: aggregation of incoming messages. For the moment, only &#39;sum&#39; is supported.</span>
+<span class="sd">            post_aggregation_embedding_name: a description of the embedding layer that will be applied to the</span>
+<span class="sd">                aggregated messages. For simplicity, omitted in the paper.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">self_embedding</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">build_embedding_layer</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span>
+                                  <span class="n">self_embedding_name</span><span class="p">)</span> <span class="k">if</span> <span class="n">self_embedding_name</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_embedding</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">build_embedding_layer</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span>
+                                  <span class="n">parallel_embedding_name</span><span class="p">)</span> <span class="k">if</span> <span class="n">parallel_embedding_name</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">aggregation_name</span> <span class="o">==</span> <span class="s1">&#39;sum&#39;</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">_sum</span><span class="p">(</span><span class="n">all_msg</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">all_mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">all_msg</span><span class="p">,</span> <span class="o">~</span><span class="n">all_mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_fn</span> <span class="o">=</span> <span class="n">_sum</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Aggregation </span><span class="si">{</span><span class="n">aggregation_name</span><span class="si">}</span><span class="s1"> is not implemented.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_aggregation_embedding</span> <span class="o">=</span> <span class="n">build_embedding_layer</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">,</span> <span class="n">post_aggregation_embedding_name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChiENNAggregate.forward">
+<a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNAggregate.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Batch</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Aggregates the messages from the incoming neighbors, the node itself and the parallel node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch: a batch of data containing the following attributes:</span>
+<span class="sd">                - x: a tensor of shape (num_nodes, hidden_dim) containing the node features.</span>
+<span class="sd">                - parallel_node_index: a tensor of shape (num_nodes,) containing the index of the parallel node.</span>
+<span class="sd">            msg: a tensor of shape (num_nodes, max_num_neighbors, hidden_dim) containing the order-sensitive messages.</span>
+<span class="sd">            mask: a tensor of shape (num_nodes, max_num_neighbors) containing the mask for the messages.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            a tensor of shape (num_nodes, hidden_dim) containing the aggregated messages.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg</span><span class="p">]</span>
+        <span class="n">mask_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_embedding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">self_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">self_embedding</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">self_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">msg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">self_msg</span><span class="p">)</span>
+            <span class="n">mask_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">self_mask</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_embedding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parallel_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_embedding</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">parallel_msg</span> <span class="o">=</span> <span class="n">parallel_msg</span><span class="p">[</span><span class="n">batch</span><span class="o">.</span><span class="n">parallel_node_index</span><span class="p">]</span>
+            <span class="n">parallel_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">bool</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">msg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parallel_msg</span><span class="p">)</span>
+            <span class="n">mask_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parallel_mask</span><span class="p">)</span>
+
+        <span class="n">all_msg</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">msg_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">all_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">mask_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_fn</span><span class="p">(</span><span class="n">all_msg</span><span class="p">,</span> <span class="n">all_mask</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_aggregation_embedding</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">all_masked_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">all_mask</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">all_masked_mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

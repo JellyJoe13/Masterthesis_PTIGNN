@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.dataset.mc_dataset &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.dataset.mc_dataset</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.dataset.mc_dataset</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch_geometric</span>
+<span class="kn">from</span> <span class="nn">chainer_chemistry.dataset.splitters</span> <span class="kn">import</span> <span class="n">RandomSplitter</span>
+<span class="kn">from</span> <span class="nn">multiprocess.pool</span> <span class="kn">import</span> <span class="n">Pool</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">InMemoryDataset</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">ptgnn.dataset.chainer_chemistry_split</span> <span class="kn">import</span> <span class="n">scaffold_split</span>
+<span class="kn">from</span> <span class="nn">ptgnn.dataset.utils</span> <span class="kn">import</span> <span class="n">dict_to_storage_path</span>
+<span class="kn">from</span> <span class="nn">ptgnn.dataset.utils_chienn</span> <span class="kn">import</span> <span class="n">download_url_to_path</span>
+<span class="kn">from</span> <span class="nn">ptgnn.masking</span> <span class="kn">import</span> <span class="n">MASKING_MAPPING</span>
+<span class="kn">from</span> <span class="nn">ptgnn.transform</span> <span class="kn">import</span> <span class="n">PRE_TRANSFORM_MAPPING</span>
+
+
+<div class="viewcode-block" id="filter_mc_tetra_mol">
+<a class="viewcode-back" href="../../../ptgnn.dataset.html#ptgnn.dataset.mc_dataset.filter_mc_tetra_mol">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_mc_tetra_mol</span><span class="p">(</span>
+        <span class="n">df_entry</span><span class="p">,</span>
+        <span class="n">smiles_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;smiles&quot;</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns true if molecule has multiple chiral centers.</span>
+
+<span class="sd">    :param df_entry: pandas row object</span>
+<span class="sd">    :param smiles_name: name of the columns under which the stereochemical SMILES can be queried from the</span>
+<span class="sd">        df_entry</span>
+<span class="sd">    :return: whether or not the molecule has multiple chiral centers (plus the idx and the entry before that)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">ptgnn.features.chienn.molecule3d</span> <span class="kn">import</span> <span class="n">smiles_to_3d_mol</span>
+    <span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
+
+    <span class="c1"># unpack passed object</span>
+    <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">df_entry</span>
+
+    <span class="c1"># extract smiles string</span>
+    <span class="n">smiles</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="n">smiles_name</span><span class="p">]</span>
+
+    <span class="c1"># get molecule</span>
+    <span class="n">molecule</span> <span class="o">=</span> <span class="n">smiles_to_3d_mol</span><span class="p">(</span>
+        <span class="n">smiles</span><span class="o">=</span><span class="n">smiles</span><span class="p">,</span>
+        <span class="n">max_number_of_atoms</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">max_number_of_attempts</span><span class="o">=</span><span class="mi">100</span>
+    <span class="p">)</span>
+
+    <span class="c1"># if molecule cannot be rendered (i.e. is None) return appropriate information</span>
+    <span class="k">if</span> <span class="n">molecule</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">df_entry</span><span class="p">,</span> <span class="kc">False</span>
+
+    <span class="c1"># does molecule have multiple marked chiral centers</span>
+    <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">AllChem</span><span class="o">.</span><span class="n">FindMolChiralCenters</span><span class="p">(</span><span class="n">molecule</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="worker_create_all_combinations">
+<a class="viewcode-back" href="../../../ptgnn.dataset.html#ptgnn.dataset.mc_dataset.worker_create_all_combinations">[docs]</a>
+<span class="k">def</span> <span class="nf">worker_create_all_combinations</span><span class="p">(</span>
+        <span class="n">df_entry</span><span class="p">,</span>
+        <span class="n">smiles_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;smiles&#39;</span>
+<span class="p">):</span>
+    <span class="c1"># unpack passed object</span>
+    <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">df_entry</span>
+
+    <span class="c1"># extract smiles string</span>
+    <span class="n">smiles</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="n">smiles_name</span><span class="p">]</span>
+
+    <span class="c1"># replace all double @ with normal @... wait but different forms? urgh the smiles may be different...</span>
+    <span class="c1"># what in the first place is the label?</span>
+    <span class="c1"># if I make it such that EXACTLY 2, then u/l prediction is possible. or distribution of max(|R|, |S|) in general</span>
+
+    <span class="c1"># get clearned smiles version with only one @</span>
+    <span class="n">cleaned_smiles</span> <span class="o">=</span> <span class="n">smiles</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@@&quot;</span><span class="p">,</span> <span class="s2">&quot;@&quot;</span><span class="p">)</span>
+
+    <span class="c1"># split it</span>
+    <span class="n">split_smiles</span> <span class="o">=</span> <span class="n">cleaned_smiles</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">split_smiles</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SMILES </span><span class="si">{</span><span class="n">smiles</span><span class="si">}</span><span class="s2"> dropped as too many @ in smiles&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="c1"># it is basically guaranteed that this results in 3 parts as there must be 2 centers in there</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;smiles&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">split_smiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@&quot;</span> <span class="o">+</span> <span class="n">split_smiles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@&quot;</span> <span class="o">+</span> <span class="n">split_smiles</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">split_smiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@&quot;</span> <span class="o">+</span> <span class="n">split_smiles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@@&quot;</span> <span class="o">+</span> <span class="n">split_smiles</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">split_smiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@@&quot;</span> <span class="o">+</span> <span class="n">split_smiles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@&quot;</span> <span class="o">+</span> <span class="n">split_smiles</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">split_smiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@@&quot;</span> <span class="o">+</span> <span class="n">split_smiles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@@&quot;</span> <span class="o">+</span> <span class="n">split_smiles</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="p">],</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="assign_lu_label">
+<a class="viewcode-back" href="../../../ptgnn.dataset.html#ptgnn.dataset.mc_dataset.assign_lu_label">[docs]</a>
+<span class="k">def</span> <span class="nf">assign_lu_label</span><span class="p">(</span><span class="n">df_entry</span><span class="p">):</span>
+    <span class="c1"># unpack passed object</span>
+    <span class="n">idx</span><span class="p">,</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">df_entry</span>
+
+    <span class="c1"># extract smiles string</span>
+    <span class="n">smiles</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;smiles&#39;</span><span class="p">]</span>
+
+    <span class="c1"># render molecule</span>
+    <span class="kn">from</span> <span class="nn">ptgnn.features.chienn.molecule3d</span> <span class="kn">import</span> <span class="n">smiles_to_3d_mol</span>
+    <span class="n">molecule</span> <span class="o">=</span> <span class="n">smiles_to_3d_mol</span><span class="p">(</span><span class="n">smiles</span><span class="p">,</span> <span class="n">max_number_of_atoms</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_number_of_attempts</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">molecule</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># create the label, thus first fetch stereo centers</span>
+    <span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+    <span class="n">center_one</span><span class="p">,</span> <span class="n">center_two</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">FindMolChiralCenters</span><span class="p">(</span><span class="n">molecule</span><span class="p">)</span>
+
+    <span class="n">binary_label</span> <span class="o">=</span> <span class="n">center_one</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">center_two</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;MC_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;L&quot;</span> <span class="k">if</span> <span class="n">binary_label</span> <span class="k">else</span> <span class="s2">&quot;U&quot;</span>
+    <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;MC_label_binary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">binary_label</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">entry</span></div>
+
+
+
+<div class="viewcode-block" id="MCDataset">
+<a class="viewcode-back" href="../../../ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset">[docs]</a>
+<span class="k">class</span> <span class="nc">MCDataset</span><span class="p">(</span><span class="n">InMemoryDataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dataset based on Tox21 dataset and only contains molecules with 2 stereo centers. From this the tetrahedral</span>
+<span class="sd">    stereoisomers were created and labeled using the L/U logic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;src/mc&quot;</span><span class="p">,</span>
+            <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;classification&#39;</span><span class="p">,</span>  <span class="c1"># or &#39;classification_multilabel&#39;</span>
+            <span class="n">mask_chiral_tags</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">split</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>
+            <span class="n">graph_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;edge&quot;</span><span class="p">,</span>
+            <span class="n">transformation_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+            <span class="n">transformation_parameters</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+            <span class="n">max_atoms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>  <span class="c1"># significantly decreased - 5000 is way too much!</span>
+            <span class="n">use_multiprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init of the MC dataset class. Starts the downloading and processing if the corresponding files are not</span>
+<span class="sd">        present. Uses multiprocess library to speed up computation by using all CPU cores.</span>
+
+<span class="sd">        :param root: Path to which the dataset should be downloaded/saved.</span>
+<span class="sd">        :type root: str</span>
+<span class="sd">        :param mask_chiral_tags: Whether or not to mask the chiral tags in the nodes and edges. Default ``True`` as</span>
+<span class="sd">            it is of interest whether or not the model can learn the stereo-properties without having direct access</span>
+<span class="sd">            to them. Should infer them using neighbor order.</span>
+<span class="sd">        :type mask_chiral_tags: bool</span>
+<span class="sd">        :param split: Specifies which dataset split to load for this class. Options: ``&quot;train&quot;``, ``&quot;val&quot;`` and ``test``</span>
+<span class="sd">        :type split: str</span>
+<span class="sd">        :param graph_mode: Mode of the graph. Either ``&quot;edge&quot;`` or ``&quot;vertex&quot;``. Controls whether an edge graph</span>
+<span class="sd">            transformation should take place or not. For PTGNN both options are possible, for ChiENN only edge graph</span>
+<span class="sd">            is possible or else their &#39;cycle_index&#39; will not work.</span>
+<span class="sd">        :type graph_mode: str</span>
+<span class="sd">        :param transformation_mode: Specifies the mode of transformation. Currently available: ``&quot;default&quot;``=``chienn``,</span>
+<span class="sd">            ``&quot;permutation_tree&quot;``.</span>
+<span class="sd">        :type transformation_mode: str</span>
+<span class="sd">        :param transformation_parameters: Configurable options of the transformation.</span>
+<span class="sd">        :type transformation_parameters: typing.Dict[str, typing.Any]</span>
+<span class="sd">        :param max_atoms: Max number of atoms - required for creating embedding</span>
+<span class="sd">        :type max_atoms: int</span>
+<span class="sd">        :param max_attempts: Maximal attempts of creating a 3d version of the molecule. Warning: Do not set too high</span>
+<span class="sd">            as some molecules cannot be &#39;rendered&#39; in reasonable time.</span>
+<span class="sd">        :type max_attempts: int</span>
+<span class="sd">        :param use_multiprocess: Whether or not the generation should be parallelized using the multiprocess framework.</span>
+<span class="sd">            Use with caution on Linux - for some reason it uses significantly more cores on Linux, maybe some reason</span>
+<span class="sd">            the default process uses multiple CPUs already...</span>
+<span class="sd">        :type use_multiprocess: bool</span>
+<span class="sd">        :param kwargs: Catches access arguments which are not specified for all datasets. CAUTION: make sure the</span>
+<span class="sd">            parameters have the correct name as a mis-spelling will not cause an error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># connection to dataset download</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_storage</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/tox21.csv.gz&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;raw_name&#39;</span><span class="p">:</span> <span class="s1">&#39;tox21.csv.gz&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;data_column&#39;</span><span class="p">:</span> <span class="s1">&#39;smiles&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;split_type&#39;</span><span class="p">:</span> <span class="s1">&#39;random&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;target_column&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;NR-AR&#39;</span><span class="p">,</span> <span class="s1">&#39;NR-AR-LBD&#39;</span><span class="p">,</span> <span class="s1">&#39;NR-AhR&#39;</span><span class="p">,</span> <span class="s1">&#39;NR-Aromatase&#39;</span><span class="p">,</span> <span class="s1">&#39;NR-ER&#39;</span><span class="p">,</span> <span class="s1">&#39;NR-ER-LBD&#39;</span><span class="p">,</span> <span class="s1">&#39;NR-PPAR-gamma&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;SR-ARE&#39;</span><span class="p">,</span> <span class="s1">&#39;SR-ATAD5&#39;</span><span class="p">,</span> <span class="s1">&#39;SR-HSE&#39;</span><span class="p">,</span> <span class="s1">&#39;SR-MMP&#39;</span><span class="p">,</span> <span class="s1">&#39;SR-p53&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="c1"># set internal parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_type</span> <span class="o">=</span> <span class="n">task_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_chiral_tags</span> <span class="o">=</span> <span class="n">mask_chiral_tags</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="n">split</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_mode</span> <span class="o">=</span> <span class="n">graph_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_mode</span> <span class="o">=</span> <span class="n">transformation_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_parameters</span> <span class="o">=</span> <span class="n">transformation_parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_transform</span> <span class="o">=</span> <span class="n">PRE_TRANSFORM_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph_mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">masking</span> <span class="o">=</span> <span class="n">MASKING_MAPPING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph_mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span> <span class="o">=</span> <span class="n">max_atoms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="o">=</span> <span class="n">max_attempts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocess</span> <span class="o">=</span> <span class="n">use_multiprocess</span>
+
+        <span class="c1"># starts procedure of downloading and processing</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">pre_transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_transform</span><span class="p">,</span>
+            <span class="n">pre_filter</span><span class="o">=</span><span class="kc">None</span>
+        <span class="p">)</span>
+
+        <span class="c1"># part that actually loads the data into the class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processed_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.pt&quot;</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">raw_file_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">link_storage</span><span class="p">[</span><span class="s1">&#39;raw_name&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">processed_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_mode</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_mode</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">name</span> <span class="o">+=</span> <span class="s2">&quot;+&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_mode</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_mode</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="p">,</span>
+            <span class="n">dict_to_storage_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformation_parameters</span><span class="p">),</span>
+            <span class="s1">&#39;processed&#39;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">processed_file_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;train.pt&#39;</span><span class="p">,</span> <span class="s1">&#39;test.pt&#39;</span><span class="p">,</span> <span class="s1">&#39;val.pt&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="MCDataset.download">
+<a class="viewcode-back" href="../../../ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.download">[docs]</a>
+    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_file_names</span><span class="p">)</span>
+        <span class="n">download_url_to_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link_storage</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MCDataset.split_fn">
+<a class="viewcode-back" href="../../../ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.split_fn">[docs]</a>
+    <span class="k">def</span> <span class="nf">split_fn</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">data_col</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="c1"># fetch split type from the dict</span>
+        <span class="n">split_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">link_storage</span><span class="p">[</span><span class="s1">&#39;split_type&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">split_type</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+            <span class="n">splitter</span> <span class="o">=</span> <span class="n">RandomSplitter</span><span class="p">()</span>
+            <span class="n">train_idx</span><span class="p">,</span> <span class="n">valid_idx</span><span class="p">,</span> <span class="n">test_idx</span> <span class="o">=</span> <span class="n">splitter</span><span class="o">.</span><span class="n">train_valid_test_split</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span>
+                <span class="n">smiles_list</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">data_col</span><span class="p">],</span>
+                <span class="n">frac_train</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+                <span class="n">frac_valid</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                <span class="n">frac_test</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">include_chirality</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">split_type</span> <span class="o">==</span> <span class="s1">&#39;scaffold&#39;</span><span class="p">:</span>
+            <span class="n">train_idx</span><span class="p">,</span> <span class="n">valid_idx</span><span class="p">,</span> <span class="n">test_idx</span> <span class="o">=</span> <span class="n">scaffold_split</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">,</span>
+                <span class="n">smiles_list</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">data_col</span><span class="p">],</span>
+                <span class="n">frac_train</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+                <span class="n">frac_valid</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                <span class="n">frac_test</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">include_chirality</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Split type </span><span class="si">{</span><span class="n">split_type</span><span class="si">}</span><span class="s2"> is not allowed, use random or scaffold instead.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># split</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;split&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_idx</span><span class="p">,</span> <span class="s1">&#39;split&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;train&#39;</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">valid_idx</span><span class="p">,</span> <span class="s1">&#39;split&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;val&#39;</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">test_idx</span><span class="p">,</span> <span class="s1">&#39;split&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="MCDataset.process">
+<a class="viewcode-back" href="../../../ptgnn.dataset.html#ptgnn.dataset.mc_dataset.MCDataset.process">[docs]</a>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># load dataframe</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_file_names</span><span class="p">))</span>
+
+        <span class="c1"># get special columns</span>
+        <span class="n">data_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">link_storage</span><span class="p">[</span><span class="s1">&#39;data_column&#39;</span><span class="p">]</span>
+        <span class="n">target_col</span> <span class="o">=</span> <span class="s2">&quot;MC_label_binary&quot;</span>
+
+        <span class="c1"># execute split</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_fn</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">data_col</span><span class="p">)</span>
+
+        <span class="c1"># for each split type</span>
+        <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">]:</span>
+            <span class="c1"># get split of dataframe</span>
+            <span class="n">split_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;split&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">split</span><span class="p">]</span>
+
+            <span class="c1"># do multiprocess processing of data</span>
+            <span class="k">def</span> <span class="nf">worker</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+                <span class="c1"># required for Windows to make the threads have the proper modules</span>
+                <span class="kn">from</span> <span class="nn">ptgnn.features.chienn.molecule3d</span> <span class="kn">import</span> <span class="n">smiles_to_3d_mol</span>
+                <span class="kn">from</span> <span class="nn">ptgnn.dataset.utils_chienn</span> <span class="kn">import</span> <span class="n">get_chiro_data_from_mol</span><span class="p">,</span> <span class="n">convert_target_for_task</span>
+                <span class="kn">import</span> <span class="nn">logging</span>
+                <span class="kn">import</span> <span class="nn">torch</span>
+
+                <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="o">=</span> <span class="n">entry</span>
+
+                <span class="c1"># get smiles</span>
+                <span class="n">smiles</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">data_col</span><span class="p">]</span>
+
+                <span class="c1"># get the molecule</span>
+                <span class="n">mol</span> <span class="o">=</span> <span class="n">smiles_to_3d_mol</span><span class="p">(</span>
+                    <span class="n">smiles</span><span class="p">,</span>
+                    <span class="n">max_number_of_attempts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">,</span>
+                    <span class="n">max_number_of_atoms</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_atoms</span>
+                <span class="p">)</span>
+
+                <span class="c1"># check if mol present</span>
+                <span class="k">if</span> <span class="n">mol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">smiles</span><span class="p">,</span> <span class="kc">None</span>
+
+                <span class="c1"># attempt to generate data object (raw)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">get_chiro_data_from_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Omitting molecule </span><span class="si">{</span><span class="n">smiles</span><span class="si">}</span><span class="s2"> as cannot be properly embedded. The original error &quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;message was: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">smiles</span><span class="p">,</span> <span class="kc">None</span>
+
+                <span class="c1"># do transformation</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_transform</span><span class="p">(</span>
+                        <span class="n">data</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_mode</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_parameters</span><span class="p">,</span>
+                        <span class="n">mol</span><span class="o">=</span><span class="n">mol</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># create label</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">target_col</span><span class="p">])</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">convert_target_for_task</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">smiles</span><span class="p">,</span> <span class="n">data</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocess</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(),</span> <span class="mi">24</span><span class="p">))</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
+                    <span class="c1"># first process step: filtering molecules with exactly 2 stereo centers</span>
+                    <span class="n">df_collection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span>
+                        <span class="n">filter_mc_tetra_mol</span><span class="p">,</span>
+                        <span class="n">tqdm</span><span class="p">(</span><span class="n">split_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">split_df</span><span class="p">))</span>
+                    <span class="p">))</span>
+                    <span class="n">df_collection</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
+                        <span class="n">elem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">df_collection</span>
+                        <span class="k">if</span> <span class="n">elem</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+
+                    <span class="c1"># creating all combinations</span>
+                    <span class="n">df_collection</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+                        <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+                            <span class="n">worker_create_all_combinations</span><span class="p">,</span>
+                            <span class="n">tqdm</span><span class="p">(</span><span class="n">df_collection</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_collection</span><span class="p">))</span>
+                        <span class="p">))</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+                    <span class="n">df_collection</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;smiles&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                    <span class="c1"># generate label</span>
+                    <span class="n">df_collection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span>
+                        <span class="n">assign_lu_label</span><span class="p">,</span>
+                        <span class="n">tqdm</span><span class="p">(</span><span class="n">df_collection</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_collection</span><span class="p">))</span>
+                    <span class="p">))</span>
+                    <span class="n">df_collection</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">df_collection</span> <span class="k">if</span> <span class="n">elem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+
+                    <span class="n">data_list</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">worker</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">df_collection</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_collection</span><span class="p">))</span>
+                    <span class="p">]</span>
+
+                    <span class="n">data_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                        <span class="n">worker</span><span class="p">,</span>
+                        <span class="n">tqdm</span><span class="p">(</span>
+                            <span class="n">df_collection</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span>
+                            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_collection</span><span class="p">),</span>
+                            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Split: </span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># first process step: filtering molecules with exactly 2 stereo centers</span>
+                <span class="n">df_collection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+                    <span class="n">filter_mc_tetra_mol</span><span class="p">,</span>
+                    <span class="n">tqdm</span><span class="p">(</span><span class="n">split_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">split_df</span><span class="p">))</span>
+                <span class="p">))</span>
+                <span class="n">df_collection</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span>
+                    <span class="n">elem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">df_collection</span>
+                    <span class="k">if</span> <span class="n">elem</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+
+                <span class="c1"># creating all combinations</span>
+                <span class="n">df_collection</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+                        <span class="n">worker_create_all_combinations</span><span class="p">,</span>
+                        <span class="n">tqdm</span><span class="p">(</span><span class="n">df_collection</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_collection</span><span class="p">))</span>
+                    <span class="p">))</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+                <span class="n">df_collection</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;smiles&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="c1"># generate label</span>
+                <span class="n">df_collection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+                    <span class="n">assign_lu_label</span><span class="p">,</span>
+                    <span class="n">tqdm</span><span class="p">(</span><span class="n">df_collection</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_collection</span><span class="p">))</span>
+                <span class="p">))</span>
+                <span class="n">df_collection</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">df_collection</span> <span class="k">if</span> <span class="n">elem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+
+                <span class="n">data_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+                    <span class="n">worker</span><span class="p">,</span>
+                    <span class="n">tqdm</span><span class="p">(</span>
+                        <span class="n">df_collection</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span>
+                        <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df_collection</span><span class="p">),</span>
+                        <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Split: </span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">))</span>
+
+            <span class="c1"># extract data list and remove elements to remove (from previous list)</span>
+            <span class="n">data_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">data_object</span>
+                <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">data_object</span> <span class="ow">in</span> <span class="n">data_list</span>
+                <span class="k">if</span> <span class="n">data_object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">]</span>
+
+            <span class="c1"># get data object to have the same number of layers</span>
+            <span class="k">if</span> <span class="s1">&#39;num_layer&#39;</span> <span class="ow">in</span> <span class="n">data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="c1"># get number of layers</span>
+                <span class="n">n_layers</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">num_layer</span>
+                    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_list</span>
+                <span class="p">])</span>
+                <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Postprocessing matrices&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">num_layer</span> <span class="o">==</span> <span class="n">n_layers</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">num_layer</span><span class="p">,</span> <span class="n">n_layers</span><span class="p">):</span>
+                        <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;type_mask&#39;</span><span class="p">,</span> <span class="s1">&#39;order_matrix&#39;</span><span class="p">,</span> <span class="s1">&#39;pooling&#39;</span><span class="p">]:</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">matrix</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                                <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]]</span>
+
+            <span class="c1"># save processed data</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">collate</span><span class="p">(</span><span class="n">data_list</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processed_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.pt&quot;</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">torch_geometric</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_chiral_tags</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">masking</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

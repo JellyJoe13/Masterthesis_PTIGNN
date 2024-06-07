@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.loading.collate &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.loading.collate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.loading.collate</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">Batch</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.data.data</span> <span class="kn">import</span> <span class="n">BaseData</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.loader.dataloader</span> <span class="kn">import</span> <span class="n">Collater</span>
+
+<span class="kn">from</span> <span class="nn">ptgnn.loading.chienn_collate</span> <span class="kn">import</span> <span class="n">collate_with_circle_index</span>
+
+
+<div class="viewcode-block" id="UniversalCollater">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.collate.UniversalCollater">[docs]</a>
+<span class="k">class</span> <span class="nc">UniversalCollater</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inspiration/Extension of https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/collate.py#L9</span>
+
+<span class="sd">    Collates all types of data used in this project so that it can be used in a batch. Differentiates based on the</span>
+<span class="sd">    fields that are registered in the input pytorch geometric data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">follow_batch</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">exclude_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">n_neighbors_in_circle</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="p">):</span>
+        <span class="c1"># set internal params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">follow_batch</span> <span class="o">=</span> <span class="n">follow_batch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exclude_keys</span> <span class="o">=</span> <span class="n">exclude_keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_neighbors_in_circle</span> <span class="o">=</span> <span class="n">n_neighbors_in_circle</span>
+
+        <span class="c1"># construct default collator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_collator</span> <span class="o">=</span> <span class="n">Collater</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">follow_batch</span><span class="o">=</span><span class="n">follow_batch</span><span class="p">,</span>
+            <span class="n">exclude_keys</span><span class="o">=</span><span class="n">exclude_keys</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">batch</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="p">):</span>
+        <span class="c1"># get sample element</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># logic for treating elements differently</span>
+        <span class="c1"># check if it is a pyg data element (basedata)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">BaseData</span><span class="p">):</span>
+
+            <span class="c1"># if it has a circle index treat is as a chienn related data object</span>
+            <span class="c1"># assumes that if not this field is deleted</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;ptree&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">permutation_tree_collation</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="s1">&#39;circle_index&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">collate_with_circle_index</span><span class="p">(</span>
+                    <span class="n">data_list</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span>
+                    <span class="n">k_neighbors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_neighbors_in_circle</span>
+                <span class="p">)</span>
+
+            <span class="c1"># default treatment</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_collator</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="permutation_tree_batching">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.collate.permutation_tree_batching">[docs]</a>
+<span class="k">def</span> <span class="nf">permutation_tree_batching</span><span class="p">(</span>
+        <span class="n">data_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseData</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utilized for permutation tree batching. This function increases the indices in the permutation trees so that</span>
+<span class="sd">    they can be merged into one larger list of permutation trees - which would be an internal parameter for the batch</span>
+<span class="sd">    object.</span>
+
+<span class="sd">    :param data_list: List of data objects with the trees to &#39;batch&#39;</span>
+<span class="sd">    :type data_list: List[BaseData]</span>
+<span class="sd">    :return: List of permutation trees to insert into the batch object</span>
+<span class="sd">    :rtype: typing.List[str]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># make container for transformed ptree strings</span>
+    <span class="n">ptree_batch_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># iterate over elements to be put into batch</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_list</span><span class="p">:</span>
+
+        <span class="c1"># extract ptree string</span>
+        <span class="n">ptree_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ptree</span>
+        <span class="c1"># create dict from it</span>
+        <span class="n">ptree_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">ptree_string</span><span class="p">)</span> <span class="k">for</span> <span class="n">ptree_string</span> <span class="ow">in</span> <span class="n">ptree_list</span><span class="p">]</span>
+
+        <span class="c1"># elevate numbers in dict - will probably need to be recursive - check for int and if int then increase</span>
+        <span class="k">def</span> <span class="nf">_increase_int</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">increase</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">increase</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">d</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_increase_int</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">increase</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">d</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">[</span>
+                    <span class="n">_increase_int</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">increase</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">d</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">d</span> <span class="o">+</span> <span class="n">increase</span>
+        <span class="n">ptree_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">_increase_int</span><span class="p">(</span>
+                <span class="n">ptree_dict</span><span class="p">,</span>
+                <span class="n">increase</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ptree_batch_list</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">ptree_dict</span> <span class="ow">in</span> <span class="n">ptree_list</span>
+        <span class="p">]</span>
+        <span class="c1"># revert to string</span>
+        <span class="n">ptree_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ptree_dict</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ptree_dict</span> <span class="ow">in</span> <span class="n">ptree_list</span>
+        <span class="p">]</span>
+        <span class="c1"># put into storage</span>
+        <span class="n">ptree_batch_list</span> <span class="o">+=</span> <span class="n">ptree_list</span>
+
+    <span class="k">return</span> <span class="n">ptree_batch_list</span></div>
+
+
+
+<div class="viewcode-block" id="permutation_tree_collation">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.collate.permutation_tree_collation">[docs]</a>
+<span class="k">def</span> <span class="nf">permutation_tree_collation</span><span class="p">(</span>
+        <span class="n">data_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseData</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Batch</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collates data that is related to permutation tree data, i.e. contains a parameter with ptree and the order, type and</span>
+<span class="sd">    pooling instruction matrices. Returns a batch object.</span>
+
+<span class="sd">    :param data_list: List of data objects to &#39;batch&#39;</span>
+<span class="sd">    :type data_list: List[BaseData]</span>
+<span class="sd">    :return: Batched permutation tree related data</span>
+<span class="sd">    :rtype: Batch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create list of keys to exclude</span>
+    <span class="n">exclude_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ptree&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;num_layer&#39;</span><span class="p">):</span>
+        <span class="n">num_layer</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">num_layer</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_list</span><span class="p">])</span>
+
+        <span class="n">exclude_keys</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;num_layer&#39;</span><span class="p">,</span> <span class="s1">&#39;initial_map&#39;</span><span class="p">]</span>
+        <span class="n">exclude_keys</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_order_matrix&quot;</span>
+            <span class="k">for</span> <span class="n">layer_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layer</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">exclude_keys</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_type_mask&quot;</span>
+            <span class="k">for</span> <span class="n">layer_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layer</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">exclude_keys</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_pooling&quot;</span>
+            <span class="k">for</span> <span class="n">layer_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layer</span><span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">Batch</span><span class="o">.</span><span class="n">from_data_list</span><span class="p">(</span>
+        <span class="n">data_list</span><span class="o">=</span><span class="n">data_list</span><span class="p">,</span>
+        <span class="n">exclude_keys</span><span class="o">=</span><span class="n">exclude_keys</span>
+    <span class="p">)</span>
+    <span class="n">batch</span><span class="o">.</span><span class="n">ptree</span> <span class="o">=</span> <span class="n">permutation_tree_batching</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;num_layer&#39;</span><span class="p">):</span>
+        <span class="n">batch</span><span class="o">.</span><span class="n">num_layer</span> <span class="o">=</span> <span class="n">num_layer</span>
+
+        <span class="c1"># initial map</span>
+        <span class="n">pooling_max</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">initial_map_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_list</span><span class="p">:</span>
+            <span class="n">initial_map_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">initial_map</span> <span class="o">+</span> <span class="n">num_nodes</span>
+            <span class="p">)</span>
+            <span class="n">pooling_max</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">initial_map</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">num_nodes</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="s2">&quot;initial_map&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">initial_map_matrix</span><span class="p">))</span>
+
+        <span class="c1"># get k parameter</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">layer0_order_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># i know its stupid but having these wrapped in two lists was the best way to counter the auto-collation</span>
+        <span class="c1"># function of pyg... without hardcoding the dimensions which</span>
+
+        <span class="k">for</span> <span class="n">layer_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layer</span><span class="p">):</span>
+
+            <span class="c1"># order matrix section and graph pooling</span>
+            <span class="n">order_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">index_offset</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">p_max</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="n">pooling_max</span><span class="p">):</span>
+                <span class="n">o_m</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_order_matrix&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">o_m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">o_m</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">p_max</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">p_max</span><span class="p">,),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">o_m</span> <span class="o">=</span> <span class="n">o_m</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+
+                <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">o_m</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">o_m</span> <span class="o">+=</span> <span class="n">index_offset</span>
+                <span class="n">o_m</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+                <span class="n">index_offset</span> <span class="o">+=</span> <span class="n">p_max</span>
+                <span class="n">order_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o_m</span><span class="p">)</span>
+
+            <span class="n">batch</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_order_matrix&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">order_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># type mask section</span>
+            <span class="n">type_mask</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_type_mask&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_list</span>
+            <span class="p">]</span>
+            <span class="c1"># iterate over type mask and create matrices for null situations</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">type_mask</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">type_mask</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">type_mask</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pooling_max</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+            <span class="n">batch</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_type_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">type_mask</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># pooling</span>
+            <span class="n">old_pooling_max</span> <span class="o">=</span> <span class="n">pooling_max</span>
+            <span class="n">pooling_max</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">index_offset</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">pool_matrix</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">pmax_old</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="n">old_pooling_max</span><span class="p">):</span>
+                <span class="n">pool</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_pooling&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">pool</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">pool</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">pmax_old</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pool</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+                <span class="n">max_val</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># mind the 0</span>
+
+                <span class="n">pool</span> <span class="o">+=</span> <span class="n">index_offset</span>
+                <span class="n">pool_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pool</span><span class="p">)</span>
+                <span class="n">pooling_max</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_val</span><span class="p">)</span>
+
+                <span class="n">index_offset</span> <span class="o">+=</span> <span class="n">max_val</span>
+
+            <span class="n">batch</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;layer</span><span class="si">{</span><span class="n">layer_idx</span><span class="si">}</span><span class="s2">_pooling&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">pool_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">batch</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
