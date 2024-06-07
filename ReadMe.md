@@ -1,9 +1,15 @@
 # Master thesis - Permutation Tree Invariant Graph Neural Networks
 ## Information
-Author: Johannes P. Urban
+Author: Johannes P. Urban, B.Sc.
+Supervisor: Assoz. Prof. Dipl.-Inf. Dr. Nils Morten Kriege
+Full master thesis title: Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
 
 ## Installation procedure:
-(python 3.9)
+For this project Python 3.9 is required/recommended. It is further recommended to use conda to create an environment 
+as then no conflicts with previously installed libraries exist. The following instructions need to be executed to 
+set up the environment. Note that the versions may need to be adapted to the users operating system and device.
+Further note that not a requirements.txt is provided due to known complications with the installation of certain
+libraries (e.g. pytorch) with CUDA versions. Furthermore it enables conda to use device-customized environments.
 ```bash
 conda install pytorch==2.2.2 torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 conda install pyg==2.5.2 -c pyg
@@ -24,6 +30,8 @@ however, at the beginning of the project the general term PTGNN was chosen which
 equivariant. (Changing it now would change almost every file which is guaranteed to cause errors, except everything is retested)
 - .gitignore: Prevent pushing of datasets to GitHub repo
 - ReadMe.md: General information and installation instructions
+
+For more information regarding the implementation (classes, function, etc) please refer to the documentation https://github.com/JellyJoe13/Masterthesis_PTIGNN or directly the source code.
 
 ## Notebook information:
 
