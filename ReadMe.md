@@ -33,3 +33,9 @@ Notebooks have been opened and used with DataSpell and not directly with jupyter
 import sys
 sys.path.append("../") # or "../../" or more incase notebook is contained in a deeper subfolder structure 
 ```
+
+## Notice on foreign sources
+
+Other works have been used in some parts to recreate functionality and to realize experiment setups to test the methods
+proposed by this thesis. This mainly refers to contents from ChiENN (https://github.com/gmum/ChiENN). Relevant parts are marked and linked to their 
+source, these contents are licenced under an MIT licence, see https://github.com/gmum/ChiENN/blob/master/LICENSE.
