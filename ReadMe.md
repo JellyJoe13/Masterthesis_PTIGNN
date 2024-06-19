@@ -11,6 +11,8 @@ set up the environment. Note that the versions may need to be adapted to the use
 Further note that not a requirements.txt is provided due to known complications with the installation of certain
 libraries (e.g. pytorch) with CUDA versions. Furthermore it enables conda to use device-customized environments.
 ```bash
+conda create -n "PTIGNN" python==3.9.*
+conda activate PTIGNN
 conda install pytorch==2.2.2 torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 conda install pyg==2.5.2 -c pyg
 pip install rdkit==2023.9.5
