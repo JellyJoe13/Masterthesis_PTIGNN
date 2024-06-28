@@ -1,7 +1,9 @@
 # Master thesis - Permutation Tree Invariant Graph Neural Networks
 ## Information
 Author: Johannes P. Urban, B.Sc.
+
 Supervisor: Assoz. Prof. Dipl.-Inf. Dr. Nils Morten Kriege
+
 Full master thesis title: Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
 
 ## Installation procedure:
