@@ -41,8 +41,12 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../experiments.html">experiments</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -254,7 +258,40 @@
         <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function that executes the training and testing procedure.</span>
+
+<span class="sd">    :param model: Model to train and evaluate</span>
+<span class="sd">    :type model: torch.nn.Module</span>
+<span class="sd">    :param optimizer: Optimizer to use for training</span>
+<span class="sd">    :param scheduler: Scheduler to use for adapting learning rate of optimizer</span>
+<span class="sd">    :param train_loader: Loader of training dataset</span>
+<span class="sd">    :param val_loader: Loader of validation dataset</span>
+<span class="sd">    :param test_loader: Loader of testing dataset</span>
+<span class="sd">    :param task_type: Task type</span>
+<span class="sd">    :type task_type: str</span>
+<span class="sd">    :param device: Device to use for training and testing</span>
+<span class="sd">    :type device: str</span>
+<span class="sd">    :param n_max_epochs: Number of maximal epochs to execute</span>
+<span class="sd">    :type n_max_epochs: int</span>
+<span class="sd">    :param loss_function: Loss function to use for training</span>
+<span class="sd">    :type loss_function: str</span>
+<span class="sd">    :param clip_grad_norm: Whether to clip the gradient or not. Prevents too large training steps</span>
+<span class="sd">    :type clip_grad_norm: bool</span>
+<span class="sd">    :param out_dim: Output dimension of model</span>
+<span class="sd">    :type out_dim: int</span>
+<span class="sd">    :param use_test_set: Whether to use the test set or not. Should be disabled for hyperparameter optimization and</span>
+<span class="sd">        enabled for final test</span>
+<span class="sd">    :type use_test_set: bool</span>
+<span class="sd">    :param report: Whether to report measured metric scores to ray framework. Should be enabled if ray is to be used</span>
+<span class="sd">    :type report: bool</span>
+<span class="sd">    :param verbose: Verbose setting</span>
+<span class="sd">    :type verbose: int</span>
+<span class="sd">    :param kwargs: Auxiliary parameters that are not directly required</span>
+<span class="sd">    :return: Collected metric scores of training and test set</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initialize loss function</span>
     <span class="k">if</span> <span class="n">loss_function</span> <span class="o">==</span> <span class="s1">&#39;l1&#39;</span><span class="p">:</span>
         <span class="n">loss_function</span> <span class="o">=</span> <span class="n">l1_loss</span>
@@ -340,7 +377,34 @@
         <span class="n">task_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">train_loader</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function used to train model for one epoch with the training dataset.</span>
+
+<span class="sd">    :param metric_dict: Metric dict in which to store results</span>
+<span class="sd">    :type metric_dict: dict</span>
+<span class="sd">    :param clip_grad_norm: Whether to clip the gradient norm or not. If enabled, prevents too large training steps</span>
+<span class="sd">    :type clip_grad_norm: bool</span>
+<span class="sd">    :param device: Which device to use for training the model</span>
+<span class="sd">    :type device: str</span>
+<span class="sd">    :param df_dict: dictionary containing all dataframe splits</span>
+<span class="sd">    :type df_dict: dict</span>
+<span class="sd">    :param loss_function: Loss function to use for training</span>
+<span class="sd">    :type loss_function: typing.Callable[[torch.Tensor, torch.Tensor],[torch.Tensor, torch.Tensor]]</span>
+<span class="sd">    :param model: Model to train</span>
+<span class="sd">    :type model: torch.nn.Module</span>
+<span class="sd">    :param optimizer: Optimizer to use for training</span>
+<span class="sd">    :param out_dim: Output dimension</span>
+<span class="sd">    :type out_dim: int</span>
+<span class="sd">    :param scheduler: Scheduler to use for training, controls optimizer learning rate</span>
+<span class="sd">    :param task_type: Task type of training</span>
+<span class="sd">    :type task_type: str</span>
+<span class="sd">    :param train_loader: Loader of training data to use for training</span>
+<span class="sd">    :param verbose: Verbose option</span>
+<span class="sd">    :type verbose: bool</span>
+<span class="sd">    :return: metric dict</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
     <span class="n">loss_storage</span> <span class="o">=</span> <span class="p">[]</span>
@@ -413,6 +477,30 @@
         <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to evaluate a model on (validation or test) data</span>
+
+<span class="sd">    :param metric_dict: Dictionary in which to store the measured metrics</span>
+<span class="sd">    :type metric_dict: dict</span>
+<span class="sd">    :param device: device on which to operate the evaluation. Commonly torch devices, such as ``cpu`` or ``cuda``</span>
+<span class="sd">    :param df_dict: dictionary containing all splits of dataset</span>
+<span class="sd">    :type df_dict: dict</span>
+<span class="sd">    :param loss_function: Loss function to use to generate the loss value and pre-format the predictions</span>
+<span class="sd">    :type loss_function: typing.Callable[[torch.Tensor, torch.Tensor],[torch.Tensor, torch.Tensor]]</span>
+<span class="sd">    :param model: Model to evaluate</span>
+<span class="sd">    :type model: torch.nn.Module</span>
+<span class="sd">    :param out_dim: Output dimension of the model</span>
+<span class="sd">    :type out_dim: int</span>
+<span class="sd">    :param task_type: Task type</span>
+<span class="sd">    :type task_type: str</span>
+<span class="sd">    :param eval_loader: Data loader to use for evaluation</span>
+<span class="sd">    :param mode: Dataset mode, specifies which split is currently tested</span>
+<span class="sd">    :type mode: str</span>
+<span class="sd">    :param verbose: Verbose option</span>
+<span class="sd">    :type verbose: bool</span>
+<span class="sd">    :return: Metric dictionary</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
     <span class="n">loss_storage</span> <span class="o">=</span> <span class="p">[]</span>
@@ -462,7 +550,26 @@
         <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to use to run experiment with a certain configuration.</span>
+
+<span class="sd">    :param config_dict: Configuration specifying which experiment and with which data, model, etc. it is to be executed</span>
+<span class="sd">    :type config_dict: dict</span>
+<span class="sd">    :param report: Whether to report the measured metrics to ray framework or not. Should be enabled in the</span>
+<span class="sd">        hyper optimization, else disabled.</span>
+<span class="sd">    :type report: bool</span>
+<span class="sd">    :param verbose: Verbose option</span>
+<span class="sd">    :type verbose: bool</span>
+<span class="sd">    :param device: Device on which to execute experiment. The following options are possible:</span>
+
+<span class="sd">        - ``cpu`` - runs on the CPU</span>
+<span class="sd">        - ``cuda`` - runs on the CUDA framework, i.e. GPU. (Does not check whether this is available)</span>
+<span class="sd">        - ``None`` - if possible uses cuda, else cpu</span>
+<span class="sd">    :type device: str</span>
+<span class="sd">    :return: metric dict dataframe</span>
+<span class="sd">    :rtype: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># seed everything</span>
     <span class="n">seed</span> <span class="o">=</span> <span class="n">config_dict</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;seed&#39;</span> <span class="ow">in</span> <span class="n">config_dict</span> <span class="k">else</span> <span class="mi">1</span>
     <span class="n">torch_geometric</span><span class="o">.</span><span class="n">seed_everything</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>

@@ -41,8 +41,12 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../experiments.html">experiments</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -91,6 +95,8 @@
 <span class="sd">    Therefore, we wrapped `ChiENNLayer` with `GPSLayer`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="ChiENNModel.__init__">
+<a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.ChiENNModel.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">k_neighbors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
@@ -101,6 +107,7 @@
             <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init function</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            k_neighbors: number of k consecutive neighbors used to create a chiral-sensitive message. It&#39;s `k` from</span>
@@ -129,7 +136,8 @@
             <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">hidden_dim</span> <span class="o">//</span> <span class="mi">4</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">),</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="ChiENNModel.forward">
 <a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.ChiENNModel.forward">[docs]</a>
@@ -139,6 +147,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            batch: a batch representing `batch_size` graphs. Contains the following attributes:</span>
+
 <span class="sd">                - x: (num_nodes, hidden_dim) node features</span>
 <span class="sd">                - batch (num_nodes,): batch indices of the nodes.</span>
 <span class="sd">                - edge_index (2, num_edges): edge indices</span>
@@ -165,6 +174,8 @@
 <span class="sd">    A layer that wraps some GNN model and adds a residual connection and a MLP with batch normalization, similarly</span>
 <span class="sd">    to the GPSLayer from `experiments/graphgps/layer/gps_layer.py`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GPSLayer.__init__">
+<a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.GPSLayer.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">gnn_layer</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
@@ -181,7 +192,8 @@
             <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">),</span>
             <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">norm_2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm_2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="GPSLayer.forward">
 <a class="viewcode-back" href="../../../../ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.GPSLayer.forward">[docs]</a>
