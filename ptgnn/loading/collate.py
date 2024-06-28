@@ -176,7 +176,7 @@ def permutation_tree_collation(
         k = data_list[0].layer0_order_matrix[0][0].shape[0]
 
         # i know its stupid but having these wrapped in two lists was the best way to counter the auto-collation
-        # function of pyg... without hardcoding the dimensions which
+        # function of pyg...
 
         for layer_idx in range(num_layer):
 

@@ -113,8 +113,8 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
             temp
         ], dim=0)
 
-        # # Version 1
-        # # waaaaaaaaaaaaaaaaaay to inefficient but whyyyyyyyyyyyyyyyyyyyyy
+        # Version 1
+        # way to inefficient
         # for i, edge in enumerate(edges.T):
         #     a = torch.where(batch.edge_index[0] == edge[0])[0]
         #     b = torch.where(batch.edge_index[1] == edge[1])[0]
@@ -124,15 +124,20 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
         #         data_array[i] = data_array[i] + batch.edge_attr[index]
 
         # Version 2
+        # check if instructions have already been precomputed
         if hasattr(batch, "edge_instructions"):
+            # yes - good, load them
             edge_instructions = getattr(batch, "edge_instructions")
         else:
+            # no - generate them
+            # init empty array
             edge_instructions = torch.zeros(
                 len(data_array),
                 device=data_array.device,
                 requires_grad=False,
                 dtype=int
             )
+            # iterate over edges and update instructions
             for i, edge in enumerate(edges.T):
                 a = torch.where(batch.edge_index[0] == edge[0])[0]
                 b = torch.where(batch.edge_index[1] == edge[1])[0]
@@ -142,6 +147,7 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
                     edge_instructions[i] = index + 1
                 else:
                     edge_instructions[i] = 0
+            # write instructions into batch object
             batch['edge_instructions'] = edge_instructions
 
         # fetch edges
@@ -151,7 +157,7 @@ class AdvancedPermutationEdgeTreeLayer(torch.nn.Module):
             data_edges
         ], dim=0)
 
-        # fuze
+        # fuze edge embeddings with node embeddings
         if self.edge_mode == "default":
             data_array = data_array + data_edges[edge_instructions]
         elif self.edge_mode == "linear_reduction":

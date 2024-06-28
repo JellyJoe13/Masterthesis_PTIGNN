@@ -17,16 +17,18 @@ from ptgnn.transform import PRE_TRANSFORM_MAPPING
 
 
 def filter_mc_tetra_mol(
-        df_entry,
+        df_entry: typing.Tuple[int, pd.Series],
         smiles_name: str = "smiles"
 ):
     """
-    Returns true if molecule has multiple chiral centers.
+    Returns true if molecule has exactly two chiral centers.
 
-    :param df_entry: pandas row object
+    :param df_entry: pandas row object and index
+    :type df_entry: typing.Tuple[int, pd.Series]
     :param smiles_name: name of the columns under which the stereochemical SMILES can be queried from the
         df_entry
-    :return: whether or not the molecule has multiple chiral centers (plus the idx and the entry before that)
+    :return: whether or not the molecule has two chiral centers (plus the idx and the entry before that)
+    :rtype: tuple
     """
     from ptgnn.features.chienn.molecule3d import smiles_to_3d_mol
     from rdkit.Chem import AllChem
@@ -53,18 +55,28 @@ def filter_mc_tetra_mol(
 
 
 def worker_create_all_combinations(
-        df_entry,
+        df_entry: typing.Tuple[int, pd.Series],
         smiles_name: str = 'smiles'
-):
+) -> pd.DataFrame:
+    """
+    Creates all combinations of the molecules based on the stereocenters (@) in the molecule.
+
+    :param df_entry: Pandas dataframe row and index
+    :type df_entry: typing.Tuple[int, pd.Series]
+    :param smiles_name: Column name of the data in df_entry in which the smiles string is stored
+    :type smiles_name: str
+    :return: Dataframe containing the smiles strings of the newly generated molecule variants
+    :rtype: pd.DataFrame
+    """
     # unpack passed object
     idx, entry = df_entry
 
     # extract smiles string
     smiles = entry[smiles_name]
 
-    # replace all double @ with normal @... wait but different forms? urgh the smiles may be different...
-    # what in the first place is the label?
-    # if I make it such that EXACTLY 2, then u/l prediction is possible. or distribution of max(|R|, |S|) in general
+    # replace all double @ with normal @
+    # label idea: EXACTLY 2 centers, then u/l prediction is possible. or distribution of max(|R|, |S|) in general
+    # then produce all combinations of R/S (realized through @) and generate label
 
     # get clearned smiles version with only one @
     cleaned_smiles = smiles.replace("@@", "@")
@@ -86,7 +98,17 @@ def worker_create_all_combinations(
     })
 
 
-def assign_lu_label(df_entry):
+def assign_lu_label(
+        df_entry: typing.Tuple[int, pd.Series]
+) -> pd.DataFrame:
+    """
+    Function computing the L/U label of the passed molecule.
+
+    :param df_entry: Molecule and index to label
+    :type df_entry: typing.Tuple[int, pd.Series]
+    :return: Dataframe of molecule with label
+    :rtype: pd.DataFrame
+    """
     # unpack passed object
     idx, entry = df_entry
 
@@ -352,11 +374,6 @@ class MCDataset(InMemoryDataset):
                         tqdm(df_collection.iterrows(), total=len(df_collection))
                     ))
                     df_collection = pd.DataFrame([elem for elem in df_collection if elem is not None])
-
-                    data_list = [
-                        worker(elem)
-                        for elem in tqdm(df_collection.iterrows(), total=len(df_collection))
-                    ]
 
                     data_list = list(p.map(
                         worker,

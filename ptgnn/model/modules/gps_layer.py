@@ -11,7 +11,7 @@ from ptgnn.model.modules.ptree.advanced_tree_layer_rnn import AdvancedPermutatio
 
 class CustomGPSLayer(torch.nn.Module):
     """
-    Adapted from https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/layer/gps_layer.py#L17
+    Based on https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/layer/gps_layer.py#L17
 
     Model with residual connection around stored layer and a feed forward network (also with residual connection)
     """
