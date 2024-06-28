@@ -14,6 +14,16 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
             k: int,
             apply_p_elu: bool = False
     ):
+        """
+        Init function of the recusive (simple) PTIGNN implementation
+
+        :param hidden_dim: hidden dimension
+        :type hidden_dim: int
+        :param k: Elements to set into context
+        :type k: int
+        :param apply_p_elu: Whether or not to apply the ELU function in the P type node component
+        :type apply_p_elu: bool
+        """
         super(RecursiveSimplePtreeLayer, self).__init__()
         self.hidden_dim = hidden_dim
         self.k = k
@@ -51,6 +61,15 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         ])
 
     def do_module(self, batch, tree):
+        """
+        Execute the PTIGNN aggregation/update function for one permutation tree.
+
+        :param batch: data object containing the elements to use for the new embedding represented by the tree
+        :param tree: tree structure defining which elements to combine and how to do so
+        :type tree: dict
+        :return: data represented by the tree, used to update a specific node in the graph/batch
+        :rtype: torch.Tensor
+        """
         # get node type
         node_type = next(iter(tree.keys()))
 
@@ -78,6 +97,13 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
             raise NotImplementedError(f"permutation tree node type {node_type} is not implemented.")
 
     def p_layer_fn(self, data_list):
+        """
+        Function realizing a P type internal node
+
+        :param data_list: list of elements to combine in the tree
+        :type data_list: typing.List[torch.Tensor]
+        :return: torch.Tensor
+        """
         # run through layer for each input
         after_p = self.p_layer(data_list)
         # sum up
@@ -88,6 +114,13 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         return after_p
 
     def z_layer_fn(self, data_list):
+        """
+        Function realizing a Z type internal node
+
+        :param data_list: list of elements to combine in the tree
+        :type data_list: typing.List[torch.Tensor]
+        :return: torch.Tensor
+        """
         # run through embedding layers
         after_z = [
             layer(data_list)
@@ -113,12 +146,26 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         return self.z_elu(after_z)
 
     def c_layer_fn(self, data_list):
+        """
+        Function realizing a C type internal node
+
+        :param data_list: list of elements to combine in the tree
+        :type data_list: typing.List[torch.Tensor]
+        :return: torch.Tensor
+        """
         one_direction = self.z_layer_fn(data_list)
         other_direction = self.z_layer_fn(data_list[::-1])
 
         return self.p_layer_fn([one_direction, other_direction])
 
     def s_layer_fn(self, data_list):
+        """
+        Function realizing a S type internal node
+
+        :param data_list: list of elements to combine in the tree
+        :type data_list: typing.List[torch.Tensor]
+        :return: torch.Tensor
+        """
         # run through embedding layers
         after_s = [
             layer(data_list)
@@ -144,12 +191,28 @@ class RecursiveSimplePtreeLayer(torch.nn.Module):
         return self.s_elu(after_s)
 
     def q_layer_fn(self, data_list):
+        """
+        Function realizing a Q type internal node
+
+        :param data_list: list of elements to combine in the tree
+        :type data_list: typing.List[torch.Tensor]
+        :return: torch.Tensor
+        """
         one_direction = self.s_layer_fn(data_list)
         other_direction = self.s_layer_fn(data_list[::-1])
 
         return self.p_layer_fn([one_direction, other_direction])
 
     def fetch_or_produce(self, batch, subtree):
+        """
+        Helper function that either starts the computation of a deeper layered subtree and returns the produced data or
+        returns the value of the leaf node.
+
+        :param batch: Batch object
+        :param subtree: Subtree of an original graph (or total graph)
+        :type subtree: typing.Union[int, dict]
+        :return:
+        """
         if isinstance(subtree, int):
             return batch.x[subtree]
         else:

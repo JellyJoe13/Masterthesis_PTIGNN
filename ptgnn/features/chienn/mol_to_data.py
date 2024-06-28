@@ -30,6 +30,7 @@ bond_types = ['SINGLE', 'DOUBLE', 'TRIPLE', 'AROMATIC']
 def mol_to_data(mol: Mol) -> Data:
     """
     Transforms a rdkit mol object into a torch_geometric Data object.
+
     Args:
         mol: rdKit mol object.
 
@@ -71,6 +72,7 @@ def mol_to_data(mol: Mol) -> Data:
 def one_hot_embedding(value: int, options: List[int]) -> List[int]:
     """
     Encodes a value into a one-hot embedding.
+
     Args:
         value: a value which index will be retrieved from options and encoded.
         options: a list of possible values.
@@ -87,6 +89,7 @@ def one_hot_embedding(value: int, options: List[int]) -> List[int]:
 def adjacency_to_undirected_edge_index(adj: np.ndarray) -> np.ndarray:
     """
     Converts an adjacency matrix into an edge index.
+
     Args:
         adj: adjacency matrix.
 
@@ -104,6 +107,7 @@ def adjacency_to_undirected_edge_index(adj: np.ndarray) -> np.ndarray:
 def get_node_features(atoms: List[Atom]) -> np.ndarray:
     """
     Gets an array of node features from a list of atoms.
+
     Args:
         atoms: list of atoms of shape (N).
 
@@ -134,6 +138,7 @@ def get_node_features(atoms: List[Atom]) -> np.ndarray:
 def get_edge_features(bonds: List[Bond]) -> np.ndarray:
     """
     Gets an array of edge features from a list of bonds.
+
     Args:
         bonds: a list of bonds of shape (N).
 
@@ -157,6 +162,7 @@ def get_edge_features(bonds: List[Bond]) -> np.ndarray:
 def get_positions(mol: rdkit.Chem.Mol) -> np.ndarray:
     """
     Gets the 3D positions of the atoms in the molecule.
+
     Args:
         mol: a molecule embedded in 3D space with N atoms.
 

@@ -10,10 +10,11 @@ def smiles_to_3d_mol(smiles: str, max_number_of_atoms: int = 100, max_number_of_
     """
     From: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/chienn/data/featurization/smiles_to_3d_mol.py#L7
     Embeds the molecule in 3D space.
+
     Args:
         smiles: a smile representing molecule
         max_number_of_atoms: maximal number of atoms in a molecule. Molecules with more atoms will be omitted.
-            max_number_of_attempts: maximal number of attempts during the embedding.
+        max_number_of_attempts: maximal number of attempts during the embedding.
         max_number_of_attempts: max number of embeddings attempts.
 
     Returns:
@@ -53,6 +54,7 @@ def smiles_to_data_with_circle_index(smiles: str) -> torch_geometric.data.Data:
     """
     From: https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/chienn/data/featurize.py
     Transforms a SMILES string into a torch_geometric Data object that can be fed into the ChiENNLayer.
+
     Args:
         smiles: a SMILES string.
 

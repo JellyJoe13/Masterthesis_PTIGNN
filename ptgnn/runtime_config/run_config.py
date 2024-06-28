@@ -167,7 +167,40 @@ def training_procedure(
         report: bool = False,
         verbose: bool = True,
         **kwargs
-):
+) -> pd.DataFrame:
+    """
+    Function that executes the training and testing procedure.
+
+    :param model: Model to train and evaluate
+    :type model: torch.nn.Module
+    :param optimizer: Optimizer to use for training
+    :param scheduler: Scheduler to use for adapting learning rate of optimizer
+    :param train_loader: Loader of training dataset
+    :param val_loader: Loader of validation dataset
+    :param test_loader: Loader of testing dataset
+    :param task_type: Task type
+    :type task_type: str
+    :param device: Device to use for training and testing
+    :type device: str
+    :param n_max_epochs: Number of maximal epochs to execute
+    :type n_max_epochs: int
+    :param loss_function: Loss function to use for training
+    :type loss_function: str
+    :param clip_grad_norm: Whether to clip the gradient or not. Prevents too large training steps
+    :type clip_grad_norm: bool
+    :param out_dim: Output dimension of model
+    :type out_dim: int
+    :param use_test_set: Whether to use the test set or not. Should be disabled for hyperparameter optimization and
+        enabled for final test
+    :type use_test_set: bool
+    :param report: Whether to report measured metric scores to ray framework. Should be enabled if ray is to be used
+    :type report: bool
+    :param verbose: Verbose setting
+    :type verbose: int
+    :param kwargs: Auxiliary parameters that are not directly required
+    :return: Collected metric scores of training and test set
+    :rtype: pd.DataFrame
+    """
     # initialize loss function
     if loss_function == 'l1':
         loss_function = l1_loss
@@ -250,7 +283,34 @@ def train_epoch(
         task_type: str,
         train_loader,
         verbose: bool = True
-):
+) -> dict:
+    """
+    Function used to train model for one epoch with the training dataset.
+
+    :param metric_dict: Metric dict in which to store results
+    :type metric_dict: dict
+    :param clip_grad_norm: Whether to clip the gradient norm or not. If enabled, prevents too large training steps
+    :type clip_grad_norm: bool
+    :param device: Which device to use for training the model
+    :type device: str
+    :param df_dict: dictionary containing all dataframe splits
+    :type df_dict: dict
+    :param loss_function: Loss function to use for training
+    :type loss_function: typing.Callable[[torch.Tensor, torch.Tensor],[torch.Tensor, torch.Tensor]]
+    :param model: Model to train
+    :type model: torch.nn.Module
+    :param optimizer: Optimizer to use for training
+    :param out_dim: Output dimension
+    :type out_dim: int
+    :param scheduler: Scheduler to use for training, controls optimizer learning rate
+    :param task_type: Task type of training
+    :type task_type: str
+    :param train_loader: Loader of training data to use for training
+    :param verbose: Verbose option
+    :type verbose: bool
+    :return: metric dict
+    :rtype: dict
+    """
     model.train()
 
     loss_storage = []
@@ -320,6 +380,30 @@ def eval_epoch(
         mode: str,
         verbose: bool = True
 ):
+    """
+    Function to evaluate a model on (validation or test) data
+
+    :param metric_dict: Dictionary in which to store the measured metrics
+    :type metric_dict: dict
+    :param device: device on which to operate the evaluation. Commonly torch devices, such as ``cpu`` or ``cuda``
+    :param df_dict: dictionary containing all splits of dataset
+    :type df_dict: dict
+    :param loss_function: Loss function to use to generate the loss value and pre-format the predictions
+    :type loss_function: typing.Callable[[torch.Tensor, torch.Tensor],[torch.Tensor, torch.Tensor]]
+    :param model: Model to evaluate
+    :type model: torch.nn.Module
+    :param out_dim: Output dimension of the model
+    :type out_dim: int
+    :param task_type: Task type
+    :type task_type: str
+    :param eval_loader: Data loader to use for evaluation
+    :param mode: Dataset mode, specifies which split is currently tested
+    :type mode: str
+    :param verbose: Verbose option
+    :type verbose: bool
+    :return: Metric dictionary
+    :rtype: dict
+    """
     model.eval()
 
     loss_storage = []
@@ -366,7 +450,26 @@ def run_config(
         report: bool = False,
         verbose: bool = True,
         device: str = None
-):
+) -> pd.DataFrame:
+    """
+    Function to use to run experiment with a certain configuration.
+
+    :param config_dict: Configuration specifying which experiment and with which data, model, etc. it is to be executed
+    :type config_dict: dict
+    :param report: Whether to report the measured metrics to ray framework or not. Should be enabled in the
+        hyper optimization, else disabled.
+    :type report: bool
+    :param verbose: Verbose option
+    :type verbose: bool
+    :param device: Device on which to execute experiment. The following options are possible:
+
+        - ``cpu`` - runs on the CPU
+        - ``cuda`` - runs on the CUDA framework, i.e. GPU. (Does not check whether this is available)
+        - ``None`` - if possible uses cuda, else cpu
+    :type device: str
+    :return: metric dict dataframe
+    :rtype: pd.DataFrame
+    """
     # seed everything
     seed = config_dict['seed'] if 'seed' in config_dict else 1
     torch_geometric.seed_everything(seed)
