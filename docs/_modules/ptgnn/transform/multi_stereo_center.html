@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.transform.multi_stereo_center &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.transform.multi_stereo_center</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.transform.multi_stereo_center</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
+
+
+<div class="viewcode-block" id="limited_bfs_stereo_path_search">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.multi_stereo_center.limited_bfs_stereo_path_search">[docs]</a>
+<span class="k">def</span> <span class="nf">limited_bfs_stereo_path_search</span><span class="p">(</span>
+        <span class="n">current_molecule</span><span class="p">,</span>
+        <span class="n">current_stereocenters</span><span class="p">,</span>
+        <span class="n">start_stereo</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uses a BFS approach to connect only few stereocenters with maximal effect - not really working for molecules with</span>
+<span class="sd">    more than 3 stereo centers. Approach was cancelled(difference in diastereomers is too small) so never further</span>
+<span class="sd">    developed.</span>
+
+<span class="sd">    :param current_molecule: molecule</span>
+<span class="sd">    :type current_molecule: rdkit.Chem.rdchem.Mol</span>
+<span class="sd">    :param current_stereocenters: List of stereocenter (indices)</span>
+<span class="sd">    :type current_stereocenters: typing.List[int]</span>
+<span class="sd">    :param start_stereo: stereo center to search (builds tree until closest center is reached</span>
+<span class="sd">    :return: found closest stereo center(s), predecessor matrix - compare with default path algorithms like Dijkstra</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># init procedure</span>
+    <span class="c1"># fetch adjacency matrix</span>
+    <span class="n">adjacency_matrix</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">GetAdjacencyMatrix</span><span class="p">(</span><span class="n">current_molecule</span><span class="p">)</span>
+    <span class="c1"># init visited nodes</span>
+    <span class="n">visited_nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">visited_nodes</span><span class="p">[</span><span class="n">start_stereo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># init predecessors</span>
+    <span class="n">predecessors</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+    <span class="c1"># init current_layer</span>
+    <span class="n">current_layer</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_stereo</span><span class="p">]</span>
+
+    <span class="c1"># iterate as long as possible</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># init next layer</span>
+        <span class="n">next_layer</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># iterate over element in current layer</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">current_layer</span><span class="p">:</span>
+            <span class="c1"># fetch outgoing edges</span>
+            <span class="n">next_layer_cand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">[</span><span class="n">elem</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># check and subselect</span>
+            <span class="n">next_layer_cand</span> <span class="o">=</span> <span class="n">next_layer_cand</span><span class="p">[</span><span class="o">~</span><span class="n">visited_nodes</span><span class="p">[</span><span class="n">next_layer_cand</span><span class="p">]]</span>
+
+            <span class="c1"># add predecessor</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">next_layer_cand</span><span class="p">:</span>
+                <span class="n">predecessors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+
+            <span class="c1"># check and add</span>
+            <span class="n">next_layer</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">next_layer_cand</span><span class="p">)</span>
+
+        <span class="c1"># set new layer nodes to visited (so that they cannot be visited anymore</span>
+        <span class="n">visited_nodes</span><span class="p">[</span><span class="n">next_layer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># calc if any of the found new nodes are stereocenters</span>
+        <span class="n">stereo_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">next_layer</span><span class="p">,</span> <span class="n">current_stereocenters</span><span class="p">)</span>
+        <span class="c1"># if so, stop looping</span>
+        <span class="k">if</span> <span class="n">stereo_test</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">next_layer</span><span class="p">)[</span><span class="n">stereo_test</span><span class="p">],</span> <span class="n">predecessors</span>
+
+        <span class="c1"># set new current_layer</span>
+        <span class="n">current_layer</span> <span class="o">=</span> <span class="n">next_layer</span></div>
+
+
+
+<div class="viewcode-block" id="calc_paths">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.multi_stereo_center.calc_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_paths</span><span class="p">(</span>
+        <span class="n">current_path</span><span class="p">,</span>
+        <span class="n">predecessors</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calc paths from predecessors and current path&quot;&quot;&quot;</span>
+    <span class="c1"># get predecessors of last node in path</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">predecessors</span><span class="p">[</span><span class="n">current_path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+    <span class="c1"># if empty list then return current path</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">calc_paths</span><span class="p">(</span><span class="n">current_path</span> <span class="o">+</span> <span class="p">[</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">predecessors</span><span class="p">)</span>
+        <span class="c1"># disabled as producing significant problems</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">([</span>
+            <span class="n">calc_paths</span><span class="p">(</span><span class="n">current_path</span> <span class="o">+</span> <span class="p">[</span><span class="n">next_node</span><span class="p">],</span> <span class="n">predecessors</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">next_node</span> <span class="ow">in</span> <span class="n">pred</span>
+        <span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># no further elements</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">current_path</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="calc_edges_multiple_stereo_centers">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.multi_stereo_center.calc_edges_multiple_stereo_centers">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_edges_multiple_stereo_centers</span><span class="p">(</span>
+        <span class="n">molecule</span><span class="p">,</span>
+        <span class="n">include_unassigned</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calc which edges are to be connected for a molecule with multiple stereo centers (not working fully for molecules</span>
+<span class="sd">    with more than 3 stereo centers)&quot;&quot;&quot;</span>
+    <span class="c1"># get stereocenters</span>
+    <span class="n">stereo_centers</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">FindMolChiralCenters</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">includeUnassigned</span><span class="o">=</span><span class="n">include_unassigned</span><span class="p">)</span>
+    <span class="n">stereo_centers</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">stereo_centers</span><span class="p">]</span>
+
+    <span class="c1"># include assert, if less than 2 centers then do nothing</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stereo_centers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="c1"># init storage where the edges to create/re-tree are stored</span>
+    <span class="n">stereo_paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># iterate over all stereo_centers</span>
+    <span class="k">for</span> <span class="n">start_stereo</span> <span class="ow">in</span> <span class="n">stereo_centers</span><span class="p">:</span>
+
+        <span class="c1"># get pre-path(s) to nearest stereo center</span>
+        <span class="n">found_stereos</span><span class="p">,</span> <span class="n">predecessors</span> <span class="o">=</span> <span class="n">limited_bfs_stereo_path_search</span><span class="p">(</span>
+            <span class="n">molecule</span><span class="p">,</span>
+            <span class="n">stereo_centers</span><span class="p">,</span>
+            <span class="n">start_stereo</span>
+        <span class="p">)</span>
+
+        <span class="c1"># get the resulting paths</span>
+        <span class="n">current_paths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">([</span>
+            <span class="n">calc_paths</span><span class="p">([</span><span class="n">found_stereos</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">predecessors</span><span class="p">)</span>
+        <span class="p">]))</span>
+
+        <span class="c1"># process paths, check if already present (double edges/nodes not used)</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">current_paths</span><span class="p">:</span>
+
+            <span class="c1"># create both directions</span>
+            <span class="n">direction_a</span> <span class="o">=</span> <span class="p">((</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">direction_b</span> <span class="o">=</span> <span class="p">((</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span> <span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+            <span class="c1"># check if already in paths and if not add it</span>
+            <span class="k">if</span> <span class="n">direction_a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stereo_paths</span> <span class="ow">and</span> <span class="n">direction_b</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stereo_paths</span><span class="p">:</span>
+                <span class="n">stereo_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">direction_a</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stereo_paths</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

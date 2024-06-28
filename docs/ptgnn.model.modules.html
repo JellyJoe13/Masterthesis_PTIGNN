@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.model.modules package &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ptgnn.model.modules.ptree package" href="ptgnn.model.modules.ptree.html" />
+    <link rel="prev" title="ptgnn.model.framework package" href="ptgnn.model.framework.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ptgnn.html">ptgnn</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ptgnn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html">ptgnn.dataset package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.features.html">ptgnn.features package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html">ptgnn.loading package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.masking.html">ptgnn.masking package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ptgnn.model.html">ptgnn.model package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ptgnn.model.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.model.chienn.html">ptgnn.model.chienn package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.model.framework.html">ptgnn.model.framework package</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ptgnn.model.modules package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="ptgnn.model.modules.ptree.html">ptgnn.model.modules.ptree package</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#module-ptgnn.model.modules.custom_wrapper">ptgnn.model.modules.custom_wrapper module</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#ptgnn.model.modules.custom_wrapper.CustomWrapper"><code class="docutils literal notranslate"><span class="pre">CustomWrapper</span></code></a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.custom_wrapper.CustomWrapper.__init__"><code class="docutils literal notranslate"><span class="pre">CustomWrapper.__init__()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.custom_wrapper.CustomWrapper.forward"><code class="docutils literal notranslate"><span class="pre">CustomWrapper.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l7"><a class="reference internal" href="#ptgnn.model.modules.custom_wrapper.InputOutputWrapper"><code class="docutils literal notranslate"><span class="pre">InputOutputWrapper</span></code></a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.custom_wrapper.InputOutputWrapper.__init__"><code class="docutils literal notranslate"><span class="pre">InputOutputWrapper.__init__()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.custom_wrapper.InputOutputWrapper.forward"><code class="docutils literal notranslate"><span class="pre">InputOutputWrapper.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#module-ptgnn.model.modules.gps_layer">ptgnn.model.modules.gps_layer module</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#ptgnn.model.modules.gps_layer.CustomGPSLayer"><code class="docutils literal notranslate"><span class="pre">CustomGPSLayer</span></code></a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.gps_layer.CustomGPSLayer.__init__"><code class="docutils literal notranslate"><span class="pre">CustomGPSLayer.__init__()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.gps_layer.CustomGPSLayer.forward"><code class="docutils literal notranslate"><span class="pre">CustomGPSLayer.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#module-ptgnn.model.modules.graph_embedding">ptgnn.model.modules.graph_embedding module</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#ptgnn.model.modules.graph_embedding.GraphEmbedding"><code class="docutils literal notranslate"><span class="pre">GraphEmbedding</span></code></a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.graph_embedding.GraphEmbedding.__init__"><code class="docutils literal notranslate"><span class="pre">GraphEmbedding.__init__()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.graph_embedding.GraphEmbedding.forward"><code class="docutils literal notranslate"><span class="pre">GraphEmbedding.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l7"><a class="reference internal" href="#ptgnn.model.modules.graph_embedding.RWSE"><code class="docutils literal notranslate"><span class="pre">RWSE</span></code></a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.graph_embedding.RWSE.__init__"><code class="docutils literal notranslate"><span class="pre">RWSE.__init__()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.graph_embedding.RWSE.forward"><code class="docutils literal notranslate"><span class="pre">RWSE.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#module-ptgnn.model.modules.head_pooling">ptgnn.model.modules.head_pooling module</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#ptgnn.model.modules.head_pooling.SANHead"><code class="docutils literal notranslate"><span class="pre">SANHead</span></code></a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.head_pooling.SANHead.__init__"><code class="docutils literal notranslate"><span class="pre">SANHead.__init__()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#ptgnn.model.modules.head_pooling.SANHead.forward"><code class="docutils literal notranslate"><span class="pre">SANHead.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="#module-ptgnn.model.modules">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.html#module-ptgnn.model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.optimizing.html">ptgnn.optimizing package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html">ptgnn.runtime_config package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html">ptgnn.transform package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.html#module-ptgnn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">&lt;no title&gt;</a></li>
+          <li class="breadcrumb-item"><a href="ptgnn.html">ptgnn</a></li>
+          <li class="breadcrumb-item"><a href="ptgnn.model.html">ptgnn.model package</a></li>
+      <li class="breadcrumb-item active">ptgnn.model.modules package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ptgnn.model.modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ptgnn-model-modules-package">
+<h1>ptgnn.model.modules package<a class="headerlink" href="#ptgnn-model-modules-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.model.modules.ptree.html">ptgnn.model.modules.ptree package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.ptree.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.advanced_tree_layer">ptgnn.model.modules.ptree.advanced_tree_layer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer.AdvancedPermutationTreeLayer"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationTreeLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer.AdvancedPermutationTreeLayer.__init__"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationTreeLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer.AdvancedPermutationTreeLayer.forward"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationTreeLayer.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.advanced_tree_layer_e">ptgnn.model.modules.ptree.advanced_tree_layer_e module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer_e.AdvancedPermutationEdgeTreeLayer"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationEdgeTreeLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer_e.AdvancedPermutationEdgeTreeLayer.__init__"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationEdgeTreeLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer_e.AdvancedPermutationEdgeTreeLayer.forward"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationEdgeTreeLayer.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.advanced_tree_layer_rnn">ptgnn.model.modules.ptree.advanced_tree_layer_rnn module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer_rnn.AdvancedPermutationTreeLayerRNN"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationTreeLayerRNN</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer_rnn.AdvancedPermutationTreeLayerRNN.__init__"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationTreeLayerRNN.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer_rnn.AdvancedPermutationTreeLayerRNN.forward"><code class="docutils literal notranslate"><span class="pre">AdvancedPermutationTreeLayerRNN.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.complex_ptree_layer">ptgnn.model.modules.ptree.complex_ptree_layer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.complex_ptree_layer.ComplexPtreeLayer"><code class="docutils literal notranslate"><span class="pre">ComplexPtreeLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.complex_ptree_layer.ComplexPtreeLayer.__init__"><code class="docutils literal notranslate"><span class="pre">ComplexPtreeLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.complex_ptree_layer.ComplexPtreeLayer.forward"><code class="docutils literal notranslate"><span class="pre">ComplexPtreeLayer.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.recursive_simple_ptree_layer">ptgnn.model.modules.ptree.recursive_simple_ptree_layer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.__init__"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.c_layer_fn"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.c_layer_fn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.do_module"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.do_module()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.fetch_or_produce"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.fetch_or_produce()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.forward"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.p_layer_fn"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.p_layer_fn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.q_layer_fn"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.q_layer_fn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.s_layer_fn"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.s_layer_fn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.recursive_simple_ptree_layer.RecursiveSimplePtreeLayer.z_layer_fn"><code class="docutils literal notranslate"><span class="pre">RecursiveSimplePtreeLayer.z_layer_fn()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-ptgnn.model.modules.custom_wrapper">
+<span id="ptgnn-model-modules-custom-wrapper-module"></span><h2>ptgnn.model.modules.custom_wrapper module<a class="headerlink" href="#module-ptgnn.model.modules.custom_wrapper" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.model.modules.custom_wrapper.CustomWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.model.modules.custom_wrapper.</span></span><span class="sig-name descname"><span class="pre">CustomWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_to_wrap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/custom_wrapper.html#CustomWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.custom_wrapper.CustomWrapper" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Wrapper around a torch module that puts the return value of a forward into the batch x node embedding.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.custom_wrapper.CustomWrapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_to_wrap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/custom_wrapper.html#CustomWrapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.custom_wrapper.CustomWrapper.__init__" title="Link to this definition"></a></dt>
+<dd><p>Init of CustomWrapper class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>layer_to_wrap</strong> (<em>torch.nn.Module</em>) – layer to wrap</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.custom_wrapper.CustomWrapper.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/custom_wrapper.html#CustomWrapper.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.custom_wrapper.CustomWrapper.forward" title="Link to this definition"></a></dt>
+<dd><p>(Wrapped) Forward, output of original layer is written to <code class="docutils literal notranslate"><span class="pre">batch.x</span></code> and batch is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>batch</strong> – batch input object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>batch object with updated node features</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.model.modules.custom_wrapper.InputOutputWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.model.modules.custom_wrapper.</span></span><span class="sig-name descname"><span class="pre">InputOutputWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_to_wrap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/custom_wrapper.html#InputOutputWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.custom_wrapper.InputOutputWrapper" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Wrapper around a torch module that puts the return value of a forward into the batch x node embedding and uses
+normal network internally as batch.x is passed to wrapped module.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.custom_wrapper.InputOutputWrapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer_to_wrap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/custom_wrapper.html#InputOutputWrapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.custom_wrapper.InputOutputWrapper.__init__" title="Link to this definition"></a></dt>
+<dd><p>Init of CustomWrapper class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>layer_to_wrap</strong> (<em>torch.nn.Module</em>) – layer to wrap</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.custom_wrapper.InputOutputWrapper.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/custom_wrapper.html#InputOutputWrapper.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.custom_wrapper.InputOutputWrapper.forward" title="Link to this definition"></a></dt>
+<dd><p>(Wrapped) Forward, output of original layer is written to <code class="docutils literal notranslate"><span class="pre">batch.x</span></code> and batch is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>batch</strong> – batch input object</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>batch object with updated node features</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.model.modules.gps_layer">
+<span id="ptgnn-model-modules-gps-layer-module"></span><h2>ptgnn.model.modules.gps_layer module<a class="headerlink" href="#module-ptgnn.model.modules.gps_layer" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.model.modules.gps_layer.CustomGPSLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.model.modules.gps_layer.</span></span><span class="sig-name descname"><span class="pre">CustomGPSLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'batch'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/gps_layer.html#CustomGPSLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.gps_layer.CustomGPSLayer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Based on <a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/layer/gps_layer.py#L17">https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/layer/gps_layer.py#L17</a></p>
+<p>Model with residual connection around stored layer and a feed forward network (also with residual connection)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.gps_layer.CustomGPSLayer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hidden_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_model_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'batch'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/gps_layer.html#CustomGPSLayer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.gps_layer.CustomGPSLayer.__init__" title="Link to this definition"></a></dt>
+<dd><p>Init function of CustomGPSLayer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hidden_dim</strong> (<em>int</em>) – hidden dimension</p></li>
+<li><p><strong>local_model</strong> (<em>str</em>) – local model of the GPS layer, i.e. to wrap with a residual connection</p></li>
+<li><p><strong>local_model_params</strong> (<em>dict</em>) – parameters to pass to the init of the local model</p></li>
+<li><p><strong>global_model</strong> (<em>str</em>) – global model of the GPS model - not implemented, ignore it. (Original model had option to
+use a global model, i.e. Transformer and it was not clear whether this will be added or not).</p></li>
+<li><p><strong>dropout</strong> (<em>float</em>) – dropout rate</p></li>
+<li><p><strong>norm_type</strong> (<em>str</em>) – defines which norm to use. Either batch or layer</p></li>
+<li><p><strong>kwargs</strong> – Auxiliary parameters</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.gps_layer.CustomGPSLayer.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/gps_layer.html#CustomGPSLayer.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.gps_layer.CustomGPSLayer.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.model.modules.graph_embedding">
+<span id="ptgnn-model-modules-graph-embedding-module"></span><h2>ptgnn.model.modules.graph_embedding module<a class="headerlink" href="#module-ptgnn.model.modules.graph_embedding" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.model.modules.graph_embedding.GraphEmbedding">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.model.modules.graph_embedding.</span></span><span class="sig-name descname"><span class="pre">GraphEmbedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_in_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_in_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rwse_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/graph_embedding.html#GraphEmbedding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.graph_embedding.GraphEmbedding" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Embedding module for a graph. Applies node and edge level embeddings and thus embed both of them to different sizes,
+normally hidden dimension.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.graph_embedding.GraphEmbedding.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_in_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_in_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rwse_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/graph_embedding.html#GraphEmbedding.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.graph_embedding.GraphEmbedding.__init__" title="Link to this definition"></a></dt>
+<dd><p>Init function of GraphEmbedding class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node_in_dim</strong> (<em>int</em>) – node input dimension</p></li>
+<li><p><strong>node_out_dim</strong> (<em>int</em>) – node output dimension</p></li>
+<li><p><strong>edge_in_dim</strong> (<em>int</em>) – edge input dimension</p></li>
+<li><p><strong>edge_out_dim</strong> (<em>int</em>) – edge output dimension</p></li>
+<li><p><strong>node_type</strong> (<em>str</em>) – type of embedding for the nodes</p></li>
+<li><p><strong>edge_type</strong> (<em>str</em>) – type of embedding for the edges</p></li>
+<li><p><strong>rwse_params</strong> (<em>dict</em>) – parameters of the RWSE embedding (if applicable)</p></li>
+<li><p><strong>kwargs</strong> – Auxiliary parameters</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.graph_embedding.GraphEmbedding.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/graph_embedding.html#GraphEmbedding.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.graph_embedding.GraphEmbedding.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.model.modules.graph_embedding.RWSE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.model.modules.graph_embedding.</span></span><span class="sig-name descname"><span class="pre">RWSE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim_emb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_pos_enc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'batchnorm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/graph_embedding.html#RWSE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.graph_embedding.RWSE" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Adapted from <a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/encoder/kernel_pos_encoder.py">https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/encoder/kernel_pos_encoder.py</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.graph_embedding.RWSE.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim_emb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_pos_enc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'batchnorm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/graph_embedding.html#RWSE.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.graph_embedding.RWSE.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.graph_embedding.RWSE.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/graph_embedding.html#RWSE.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.graph_embedding.RWSE.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.model.modules.head_pooling">
+<span id="ptgnn-model-modules-head-pooling-module"></span><h2>ptgnn.model.modules.head_pooling module<a class="headerlink" href="#module-ptgnn.model.modules.head_pooling" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.model.modules.head_pooling.SANHead">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.model.modules.head_pooling.</span></span><span class="sig-name descname"><span class="pre">SANHead</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'add'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/head_pooling.html#SANHead"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.head_pooling.SANHead" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Head (Element that reduced graph object to graph level prediction), in this case simplified SANHead.</p>
+<p>Simplified reproduction of
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/head/san_graph.py">https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/head/san_graph.py</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.head_pooling.SANHead.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'add'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/head_pooling.html#SANHead.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.head_pooling.SANHead.__init__" title="Link to this definition"></a></dt>
+<dd><p>Init function of SANHead</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_dim</strong> (<em>int</em>) – input dimension</p></li>
+<li><p><strong>out_dim</strong> (<em>int</em>) – output dimension</p></li>
+<li><p><strong>pool_function</strong> (<em>str</em>) – Pool aggregation function - needs to be permutation invariant</p></li>
+<li><p><strong>n_layer</strong> (<em>int</em>) – number of layers</p></li>
+<li><p><strong>kwargs</strong> – Auxiliary parameters</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.model.modules.head_pooling.SANHead.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/model/modules/head_pooling.html#SANHead.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.model.modules.head_pooling.SANHead.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.model.modules">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ptgnn.model.modules" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ptgnn.model.framework.html" class="btn btn-neutral float-left" title="ptgnn.model.framework package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ptgnn.model.modules.ptree.html" class="btn btn-neutral float-right" title="ptgnn.model.modules.ptree package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

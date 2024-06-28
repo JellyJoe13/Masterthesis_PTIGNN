@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.model package &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ptgnn.model.chienn package" href="ptgnn.model.chienn.html" />
+    <link rel="prev" title="ptgnn.masking.vertex_graph package" href="ptgnn.masking.vertex_graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ptgnn.html">ptgnn</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ptgnn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html">ptgnn.dataset package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.features.html">ptgnn.features package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html">ptgnn.loading package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.masking.html">ptgnn.masking package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ptgnn.model package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.model.chienn.html">ptgnn.model.chienn package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.model.framework.html">ptgnn.model.framework package</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ptgnn.model.modules.html">ptgnn.model.modules package</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ptgnn.model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.optimizing.html">ptgnn.optimizing package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.runtime_config.html">ptgnn.runtime_config package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html">ptgnn.transform package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.html#module-ptgnn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">&lt;no title&gt;</a></li>
+          <li class="breadcrumb-item"><a href="ptgnn.html">ptgnn</a></li>
+      <li class="breadcrumb-item active">ptgnn.model package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ptgnn.model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ptgnn-model-package">
+<h1>ptgnn.model package<a class="headerlink" href="#ptgnn-model-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.model.chienn.html">ptgnn.model.chienn package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.chienn.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.chienn.html#module-ptgnn.model.chienn.chienn_layer">ptgnn.model.chienn.chienn_layer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNAggregate"><code class="docutils literal notranslate"><span class="pre">ChiENNAggregate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNAggregate.__init__"><code class="docutils literal notranslate"><span class="pre">ChiENNAggregate.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNAggregate.forward"><code class="docutils literal notranslate"><span class="pre">ChiENNAggregate.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNLayer"><code class="docutils literal notranslate"><span class="pre">ChiENNLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNLayer.__init__"><code class="docutils literal notranslate"><span class="pre">ChiENNLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNLayer.forward"><code class="docutils literal notranslate"><span class="pre">ChiENNLayer.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNMessage"><code class="docutils literal notranslate"><span class="pre">ChiENNMessage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNMessage.__init__"><code class="docutils literal notranslate"><span class="pre">ChiENNMessage.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_layer.ChiENNMessage.forward"><code class="docutils literal notranslate"><span class="pre">ChiENNMessage.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.chienn.html#module-ptgnn.model.chienn.chienn_model">ptgnn.model.chienn.chienn_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.ChiENNModel"><code class="docutils literal notranslate"><span class="pre">ChiENNModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.ChiENNModel.__init__"><code class="docutils literal notranslate"><span class="pre">ChiENNModel.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.ChiENNModel.forward"><code class="docutils literal notranslate"><span class="pre">ChiENNModel.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.GPSLayer"><code class="docutils literal notranslate"><span class="pre">GPSLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.GPSLayer.__init__"><code class="docutils literal notranslate"><span class="pre">GPSLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.chienn_model.GPSLayer.forward"><code class="docutils literal notranslate"><span class="pre">GPSLayer.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.chienn.html#module-ptgnn.model.chienn.utils">ptgnn.model.chienn.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.chienn.html#ptgnn.model.chienn.utils.build_embedding_layer"><code class="docutils literal notranslate"><span class="pre">build_embedding_layer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.chienn.html#module-ptgnn.model.chienn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.model.framework.html">ptgnn.model.framework package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.framework.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.framework.html#module-ptgnn.model.framework.custom_model">ptgnn.model.framework.custom_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.framework.html#ptgnn.model.framework.custom_model.CustomModel"><code class="docutils literal notranslate"><span class="pre">CustomModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.framework.html#ptgnn.model.framework.custom_model.CustomModel.__init__"><code class="docutils literal notranslate"><span class="pre">CustomModel.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.framework.html#ptgnn.model.framework.custom_model.CustomModel.forward"><code class="docutils literal notranslate"><span class="pre">CustomModel.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.framework.html#module-ptgnn.model.framework">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ptgnn.model.modules.html">ptgnn.model.modules package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.ptree.html">ptgnn.model.modules.ptree package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.advanced_tree_layer">ptgnn.model.modules.ptree.advanced_tree_layer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.advanced_tree_layer_e">ptgnn.model.modules.ptree.advanced_tree_layer_e module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.advanced_tree_layer_rnn">ptgnn.model.modules.ptree.advanced_tree_layer_rnn module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.complex_ptree_layer">ptgnn.model.modules.ptree.complex_ptree_layer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree.recursive_simple_ptree_layer">ptgnn.model.modules.ptree.recursive_simple_ptree_layer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.ptree.html#module-ptgnn.model.modules.ptree">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules.custom_wrapper">ptgnn.model.modules.custom_wrapper module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.CustomWrapper"><code class="docutils literal notranslate"><span class="pre">CustomWrapper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.CustomWrapper.__init__"><code class="docutils literal notranslate"><span class="pre">CustomWrapper.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.CustomWrapper.forward"><code class="docutils literal notranslate"><span class="pre">CustomWrapper.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.InputOutputWrapper"><code class="docutils literal notranslate"><span class="pre">InputOutputWrapper</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.InputOutputWrapper.__init__"><code class="docutils literal notranslate"><span class="pre">InputOutputWrapper.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.InputOutputWrapper.forward"><code class="docutils literal notranslate"><span class="pre">InputOutputWrapper.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules.gps_layer">ptgnn.model.modules.gps_layer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.gps_layer.CustomGPSLayer"><code class="docutils literal notranslate"><span class="pre">CustomGPSLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.gps_layer.CustomGPSLayer.__init__"><code class="docutils literal notranslate"><span class="pre">CustomGPSLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.gps_layer.CustomGPSLayer.forward"><code class="docutils literal notranslate"><span class="pre">CustomGPSLayer.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules.graph_embedding">ptgnn.model.modules.graph_embedding module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.GraphEmbedding"><code class="docutils literal notranslate"><span class="pre">GraphEmbedding</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.GraphEmbedding.__init__"><code class="docutils literal notranslate"><span class="pre">GraphEmbedding.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.GraphEmbedding.forward"><code class="docutils literal notranslate"><span class="pre">GraphEmbedding.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.RWSE"><code class="docutils literal notranslate"><span class="pre">RWSE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.RWSE.__init__"><code class="docutils literal notranslate"><span class="pre">RWSE.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.RWSE.forward"><code class="docutils literal notranslate"><span class="pre">RWSE.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules.head_pooling">ptgnn.model.modules.head_pooling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.head_pooling.SANHead"><code class="docutils literal notranslate"><span class="pre">SANHead</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.head_pooling.SANHead.__init__"><code class="docutils literal notranslate"><span class="pre">SANHead.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ptgnn.model.modules.html#ptgnn.model.modules.head_pooling.SANHead.forward"><code class="docutils literal notranslate"><span class="pre">SANHead.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.model.modules.html#module-ptgnn.model.modules">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-ptgnn.model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ptgnn.model" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ptgnn.masking.vertex_graph.html" class="btn btn-neutral float-left" title="ptgnn.masking.vertex_graph package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ptgnn.model.chienn.html" class="btn btn-neutral float-right" title="ptgnn.model.chienn package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

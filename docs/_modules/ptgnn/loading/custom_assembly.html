@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.loading.custom_assembly &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.loading.custom_assembly</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.loading.custom_assembly</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">ptgnn.loading.load</span> <span class="kn">import</span> <span class="n">UniversalLoader</span>
+<span class="kn">from</span> <span class="nn">ptgnn.loading.sampling</span> <span class="kn">import</span> <span class="n">SingleConformerSampler</span>
+
+
+<div class="viewcode-block" id="custom_loader">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.custom_assembly.custom_loader">[docs]</a>
+<span class="k">def</span> <span class="nf">custom_loader</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">,</span>
+        <span class="n">n_neighbors_in_circle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">sampler</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;full_batch&quot;</span><span class="p">,</span>  <span class="c1"># alternative: single_conformer_sampler</span>
+        <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">precompute_pos_enc</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UniversalLoader</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches the loader for elements in project. Currently one single loader for all elements.</span>
+
+<span class="sd">    Adapted from</span>
+<span class="sd">    https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L99</span>
+
+<span class="sd">    :param dataset: Dataset which to wrap in a loader</span>
+<span class="sd">    :param n_neighbors_in_circle: number of neighbors in circle in case of ChiENN cycle index setting.</span>
+<span class="sd">    :type n_neighbors_in_circle: int</span>
+<span class="sd">    :param batch_size: batch size</span>
+<span class="sd">    :type batch_size: int</span>
+<span class="sd">    :param sampler: Whether to use the full batch or single conformer sampling method</span>
+<span class="sd">    :type sampler: str</span>
+<span class="sd">    :param shuffle: Whether to shuffle the data or not</span>
+<span class="sd">    :type shuffle: bool</span>
+<span class="sd">    :param dataframe: dataframe which to use in single conformer sampling</span>
+<span class="sd">    :type dataframe: pd.DataFrame</span>
+<span class="sd">    :param num_workers: How many workers to use in the loader</span>
+<span class="sd">    :type num_workers: int</span>
+<span class="sd">    :param verbose: Whether to print information to command line/system out</span>
+<span class="sd">    :type verbose: bool</span>
+<span class="sd">    :param precompute_pos_enc: List of positional embeddings to calculate for the contents in advance</span>
+<span class="sd">    :type precompute_pos_enc: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">sampler</span> <span class="o">==</span> <span class="s2">&quot;single_conformer_sampler&quot;</span><span class="p">:</span>
+        <span class="c1"># select dataframe</span>
+        <span class="k">if</span> <span class="n">dataframe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s1">&#39;dataframe&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;set sampling to single conformer sampler but the dataset does not have a corresponding&quot;</span>
+                                <span class="s2">&quot;dataframe.&quot;</span><span class="p">)</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dataframe</span>
+
+        <span class="c1"># suspicion that this parameter is utterly pointless if single_conformer is enabled in the datasets</span>
+        <span class="c1"># because of this action:</span>
+        <span class="c1"># group by id and randomly select one</span>
+        <span class="n">single_conformer_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># create sampler</span>
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">SingleConformerSampler</span><span class="p">(</span>
+            <span class="n">single_conformer_ds</span><span class="o">=</span><span class="n">single_conformer_df</span><span class="p">,</span>
+            <span class="n">full_ds</span><span class="o">=</span><span class="n">dataframe</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">n_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_neg</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">without_replacement</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">stratified</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="c1"># create loader and return</span>
+        <span class="k">return</span> <span class="n">UniversalLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+            <span class="n">batch_sampler</span><span class="o">=</span><span class="n">sampler</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">n_neighbors_in_circle</span><span class="o">=</span><span class="n">n_neighbors_in_circle</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">precompute_pos_enc</span><span class="o">=</span><span class="n">precompute_pos_enc</span>
+        <span class="p">)</span>
+
+    <span class="c1"># not sure for what the original authors included the latter trigger condition</span>
+    <span class="k">elif</span> <span class="n">sampler</span> <span class="o">==</span> <span class="s2">&quot;full_batch&quot;</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">UniversalLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">,</span>
+            <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
+            <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">n_neighbors_in_circle</span><span class="o">=</span><span class="n">n_neighbors_in_circle</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">precompute_pos_enc</span><span class="o">=</span><span class="n">precompute_pos_enc</span>
+        <span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No sampler mode </span><span class="si">{</span><span class="n">sampler</span><span class="si">}</span><span class="s2">. Choose full_batch or single_conformer_sampler instead.&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

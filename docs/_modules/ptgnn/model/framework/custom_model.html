@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.model.framework.custom_model &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.model.framework.custom_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.model.framework.custom_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch.nn</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">torch_geometric.data</span>
+
+<span class="kn">from</span> <span class="nn">ptgnn.model.chienn.chienn_layer</span> <span class="kn">import</span> <span class="n">ChiENNLayer</span>
+<span class="kn">from</span> <span class="nn">ptgnn.model.modules.custom_wrapper</span> <span class="kn">import</span> <span class="n">CustomWrapper</span><span class="p">,</span> <span class="n">InputOutputWrapper</span>
+<span class="kn">from</span> <span class="nn">ptgnn.model.modules.gps_layer</span> <span class="kn">import</span> <span class="n">CustomGPSLayer</span>
+<span class="kn">from</span> <span class="nn">ptgnn.model.modules.graph_embedding</span> <span class="kn">import</span> <span class="n">GraphEmbedding</span>
+<span class="kn">from</span> <span class="nn">ptgnn.model.modules.head_pooling</span> <span class="kn">import</span> <span class="n">SANHead</span>
+<span class="kn">from</span> <span class="nn">ptgnn.model.modules.ptree.advanced_tree_layer</span> <span class="kn">import</span> <span class="n">AdvancedPermutationTreeLayer</span>
+<span class="kn">from</span> <span class="nn">ptgnn.model.modules.ptree.complex_ptree_layer</span> <span class="kn">import</span> <span class="n">ComplexPtreeLayer</span>
+
+
+<div class="viewcode-block" id="CustomModel">
+<a class="viewcode-back" href="../../../../ptgnn.model.framework.html#ptgnn.model.framework.custom_model.CustomModel">[docs]</a>
+<span class="k">class</span> <span class="nc">CustomModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model designed to be as customizable as possible through the input dictionary that specifies internal structure</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">data_sizes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+            <span class="n">model_config</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init function of ``CustomModel``</span>
+
+<span class="sd">        :param data_sizes: node and edge dimension as a tuple</span>
+<span class="sd">        :type data_sizes: tying.Tuple[int, int]</span>
+<span class="sd">        :param model_config: Config as a dictionary which contents determine how the internal structure looks like</span>
+<span class="sd">        :type model_config: typing.Dict[str, typing.Any]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># model init</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CustomModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># set internal parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">model_config</span><span class="p">[</span><span class="s1">&#39;hidden_dim&#39;</span><span class="p">]</span>
+
+        <span class="c1"># init module list</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># extract module config</span>
+        <span class="n">module_config</span> <span class="o">=</span> <span class="n">model_config</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">]</span>
+
+        <span class="c1"># get maximal number of layers</span>
+        <span class="n">n_layers</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span>
+            <span class="n">key</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">module_config</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># define dimensions</span>
+        <span class="n">node_dim</span><span class="p">,</span> <span class="n">edge_dim</span> <span class="o">=</span> <span class="n">data_sizes</span>
+        <span class="n">out_dim</span> <span class="o">=</span> <span class="n">model_config</span><span class="p">[</span><span class="s1">&#39;out_dim&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;out_dim&#39;</span> <span class="ow">in</span> <span class="n">model_config</span> <span class="k">else</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">layer_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layers</span><span class="p">):</span>
+            <span class="c1"># extract layer config</span>
+            <span class="n">layer_config</span> <span class="o">=</span> <span class="n">module_config</span><span class="p">[</span><span class="n">layer_idx</span><span class="p">]</span>
+
+            <span class="c1"># get type</span>
+            <span class="n">layer_type</span> <span class="o">=</span> <span class="n">layer_config</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+            <span class="c1"># get number of times layer should be inserted</span>
+            <span class="n">n_times_layer</span> <span class="o">=</span> <span class="n">layer_config</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;times&#39;</span> <span class="ow">in</span> <span class="n">layer_config</span> <span class="k">else</span> <span class="mi">1</span>
+
+            <span class="c1"># extract parameters</span>
+            <span class="n">param_config</span> <span class="o">=</span> <span class="n">layer_config</span><span class="p">[</span><span class="s1">&#39;parameter&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;parameter&#39;</span> <span class="ow">in</span> <span class="n">layer_config</span> <span class="k">else</span> <span class="p">{}</span>
+
+            <span class="c1"># repeatedly create layer</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_times_layer</span><span class="p">):</span>
+                <span class="c1"># create different layers</span>
+                <span class="k">if</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s1">&#39;graph_embedding&#39;</span><span class="p">:</span>
+                    <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">GraphEmbedding</span><span class="p">(</span>
+                            <span class="n">node_in_dim</span><span class="o">=</span><span class="n">node_dim</span><span class="p">,</span>
+                            <span class="n">edge_in_dim</span><span class="o">=</span><span class="n">edge_dim</span><span class="p">,</span>
+                            <span class="n">node_out_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span>
+                            <span class="n">edge_out_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">param_config</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">node_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span>
+                    <span class="n">edge_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span>
+                <span class="k">elif</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;chienn&quot;</span><span class="p">:</span>
+                    <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">CustomWrapper</span><span class="p">(</span>
+                            <span class="n">ChiENNLayer</span><span class="p">(</span>
+                                <span class="n">hidden_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">param_config</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;gps_layer&quot;</span><span class="p">:</span>
+                    <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">CustomGPSLayer</span><span class="p">(</span>
+                            <span class="n">hidden_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">param_config</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;permutation_tree&quot;</span><span class="p">:</span>
+                    <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">CustomWrapper</span><span class="p">(</span>
+                            <span class="n">AdvancedPermutationTreeLayer</span><span class="p">(</span>
+                                <span class="n">hidden_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">param_config</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;linear_dummy&quot;</span><span class="p">:</span>
+                    <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">InputOutputWrapper</span><span class="p">(</span>
+                            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+                                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">),</span>
+                                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+                            <span class="p">])</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;layer type </span><span class="si">{</span><span class="n">layer_type</span><span class="si">}</span><span class="s2"> not yet implemented.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># make list to module list and save in param</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+
+        <span class="c1"># add the head part - i.e. the part where graph pooling and reducing to output dimension happens</span>
+        <span class="n">head_config</span> <span class="o">=</span> <span class="n">model_config</span><span class="p">[</span><span class="s1">&#39;head&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">head_config</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;san_head&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">SANHead</span><span class="p">(</span>
+                <span class="n">in_dim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span>
+                <span class="n">out_dim</span><span class="o">=</span><span class="n">out_dim</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">head_config</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Head type other than san_head not implemented.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CustomModel.forward">
+<a class="viewcode-back" href="../../../../ptgnn.model.framework.html#ptgnn.model.framework.custom_model.CustomModel.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">batch</span><span class="p">:</span> <span class="n">torch_geometric</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Batch</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Forward function of ``CustomModel``</span>
+
+<span class="sd">        :param batch: Batch object to be passed through layers of this model and the head (pooling)</span>
+<span class="sd">        :type batch: torch_geometric.data.Batch</span>
+<span class="sd">        :return: Labels of the graphs in the input batch</span>
+<span class="sd">        :rtype: torch.Tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

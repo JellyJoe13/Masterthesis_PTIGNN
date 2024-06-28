@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.transform.detect_chem_structures &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.transform.detect_chem_structures</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.transform.detect_chem_structures</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">rdkit</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
+
+
+<span class="n">CIS_TRANS_STEREO_LIST</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondStereo</span><span class="o">.</span><span class="n">STEREOCIS</span><span class="p">,</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondStereo</span><span class="o">.</span><span class="n">STEREOTRANS</span><span class="p">,</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondStereo</span><span class="o">.</span><span class="n">STEREOZ</span><span class="p">,</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondStereo</span><span class="o">.</span><span class="n">STEREOE</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_chiral_center_node_mask">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.detect_chem_structures.get_chiral_center_node_mask">[docs]</a>
+<span class="k">def</span> <span class="nf">get_chiral_center_node_mask</span><span class="p">(</span>
+        <span class="n">mol</span><span class="p">:</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
+        <span class="n">chiral_center_select_potential</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">node_mapping</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">only_out</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get centers for which a chiral center is marked (or possible).</span>
+
+<span class="sd">    :param mol: Molecule</span>
+<span class="sd">    :type mol: rdkit.Chem.rdchem.Mol</span>
+<span class="sd">    :param chiral_center_select_potential: Whether or not to include potential chiral centers</span>
+<span class="sd">    :type chiral_center_select_potential: bool</span>
+<span class="sd">    :param node_mapping: Node mapping of edges to nodes in case of an edge graph</span>
+<span class="sd">    :type node_mapping: typing.Dict[typing.Tuple[int, int], int]</span>
+<span class="sd">    :param only_out: Parameter that controls whether to only consider the source node neighbors or also the target node</span>
+<span class="sd">        neighbors</span>
+<span class="sd">    :type only_out: bool</span>
+<span class="sd">    :return: List of edges -&gt; nodes which are (potentially) a chiral center</span>
+<span class="sd">    :rtype: typing.List[int]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get chiral centers</span>
+    <span class="n">chiral_center_list</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">FindMolChiralCenters</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">includeUnassigned</span><span class="o">=</span><span class="n">chiral_center_select_potential</span><span class="p">)</span>
+    <span class="c1"># modify so that only the node idx is left in the list (not interested in R/S)</span>
+    <span class="n">chiral_center_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chiral_center_list</span><span class="p">]</span>
+
+    <span class="c1"># browse through node mapping and select edges</span>
+    <span class="c1"># separation between only_out mode</span>
+    <span class="k">if</span> <span class="n">only_out</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">value</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">node_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">chiral_center_list</span>
+        <span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">idx</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">node_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">chiral_center_list</span> <span class="ow">or</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">chiral_center_list</span>
+        <span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="fetch_cis_trans_edges">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.detect_chem_structures.fetch_cis_trans_edges">[docs]</a>
+<span class="k">def</span> <span class="nf">fetch_cis_trans_edges</span><span class="p">(</span>
+        <span class="n">node_mapping</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">molecule</span><span class="p">:</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
+        <span class="n">cis_trans_edges_select_potential</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches edges which are marked (or have potential to be) as a cis/trans or E/Z type.</span>
+
+<span class="sd">    :param node_mapping: Mapping of edges to nodes in case of edge graph</span>
+<span class="sd">    :type node_mapping: typing.Dict[typing.Tuple[int, int], int]</span>
+<span class="sd">    :param molecule: Molecule</span>
+<span class="sd">    :type molecule: rdkit.Chem.rdchem.Mol</span>
+<span class="sd">    :param cis_trans_edges_select_potential: Whether or not to return potential but unmarked edges</span>
+<span class="sd">    :type cis_trans_edges_select_potential: bool</span>
+<span class="sd">    :return: Edges for which cis/trans or E/Z is defined (or possible)</span>
+<span class="sd">    :rtype:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nodes_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># iterate over bonds</span>
+    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">molecule</span><span class="o">.</span><span class="n">GetBonds</span><span class="p">():</span>
+        <span class="c1"># check if bond is a double bond and stereo is specified</span>
+        <span class="c1"># add potential stereo elements to check list</span>
+        <span class="n">check_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">CIS_TRANS_STEREO_LIST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cis_trans_edges_select_potential</span><span class="p">:</span>
+            <span class="n">check_list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondStereo</span><span class="o">.</span><span class="n">STEREOANY</span><span class="p">]</span>
+        <span class="c1"># random (cis or trans)</span>
+        <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetBondType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">DOUBLE</span> <span class="ow">and</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetStereo</span><span class="p">()</span> <span class="ow">in</span> <span class="n">CIS_TRANS_STEREO_LIST</span><span class="p">:</span>
+            <span class="c1"># fetch ends of the bond and check correct number of bonds</span>
+            <span class="n">node_a</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetBeginAtom</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">node_a</span><span class="o">.</span><span class="n">GetDegree</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">node_a</span> <span class="o">=</span> <span class="n">node_a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+
+            <span class="n">node_b</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">GetEndAtom</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">node_b</span><span class="o">.</span><span class="n">GetDegree</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">node_b</span> <span class="o">=</span> <span class="n">node_b</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+
+            <span class="c1"># check if first direction edge is in node mapping</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node_mapping</span><span class="p">:</span>
+                <span class="n">nodes_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">node_b</span><span class="p">,</span> <span class="n">node_a</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node_mapping</span><span class="p">:</span>
+                <span class="n">nodes_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">node_b</span><span class="p">,</span> <span class="n">node_a</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">nodes_list</span></div>
+
+
+
+<div class="viewcode-block" id="detect_possible_axial_chiral_edges">
+<a class="viewcode-back" href="../../../ptgnn.transform.html#ptgnn.transform.detect_chem_structures.detect_possible_axial_chiral_edges">[docs]</a>
+<span class="k">def</span> <span class="nf">detect_possible_axial_chiral_edges</span><span class="p">(</span>
+        <span class="n">molecule</span><span class="p">:</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
+        <span class="n">node_mapping</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns candidates of edges related to axial chirality. Method is not entirely accurate, may detect more edges than</span>
+<span class="sd">    are truly a candidate. Implemented axial chirality between rings.</span>
+
+<span class="sd">    :param molecule: Molecule</span>
+<span class="sd">    :type molecule: rdkit.Chem.rdchem.Mol</span>
+<span class="sd">    :param node_mapping: Maps edges to nodes in case of an edge graph transformation. Default: ``None``</span>
+<span class="sd">    :type node_mapping: typing.Dict[typing.Tuple[int, int], int]</span>
+<span class="sd">    :return: Edges or nodes where axial chirality is possible.</span>
+<span class="sd">    :rtype: typing.List[typing.Tuple[int, int]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create storage for potential axial chirality edges</span>
+    <span class="n">potential_edges</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># fetch the adjacency matrix of molecule</span>
+    <span class="n">adjacency_matrix</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">GetAdjacencyMatrix</span><span class="p">(</span><span class="n">molecule</span><span class="p">)</span>
+
+    <span class="c1"># iterate over ring combinations</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ring_a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">GetRingInfo</span><span class="p">()</span><span class="o">.</span><span class="n">AtomRings</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">ring_b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">GetRingInfo</span><span class="p">()</span><span class="o">.</span><span class="n">AtomRings</span><span class="p">()):</span>
+
+            <span class="c1"># if it&#39;s the same ring then skip</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># if ring share atoms then skip</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ring_a</span> <span class="o">+</span> <span class="n">ring_b</span><span class="p">))</span> <span class="o">&lt;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ring_a</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ring_b</span><span class="p">)):</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># get edges connecting the two rings</span>
+            <span class="n">connection_edges</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ring_a</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">ring_b</span>
+                <span class="k">if</span> <span class="n">adjacency_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="p">]</span>
+
+            <span class="c1"># if there is only one edge connecting rings: yes. else no</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">connection_edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">potential_edges</span> <span class="o">+=</span> <span class="n">connection_edges</span>
+
+    <span class="k">if</span> <span class="n">node_mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">potential_edges</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">edge</span>
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">potential_edges</span>
+            <span class="k">if</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">node_mapping</span>
+        <span class="p">]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

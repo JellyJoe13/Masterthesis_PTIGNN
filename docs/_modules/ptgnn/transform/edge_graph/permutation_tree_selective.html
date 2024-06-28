@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.transform.edge_graph.permutation_tree_selective &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../edge_graph.html">ptgnn.transform.edge_graph</a></li>
+      <li class="breadcrumb-item active">ptgnn.transform.edge_graph.permutation_tree_selective</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.transform.edge_graph.permutation_tree_selective</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span> <span class="nn">rdkit</span>
+<span class="kn">import</span> <span class="nn">torch_geometric</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">ptgnn.transform.detect_chem_structures</span> <span class="kn">import</span> <span class="n">get_chiral_center_node_mask</span><span class="p">,</span> <span class="n">fetch_cis_trans_edges</span><span class="p">,</span> \
+    <span class="n">detect_possible_axial_chiral_edges</span>
+<span class="kn">from</span> <span class="nn">ptgnn.transform.edge_graph.basic_permutation_tree</span> <span class="kn">import</span> <span class="n">_circle_index_to_primordial_tree</span>
+<span class="kn">from</span> <span class="nn">ptgnn.transform.edge_graph.chienn.get_circle_index</span> <span class="kn">import</span> <span class="n">get_circle_index</span>
+<span class="kn">from</span> <span class="nn">ptgnn.transform.edge_graph.cyclic_tree</span> <span class="kn">import</span> <span class="n">cyclic_tree_edge</span><span class="p">,</span> <span class="n">cyclic_tree_edge_minimal</span><span class="p">,</span> <span class="n">cyclic_tree_edge_light</span>
+<span class="kn">from</span> <span class="nn">ptgnn.transform.edge_graph.permutation_tree_special</span> <span class="kn">import</span> <span class="n">get_cistrans_tree</span>
+<span class="kn">from</span> <span class="nn">ptgnn.transform.multi_stereo_center</span> <span class="kn">import</span> <span class="n">calc_edges_multiple_stereo_centers</span>
+<span class="kn">from</span> <span class="nn">ptgnn.transform.ptree_matrix</span> <span class="kn">import</span> <span class="n">permutation_tree_to_order_matrix</span>
+<span class="kn">from</span> <span class="nn">ptgnn.transform.tree_separation</span> <span class="kn">import</span> <span class="n">separate_tree_into_subtrees</span>
+
+
+<div class="viewcode-block" id="custom_to_edge_graph">
+<a class="viewcode-back" href="../../../../ptgnn.transform.edge_graph.html#ptgnn.transform.edge_graph.permutation_tree_selective.custom_to_edge_graph">[docs]</a>
+<span class="k">def</span> <span class="nf">custom_to_edge_graph</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Modified version of to_edge_graph from ``ptgnn.transform.chienn.to_edge_graph``</span>
+
+<span class="sd">    Original source:</span>
+<span class="sd">    https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/chienn/data/edge_graph/to_edge_graph.py#L12</span>
+
+<span class="sd">    :param data: vertex graph</span>
+<span class="sd">    :type data: torch_geometric.data.Data</span>
+<span class="sd">    :return: edge graph</span>
+<span class="sd">    :rtype: torch_geometric.data.Data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># make sure that edges are undirected (in chemical context necessary)</span>
+    <span class="k">if</span> <span class="n">torch_geometric</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">is_undirected</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">):</span>
+        <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_attr</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span> <span class="o">=</span> <span class="n">torch_geometric</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">to_undirected</span><span class="p">(</span>
+            <span class="n">edge_index</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span>
+            <span class="n">edge_attr</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">edge_attr</span>
+        <span class="p">)</span>
+
+    <span class="c1"># create the new nodes</span>
+    <span class="n">node_storage</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">node_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">),</span> <span class="n">edge_attr</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">edge_index</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">edge_attr</span><span class="p">):</span>
+        <span class="c1"># create the embedding for the new node</span>
+        <span class="n">embedding_a2b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">a</span><span class="p">],</span>
+            <span class="n">edge_attr</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+        <span class="p">])</span>  <span class="c1"># x_{i, j} = x&#39;_i | e&#39;_{i, j} | x&#39;_j.</span>
+
+        <span class="c1"># create the new position</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="n">b</span><span class="p">]])</span>
+
+        <span class="c1"># add to the storages</span>
+        <span class="n">node_mapping</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_storage</span><span class="p">)</span>
+        <span class="n">node_storage</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span>
+            <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">b</span><span class="p">,</span>
+            <span class="s1">&#39;a_attr&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">a</span><span class="p">],</span>
+            <span class="s1">&#39;node_attr&#39;</span><span class="p">:</span> <span class="n">embedding_a2b</span><span class="p">,</span>
+            <span class="s1">&#39;old_edge_attr&#39;</span><span class="p">:</span> <span class="n">edge_attr</span><span class="p">,</span>
+            <span class="s1">&#39;pos&#39;</span><span class="p">:</span> <span class="n">pos</span>
+        <span class="p">})</span>
+
+    <span class="c1"># create dictionary for ingoing nodes (helper for later)</span>
+    <span class="n">in_nodes</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># iterate over new nodes</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">node_dict</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">node_storage</span><span class="p">):</span>
+        <span class="c1"># unpack edge source and target</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">node_dict</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">node_dict</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+
+        <span class="c1"># add source to each target</span>
+        <span class="n">in_nodes</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;node_idx&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;start_node_idx&#39;</span><span class="p">:</span> <span class="n">a</span><span class="p">})</span>
+
+    <span class="c1"># create new edges</span>
+    <span class="n">new_edges</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># iterate over new nodes</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">node_dict</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">node_storage</span><span class="p">):</span>
+
+        <span class="c1"># unpack source and target</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">node_dict</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">node_dict</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+
+        <span class="c1"># get the edge embeddings (former node embedding)</span>
+        <span class="n">ab_old_edge_attr</span> <span class="o">=</span> <span class="n">node_dict</span><span class="p">[</span><span class="s1">&#39;old_edge_attr&#39;</span><span class="p">]</span>
+
+        <span class="c1"># get the attributes of the source node</span>
+        <span class="n">a_attr</span> <span class="o">=</span> <span class="n">node_dict</span><span class="p">[</span><span class="s1">&#39;a_attr&#39;</span><span class="p">]</span>
+
+        <span class="c1"># get the indices ingoing to a</span>
+        <span class="n">a_in_nodes_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;node_idx&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">in_nodes</span><span class="p">[</span><span class="n">a</span><span class="p">]]</span>
+
+        <span class="c1"># iterate over them</span>
+        <span class="k">for</span> <span class="n">in_node_c</span> <span class="ow">in</span> <span class="n">a_in_nodes_indices</span><span class="p">:</span>
+            <span class="c1"># fetch the current ingoing node</span>
+            <span class="n">in_node</span> <span class="o">=</span> <span class="n">node_storage</span><span class="p">[</span><span class="n">in_node_c</span><span class="p">]</span>
+            <span class="c1"># ... and extract the node embedding</span>
+            <span class="n">ca_old_edge_attr</span> <span class="o">=</span> <span class="n">in_node</span><span class="p">[</span><span class="s1">&#39;old_edge_attr&#39;</span><span class="p">]</span>
+
+            <span class="c1"># e_{(i, j), (j, k)} = e&#39;_(i, j) | x&#39;_j | e&#39;_{k, j}:</span>
+            <span class="n">edge_attr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">ca_old_edge_attr</span><span class="p">,</span> <span class="n">a_attr</span><span class="p">,</span> <span class="n">ab_old_edge_attr</span><span class="p">])</span>
+            <span class="n">new_edges</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;edge&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">in_node_c</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="s1">&#39;edge_attr&#39;</span><span class="p">:</span> <span class="n">edge_attr</span><span class="p">})</span>
+
+    <span class="n">parallel_node_index</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">node_dict</span> <span class="ow">in</span> <span class="n">node_storage</span><span class="p">:</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">node_dict</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">node_dict</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+        <span class="n">parallel_idx</span> <span class="o">=</span> <span class="n">node_mapping</span><span class="p">[(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)]</span>
+        <span class="n">parallel_node_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parallel_idx</span><span class="p">)</span>
+
+    <span class="n">new_x</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;node_attr&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">node_storage</span><span class="p">]</span>
+    <span class="n">new_pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">node_storage</span><span class="p">]</span>
+    <span class="n">new_edge_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">new_edges</span><span class="p">]</span>
+    <span class="n">new_edge_attr</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;edge_attr&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">new_edges</span><span class="p">]</span>
+    <span class="n">new_x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">new_x</span><span class="p">)</span>
+    <span class="n">new_pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">new_pos</span><span class="p">)</span>
+    <span class="n">new_edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">new_edge_index</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">new_edge_attr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">new_edge_attr</span><span class="p">)</span>
+    <span class="n">parallel_node_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">parallel_node_index</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">torch_geometric</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">new_x</span><span class="p">,</span> <span class="n">edge_index</span><span class="o">=</span><span class="n">new_edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span class="o">=</span><span class="n">new_edge_attr</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">new_pos</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">parallel_node_index</span> <span class="o">=</span> <span class="n">parallel_node_index</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">circle_index</span> <span class="o">=</span> <span class="n">get_circle_index</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">clockwise</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">node_mapping</span></div>
+
+
+
+<div class="viewcode-block" id="remove_duplicate_edges_function">
+<a class="viewcode-back" href="../../../../ptgnn.transform.edge_graph.html#ptgnn.transform.edge_graph.permutation_tree_selective.remove_duplicate_edges_function">[docs]</a>
+<span class="k">def</span> <span class="nf">remove_duplicate_edges_function</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">node_mapping</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to remove duplicate nodes</span>
+
+<span class="sd">    :param data:</span>
+<span class="sd">    :param node_mapping:</span>
+<span class="sd">    :return: transformed graph, new node mapping</span>
+<span class="sd">    :rtype: typing.Tuple[torch_geometric.data.Data, dict]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># determine which nodes to keep and which to discard</span>
+    <span class="n">keep_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">discard_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">node_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="ow">in</span> <span class="n">keep_nodes</span><span class="p">:</span>
+            <span class="n">discard_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keep_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
+
+    <span class="c1"># get indices of keep and discard</span>
+    <span class="n">keep_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span>
+        <span class="n">node_mapping</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">keep_nodes</span>
+    <span class="p">])</span>
+    <span class="n">discard_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span>
+        <span class="n">node_mapping</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">discard_nodes</span>
+    <span class="p">])</span>
+
+    <span class="c1"># modify edge set so that bad nodes are swapped out with good nodes</span>
+    <span class="k">def</span> <span class="nf">_replace</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">keep_idx</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">i</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">parallel_node_index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="c1"># subselect edge related data</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span>
+        <span class="p">[</span>
+            <span class="n">_replace</span><span class="p">(</span><span class="n">source</span><span class="p">),</span>
+            <span class="n">_replace</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="p">])</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">]</span>
+    <span class="n">edge_attr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_attr</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+    <span class="c1"># map indices of edge index to new nodes</span>
+    <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">keep_idx</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="n">d</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="n">b</span><span class="p">]]</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">edge_index</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">tolist</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># create absolute choice of which node embedding to choose</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">keep_idx</span><span class="p">:</span>
+        <span class="c1"># get elements to compare</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">parallel_node_index</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
+
+        <span class="c1"># compare</span>
+        <span class="n">one</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span>
+        <span class="n">two</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span>
+
+        <span class="c1"># catch exception where two nodes are identical</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">one</span><span class="o">.</span><span class="n">any</span><span class="p">())</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">two</span><span class="o">.</span><span class="n">any</span><span class="p">()):</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># absolute comparison</span>
+        <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">one</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">two</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+
+    <span class="c1"># merge ptrees</span>
+    <span class="k">def</span> <span class="nf">_map_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">_map_tree</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">_replace</span><span class="p">(</span><span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">]))]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_map_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">tree</span>
+
+    <span class="k">def</span> <span class="nf">_merge_map_ptrees</span><span class="p">(</span><span class="n">tree_a</span><span class="p">,</span> <span class="n">tree_b</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="c1"># get s node rooted list</span>
+        <span class="n">tree_a</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">tree_a</span><span class="p">)[</span><span class="s1">&#39;S&#39;</span><span class="p">]</span>
+        <span class="n">tree_b</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">tree_b</span><span class="p">)[</span><span class="s1">&#39;S&#39;</span><span class="p">]</span>
+
+        <span class="c1"># catch cases where tree is just nonsensical</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree_a</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree_b</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">_map_tree</span><span class="p">({</span><span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)]}))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree_a</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">_map_tree</span><span class="p">({</span>
+                <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span>
+                    <span class="n">tree_b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="p">}))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree_b</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">_map_tree</span><span class="p">({</span>
+                <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span>
+                    <span class="n">tree_a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="p">}))</span>
+        <span class="c1"># create tree</span>
+        <span class="n">tree_a</span> <span class="o">=</span> <span class="n">tree_a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">tree_b</span> <span class="o">=</span> <span class="n">tree_b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># map with _replace, then map with d dict</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">_map_tree</span><span class="p">({</span>
+            <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="n">tree_a</span><span class="p">,</span>
+                        <span class="n">tree_b</span>
+                    <span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}))</span>
+
+    <span class="n">ptrees</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">_merge_map_ptrees</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">data</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">parallel_node_index</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">keep_idx</span>
+    <span class="p">]</span>
+
+    <span class="c1"># set elements into data</span>
+    <span class="n">new_data</span> <span class="o">=</span> <span class="n">torch_geometric</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span>
+        <span class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">,</span>
+        <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr</span><span class="p">,</span>
+        <span class="n">ptree</span><span class="o">=</span><span class="n">ptrees</span>
+    <span class="p">)</span>
+
+    <span class="c1"># filter and map node_mapping</span>
+    <span class="n">node_mapping</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keep_nodes</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keep_nodes</span><span class="p">))))</span>
+
+    <span class="k">return</span> <span class="n">new_data</span><span class="p">,</span> <span class="n">node_mapping</span></div>
+
+
+
+<div class="viewcode-block" id="permutation_tree_transformation">
+<a class="viewcode-back" href="../../../../ptgnn.transform.edge_graph.html#ptgnn.transform.edge_graph.permutation_tree_selective.permutation_tree_transformation">[docs]</a>
+<span class="k">def</span> <span class="nf">permutation_tree_transformation</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">torch_geometric</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Data</span><span class="p">,</span>
+        <span class="n">mol</span><span class="p">:</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">tetrahedral_chiral</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">chiral_center_selective</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">chiral_center_select_potential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">remove_duplicate_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">cis_trans_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">cis_trans_edges_select_potential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">axial_chirality</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">create_order_matrix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">multi_stereo_center_dia</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">multi_stereo_center_dia_mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">separate_tree</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">add_cyclic_trees</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">cyclic_tree_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;complex&quot;</span><span class="p">,</span>  <span class="c1"># alternatives: light, minimal</span>
+        <span class="n">use_new_inv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch_geometric</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Data</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function with many bool control variables. Determines how the permutation tree is constructed and to which</span>
+<span class="sd">    stereoisomer to be sensitive to.</span>
+
+<span class="sd">    :param data: vertex graph</span>
+<span class="sd">    :param mol: molecule which corresponds to vertex graph</span>
+<span class="sd">    :param k: number of neighbors to set into context. Not always necessary.</span>
+<span class="sd">    :param tetrahedral_chiral: Sensitive to tetrahedral chiral centers if enabled</span>
+<span class="sd">    :param chiral_center_selective: Sensitive to only marked tetrahedral chiral centers (and not by default to all</span>
+<span class="sd">        nodes/atoms)</span>
+<span class="sd">    :param chiral_center_select_potential: Sensitive also to potential stereocenters (if selective is true)</span>
+<span class="sd">    :param remove_duplicate_edges: remove duplicate edges and reduce complexity - also often called reduction</span>
+<span class="sd">    :param cis_trans_edges: enable cis/trans trees (only selective)</span>
+<span class="sd">    :param cis_trans_edges_select_potential: enable cis/trans trees also for unmarked but potential cis/trans bonds</span>
+<span class="sd">    :param axial_chirality: Enable axial chirality - requires that rdkit has correct position values stored (is not true</span>
+<span class="sd">        by default for version 2023.*.*)</span>
+<span class="sd">    :param create_order_matrix: whether or not to create the order matrix.</span>
+<span class="sd">    :param multi_stereo_center_dia: Whether or not do multiple stereo center enantiomer invariance. Not advisable as</span>
+<span class="sd">        model can distinguish these stereoisomers (see master thesis) but difference is 10^(-4) which is too small.</span>
+<span class="sd">    :param multi_stereo_center_dia_mode: Mode that controls where to insert the MC trees. 0 creates new nodes that are</span>
+<span class="sd">        not connected to remaining graph, 1 overwrites existing edges</span>
+<span class="sd">    :param separate_tree: Whether to separate tree - make simplest trees with only one internal node for each ptree</span>
+<span class="sd">        for each node.</span>
+<span class="sd">    :param add_cyclic_trees: Add cyclic trees for graph - extra nodes, and more connections</span>
+<span class="sd">    :param cyclic_tree_mode: Mode of the cylcic trees. Either complex, light or minimal - see master thesis</span>
+<span class="sd">    :type cyclic_tree_mode: str</span>
+<span class="sd">    :param use_new_inv: Whether or not to separate C and Q types into P(Z,Z) &amp; P(S,S) (if false) else P(Z2,Z2) &amp; P(S2,S2)</span>
+<span class="sd">    :return: transformed graph</span>
+<span class="sd">    :rtype: torch_geometric.data.Data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># transform to edge graph using custom function</span>
+    <span class="n">edge_graph</span><span class="p">,</span> <span class="n">node_mapping</span> <span class="o">=</span> <span class="n">custom_to_edge_graph</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="c1"># remove_duplicate_edges=remove_duplicate_edges  # removed as removal is done at the end</span>
+    <span class="p">)</span>
+    <span class="n">original_node_mapping</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">node_mapping</span><span class="p">)</span>
+
+    <span class="c1"># ==================================================================================================================</span>
+    <span class="c1"># create default behaviour: P tree or C tree - in case of tetrahedral_chiral and !chiral_center_selective Z</span>
+    <span class="c1"># ==================================================================================================================</span>
+    <span class="c1"># get default type</span>
+    <span class="n">default_type</span> <span class="o">=</span> <span class="s2">&quot;P&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">tetrahedral_chiral</span> <span class="ow">or</span> <span class="n">chiral_center_selective</span> <span class="k">else</span> <span class="s2">&quot;Z&quot;</span>
+
+    <span class="c1"># produce default trees for each node</span>
+    <span class="n">permutation_trees</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">_circle_index_to_primordial_tree</span><span class="p">(</span><span class="n">circle_index</span><span class="p">,</span> <span class="n">parallel_node</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">inner_type</span><span class="o">=</span><span class="n">default_type</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">circle_index</span><span class="p">,</span> <span class="n">parallel_node</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">edge_graph</span><span class="o">.</span><span class="n">circle_index</span><span class="p">,</span>
+                <span class="n">edge_graph</span><span class="o">.</span><span class="n">parallel_node_index</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+    <span class="c1"># register permutation trees in data object</span>
+    <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span> <span class="o">=</span> <span class="n">permutation_trees</span>
+
+    <span class="c1"># ==================================================================================================================</span>
+    <span class="c1"># case for selective Z setting: there where chiral centers are present/possible</span>
+    <span class="c1"># ==================================================================================================================</span>
+    <span class="c1"># control over only_out parameter</span>
+    <span class="n">only_out</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># deactivated as not relevant</span>
+    <span class="c1"># if remove_duplicate_edges:</span>
+    <span class="c1">#    only_out = False</span>
+
+    <span class="c1"># do selective chiral node differntiation</span>
+    <span class="k">if</span> <span class="n">tetrahedral_chiral</span> <span class="ow">and</span> <span class="n">chiral_center_selective</span><span class="p">:</span>
+        <span class="c1"># get mask</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">get_chiral_center_node_mask</span><span class="p">(</span>
+            <span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+            <span class="n">chiral_center_select_potential</span><span class="o">=</span><span class="n">chiral_center_select_potential</span><span class="p">,</span>
+            <span class="n">node_mapping</span><span class="o">=</span><span class="n">node_mapping</span><span class="p">,</span>
+            <span class="n">only_out</span><span class="o">=</span><span class="n">only_out</span>
+        <span class="p">)</span>
+
+        <span class="c1"># generate new permutation trees for this mask</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mask</span><span class="p">:</span>
+            <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_circle_index_to_primordial_tree</span><span class="p">(</span>
+                <span class="n">edge_graph</span><span class="o">.</span><span class="n">circle_index</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">edge_graph</span><span class="o">.</span><span class="n">parallel_node_index</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">i</span><span class="p">,</span>
+                <span class="n">inner_type</span><span class="o">=</span><span class="s2">&quot;Z&quot;</span>
+            <span class="p">)</span>
+
+    <span class="c1"># removal of double edges</span>
+    <span class="k">if</span> <span class="n">remove_duplicate_edges</span><span class="p">:</span>
+        <span class="n">edge_graph</span><span class="p">,</span> <span class="n">node_mapping</span> <span class="o">=</span> <span class="n">remove_duplicate_edges_function</span><span class="p">(</span><span class="n">edge_graph</span><span class="p">,</span> <span class="n">node_mapping</span><span class="p">)</span>
+
+    <span class="c1"># add cis/trans specific trees</span>
+    <span class="k">if</span> <span class="n">cis_trans_edges</span><span class="p">:</span>
+        <span class="c1"># calculate the bonds for which cis/trans permutation graphs should be created</span>
+        <span class="n">cis_trans_nodes_list</span> <span class="o">=</span> <span class="n">fetch_cis_trans_edges</span><span class="p">(</span><span class="n">node_mapping</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">cis_trans_edges_select_potential</span><span class="p">)</span>
+
+        <span class="c1"># iterate over edges and generate new ptrees for these entries</span>
+        <span class="k">for</span> <span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span> <span class="ow">in</span> <span class="n">cis_trans_nodes_list</span><span class="p">:</span>
+            <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">node_mapping</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">get_cistrans_tree</span><span class="p">(</span>
+                <span class="n">vertex_graph</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">node_a</span><span class="o">=</span><span class="n">node_a</span><span class="p">,</span>
+                <span class="n">node_b</span><span class="o">=</span><span class="n">node_b</span><span class="p">,</span>
+                <span class="n">node_mapping</span><span class="o">=</span><span class="n">node_mapping</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">axial_chirality</span><span class="p">:</span>
+        <span class="c1"># calculate candidates for axial chirality</span>
+        <span class="n">potential_axial_nodes_list</span> <span class="o">=</span> <span class="n">detect_possible_axial_chiral_edges</span><span class="p">(</span>
+            <span class="n">molecule</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+            <span class="n">node_mapping</span><span class="o">=</span><span class="n">node_mapping</span>
+        <span class="p">)</span>
+
+        <span class="c1"># iterate over edges and generate new ptrees for these entries</span>
+        <span class="k">for</span> <span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span> <span class="ow">in</span> <span class="n">potential_axial_nodes_list</span><span class="p">:</span>
+            <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">node_mapping</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">get_cistrans_tree</span><span class="p">(</span>
+                <span class="n">vertex_graph</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">node_a</span><span class="o">=</span><span class="n">node_a</span><span class="p">,</span>
+                <span class="n">node_b</span><span class="o">=</span><span class="n">node_b</span><span class="p">,</span>
+                <span class="n">node_mapping</span><span class="o">=</span><span class="n">node_mapping</span>
+            <span class="p">)</span>
+
+    <span class="c1"># in case only diastereomers are to be distinguished</span>
+    <span class="k">if</span> <span class="n">multi_stereo_center_dia</span><span class="p">:</span>
+        <span class="c1"># get stereo paths</span>
+        <span class="n">stereo_paths</span> <span class="o">=</span> <span class="n">calc_edges_multiple_stereo_centers</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">chiral_center_select_potential</span><span class="p">)</span>
+        <span class="c1"># possible todo: pairwise connections between all stereo centers instead of selective pairs</span>
+
+        <span class="c1"># iterate over stereo_paths</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">source_a</span><span class="p">,</span> <span class="n">source_b</span><span class="p">),</span> <span class="p">(</span><span class="n">target_a</span><span class="p">,</span> <span class="n">target_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">stereo_paths</span><span class="p">:</span>
+            <span class="c1"># get circle indices</span>
+            <span class="n">source_circle_index</span> <span class="o">=</span> <span class="n">edge_graph</span><span class="o">.</span><span class="n">circle_index</span><span class="p">[</span><span class="n">original_node_mapping</span><span class="p">[(</span><span class="n">source_a</span><span class="p">,</span> <span class="n">source_b</span><span class="p">)]]</span>
+            <span class="n">target_circle_index</span> <span class="o">=</span> <span class="n">edge_graph</span><span class="o">.</span><span class="n">circle_index</span><span class="p">[</span><span class="n">original_node_mapping</span><span class="p">[(</span><span class="n">target_b</span><span class="p">,</span> <span class="n">target_a</span><span class="p">)]]</span>
+
+            <span class="c1"># create tree to insert</span>
+            <span class="n">temp_tree</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="p">[</span>
+                            <span class="p">{</span><span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="n">source_circle_index</span><span class="p">},</span>
+                            <span class="p">{</span><span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="n">target_circle_index</span><span class="p">}</span>
+                        <span class="p">]</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="p">[</span>
+                            <span class="p">{</span><span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="n">source_circle_index</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]},</span>
+                            <span class="p">{</span><span class="s2">&quot;Z&quot;</span><span class="p">:</span> <span class="n">target_circle_index</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]}</span>
+                        <span class="p">]</span>
+                    <span class="p">}</span>
+                <span class="p">]</span>
+            <span class="p">}</span>
+
+            <span class="c1"># mode switch</span>
+            <span class="k">if</span> <span class="n">multi_stereo_center_dia_mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Original mode: potential additional nodes created</span>
+                <span class="n">create_new_node</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="c1"># check whether one direction of the connection of stereocenters exist</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">source_a</span><span class="p">,</span> <span class="n">target_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node_mapping</span><span class="p">:</span>
+                    <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">node_mapping</span><span class="p">[(</span><span class="n">source_a</span><span class="p">,</span> <span class="n">target_b</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">temp_tree</span><span class="p">)</span>
+                    <span class="n">create_new_node</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># check other direction</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">target_b</span><span class="p">,</span> <span class="n">source_a</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node_mapping</span><span class="p">:</span>
+                    <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">node_mapping</span><span class="p">[(</span><span class="n">target_b</span><span class="p">,</span> <span class="n">source_a</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">temp_tree</span><span class="p">)</span>
+                    <span class="n">create_new_node</span> <span class="o">=</span> <span class="kc">False</span>
+
+                <span class="c1"># if both directions not available - create new node</span>
+                <span class="k">if</span> <span class="n">create_new_node</span><span class="p">:</span>
+                    <span class="n">node_mapping</span><span class="p">[(</span><span class="n">source_a</span><span class="p">,</span> <span class="n">target_b</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_mapping</span><span class="p">)</span>
+                    <span class="n">edge_graph</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">edge_graph</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">edge_graph</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">temp_tree</span><span class="p">))</span>
+
+            <span class="c1"># other mode: overwrite existing nodes/edges</span>
+            <span class="k">elif</span> <span class="n">multi_stereo_center_dia_mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># attempts to overwrite first edge of path from center to center</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">source_a</span><span class="p">,</span> <span class="n">source_b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node_mapping</span><span class="p">:</span>
+                    <span class="n">tree</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">node_mapping</span><span class="p">[(</span><span class="n">source_a</span><span class="p">,</span> <span class="n">source_b</span><span class="p">)]])</span>
+                    <span class="n">tree</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_tree</span>
+                    <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">node_mapping</span><span class="p">[(</span><span class="n">source_a</span><span class="p">,</span> <span class="n">source_b</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+                <span class="c1"># attempt to overwrite last edge of path</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">target_b</span><span class="p">,</span> <span class="n">target_a</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node_mapping</span><span class="p">:</span>
+                    <span class="n">tree</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">node_mapping</span><span class="p">[(</span><span class="n">target_b</span><span class="p">,</span> <span class="n">target_a</span><span class="p">)]])</span>
+                    <span class="n">tree</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_tree</span>
+                    <span class="n">edge_graph</span><span class="o">.</span><span class="n">ptree</span><span class="p">[</span><span class="n">node_mapping</span><span class="p">[(</span><span class="n">target_b</span><span class="p">,</span> <span class="n">target_a</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">add_cyclic_trees</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cyclic_tree_mode</span> <span class="o">==</span> <span class="s2">&quot;complex&quot;</span><span class="p">:</span>
+            <span class="n">edge_graph</span> <span class="o">=</span> <span class="n">cyclic_tree_edge</span><span class="p">(</span><span class="n">edge_graph</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">node_mapping</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cyclic_tree_mode</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+            <span class="n">edge_graph</span> <span class="o">=</span> <span class="n">cyclic_tree_edge_light</span><span class="p">(</span><span class="n">edge_graph</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">node_mapping</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cyclic_tree_mode</span> <span class="o">==</span> <span class="s2">&quot;minimal&quot;</span><span class="p">:</span>
+            <span class="n">edge_graph</span> <span class="o">=</span> <span class="n">cyclic_tree_edge_minimal</span><span class="p">(</span><span class="n">edge_graph</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">node_mapping</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cyclic tree mode </span><span class="si">{</span><span class="n">cyclic_tree_mode</span><span class="si">}</span><span class="s2"> is not implemented.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">separate_tree</span><span class="p">:</span>
+        <span class="n">edge_graph</span> <span class="o">=</span> <span class="n">separate_tree_into_subtrees</span><span class="p">(</span><span class="n">edge_graph</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">create_order_matrix</span><span class="p">:</span>
+        <span class="c1"># generate order matrix</span>
+        <span class="n">edge_graph</span> <span class="o">=</span> <span class="n">permutation_tree_to_order_matrix</span><span class="p">(</span><span class="n">edge_graph</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">use_new_inv</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">edge_graph</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

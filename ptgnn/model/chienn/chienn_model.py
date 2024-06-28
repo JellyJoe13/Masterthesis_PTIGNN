@@ -29,6 +29,7 @@ class ChiENNModel(nn.Module):
             dropout: float = 0.0,
     ):
         """
+        Init function
 
         Args:
             k_neighbors: number of k consecutive neighbors used to create a chiral-sensitive message. It's `k` from
@@ -65,6 +66,7 @@ class ChiENNModel(nn.Module):
 
         Args:
             batch: a batch representing `batch_size` graphs. Contains the following attributes:
+
                 - x: (num_nodes, hidden_dim) node features
                 - batch (num_nodes,): batch indices of the nodes.
                 - edge_index (2, num_edges): edge indices

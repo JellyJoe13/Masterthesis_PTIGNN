@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.runtime_config package &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ptgnn.transform package" href="ptgnn.transform.html" />
+    <link rel="prev" title="ptgnn.optimizing package" href="ptgnn.optimizing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ptgnn.html">ptgnn</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ptgnn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.dataset.html">ptgnn.dataset package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.features.html">ptgnn.features package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.loading.html">ptgnn.loading package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.masking.html">ptgnn.masking package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.model.html">ptgnn.model package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.optimizing.html">ptgnn.optimizing package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ptgnn.runtime_config package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ptgnn.runtime_config.config">ptgnn.runtime_config.config module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.config.export_as"><code class="docutils literal notranslate"><span class="pre">export_as()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.config.import_as"><code class="docutils literal notranslate"><span class="pre">import_as()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.config.optional_fetch"><code class="docutils literal notranslate"><span class="pre">optional_fetch()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.config.priority_merge_config"><code class="docutils literal notranslate"><span class="pre">priority_merge_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ptgnn.runtime_config.config_helpers">ptgnn.runtime_config.config_helpers module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.config_helpers.load_and_merge_default_configs"><code class="docutils literal notranslate"><span class="pre">load_and_merge_default_configs()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.config_helpers.run_config_adapter"><code class="docutils literal notranslate"><span class="pre">run_config_adapter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ptgnn.runtime_config.final_test_suggester">ptgnn.runtime_config.final_test_suggester module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.final_test_suggester.FinalSearcher"><code class="docutils literal notranslate"><span class="pre">FinalSearcher</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.runtime_config.final_test_suggester.FinalSearcher.__init__"><code class="docutils literal notranslate"><span class="pre">FinalSearcher.__init__()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.runtime_config.final_test_suggester.FinalSearcher.on_trial_complete"><code class="docutils literal notranslate"><span class="pre">FinalSearcher.on_trial_complete()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="#ptgnn.runtime_config.final_test_suggester.FinalSearcher.suggest"><code class="docutils literal notranslate"><span class="pre">FinalSearcher.suggest()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ptgnn.runtime_config.loss">ptgnn.runtime_config.loss module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.loss.graphgym_cross_entropy_loss"><code class="docutils literal notranslate"><span class="pre">graphgym_cross_entropy_loss()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.loss.l1_loss"><code class="docutils literal notranslate"><span class="pre">l1_loss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ptgnn.runtime_config.metrics">ptgnn.runtime_config.metrics module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.metrics.classification_binary"><code class="docutils literal notranslate"><span class="pre">classification_binary()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.metrics.classification_multilabel"><code class="docutils literal notranslate"><span class="pre">classification_multilabel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.metrics.eval_spearmanr"><code class="docutils literal notranslate"><span class="pre">eval_spearmanr()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.metrics.get_ranking_accuracies"><code class="docutils literal notranslate"><span class="pre">get_ranking_accuracies()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.metrics.metric_system"><code class="docutils literal notranslate"><span class="pre">metric_system()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.metrics.regression_fn"><code class="docutils literal notranslate"><span class="pre">regression_fn()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.metrics.regression_rank"><code class="docutils literal notranslate"><span class="pre">regression_rank()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.metrics.rounding_fn"><code class="docutils literal notranslate"><span class="pre">rounding_fn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ptgnn.runtime_config.run_config">ptgnn.runtime_config.run_config module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.create_model"><code class="docutils literal notranslate"><span class="pre">create_model()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.eval_epoch"><code class="docutils literal notranslate"><span class="pre">eval_epoch()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.fetch_data_size"><code class="docutils literal notranslate"><span class="pre">fetch_data_size()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.fetch_loaders"><code class="docutils literal notranslate"><span class="pre">fetch_loaders()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.fetch_optimizer"><code class="docutils literal notranslate"><span class="pre">fetch_optimizer()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.fetch_scheduler"><code class="docutils literal notranslate"><span class="pre">fetch_scheduler()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.run_config"><code class="docutils literal notranslate"><span class="pre">run_config()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.train_epoch"><code class="docutils literal notranslate"><span class="pre">train_epoch()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#ptgnn.runtime_config.run_config.training_procedure"><code class="docutils literal notranslate"><span class="pre">training_procedure()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ptgnn.runtime_config">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ptgnn.transform.html">ptgnn.transform package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptgnn.html#module-ptgnn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">&lt;no title&gt;</a></li>
+          <li class="breadcrumb-item"><a href="ptgnn.html">ptgnn</a></li>
+      <li class="breadcrumb-item active">ptgnn.runtime_config package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ptgnn.runtime_config.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ptgnn-runtime-config-package">
+<h1>ptgnn.runtime_config package<a class="headerlink" href="#ptgnn-runtime-config-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-ptgnn.runtime_config.config">
+<span id="ptgnn-runtime-config-config-module"></span><h2>ptgnn.runtime_config.config module<a class="headerlink" href="#module-ptgnn.runtime_config.config" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.config.export_as">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.config.</span></span><span class="sig-name descname"><span class="pre">export_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_to_save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'json'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/config.html#export_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.config.export_as" title="Link to this definition"></a></dt>
+<dd><p>Export config dictionary to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dict_to_save</strong> (<em>dict</em>) – config dict to save</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – path to which to save to</p></li>
+<li><p><strong>save_type</strong> (<em>str</em>) – file type, either <code class="docutils literal notranslate"><span class="pre">&quot;json&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;yaml&quot;</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.config.import_as">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.config.</span></span><span class="sig-name descname"><span class="pre">import_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loading_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/config.html#import_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.config.import_as" title="Link to this definition"></a></dt>
+<dd><p>Import config dict from file (path)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Path from which to load from</p></li>
+<li><p><strong>loading_type</strong> (<em>str</em>) – type of file to load. If not provided will be inferred from file ending</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>loaded config dict</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.config.optional_fetch">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.config.</span></span><span class="sig-name descname"><span class="pre">optional_fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/config.html#optional_fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.config.optional_fetch" title="Link to this definition"></a></dt>
+<dd><p>Optional fetch from config dict. Else empty dictionarity is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_dict</strong> (<em>dict</em>) – config dict from which to optionally fetch</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – key which is to be fetched</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fetched value/dict</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.config.priority_merge_config">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.config.</span></span><span class="sig-name descname"><span class="pre">priority_merge_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/config.html#priority_merge_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.config.priority_merge_config" title="Link to this definition"></a></dt>
+<dd><p>Merges two config dicts. Priority in this case means that the first dicts configs take precedence over the second
+dict. This means that if both dicts have different values for an entry, the first will be prioritized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dict1</strong> (<em>dict</em>) – first dict (higher priority)</p></li>
+<li><p><strong>dict2</strong> (<em>dict</em>) – second dict (lower priority)</p></li>
+<li><p><strong>in_place</strong> (<em>bool</em>) – Whether or not the contents should be merged into the first dictionary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Merged dict</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.runtime_config.config_helpers">
+<span id="ptgnn-runtime-config-config-helpers-module"></span><h2>ptgnn.runtime_config.config_helpers module<a class="headerlink" href="#module-ptgnn.runtime_config.config_helpers" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.config_helpers.load_and_merge_default_configs">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.config_helpers.</span></span><span class="sig-name descname"><span class="pre">load_and_merge_default_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path_lists</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/config_helpers.html#load_and_merge_default_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.config_helpers.load_and_merge_default_configs" title="Link to this definition"></a></dt>
+<dd><p>Function that loads stored configs from json or yaml files which are then merged in order of the specified file
+paths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path_lists</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of file paths which are to be loaded to a dictionary</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Config dictionaries loaded from the files</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Dict</em>[str, <em>Any</em>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.config_helpers.run_config_adapter">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.config_helpers.</span></span><span class="sig-name descname"><span class="pre">run_config_adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hyper_opt_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/config_helpers.html#run_config_adapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.config_helpers.run_config_adapter" title="Link to this definition"></a></dt>
+<dd><p>Function that runs the original function <code class="docutils literal notranslate"><span class="pre">run_config</span></code> with parameters from the hyperparameter optimization
+framework and the default parameters. This is meant to work so that the hyper parameter parameters overwrite the
+default parameters defined in the second dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hyper_opt_config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – Dictionary containing the parameters set by the hyperparameter optimization framework</p></li>
+<li><p><strong>default_config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – Dictionary containing the default parameter which are to use if not overwritten by the hyper
+parameter optimization parameters</p></li>
+<li><p><strong>report</strong> (<em>bool</em>) – Whether or not the hyperparameter optimization is active - controlls whether the metrics are to be
+reported using <code class="docutils literal notranslate"><span class="pre">ray.train.report(...)</span></code></p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether or not progress is reported</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Specifies device to run on. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then cuda is used if available, else cpu. If specified then
+this device is used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns the output of the <code class="docutils literal notranslate"><span class="pre">run_config(...)</span></code> function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.runtime_config.final_test_suggester">
+<span id="ptgnn-runtime-config-final-test-suggester-module"></span><h2>ptgnn.runtime_config.final_test_suggester module<a class="headerlink" href="#module-ptgnn.runtime_config.final_test_suggester" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.final_test_suggester.FinalSearcher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.final_test_suggester.</span></span><span class="sig-name descname"><span class="pre">FinalSearcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">best_configs_to_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/final_test_suggester.html#FinalSearcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.final_test_suggester.FinalSearcher" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Searcher</span></code></p>
+<p>Final searcher - Searcher which suggest predefined configurations. Used in the context of being provided the best
+configurations of the parameter search to use the ray framework to execute this configurations in one final test
+at the end - in parallel.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.final_test_suggester.FinalSearcher.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">best_configs_to_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/final_test_suggester.html#FinalSearcher.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.final_test_suggester.FinalSearcher.__init__" title="Link to this definition"></a></dt>
+<dd><p>Init function of FinalSearcher</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>best_configs_to_test</strong> – best configurations to suggest.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.final_test_suggester.FinalSearcher.on_trial_complete">
+<span class="sig-name descname"><span class="pre">on_trial_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trial_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/final_test_suggester.html#FinalSearcher.on_trial_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.final_test_suggester.FinalSearcher.on_trial_complete" title="Link to this definition"></a></dt>
+<dd><p>Notification for the completion of trial.</p>
+<p>Typically, this method is used for notifying the underlying
+optimizer of the result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trial_id</strong> – A unique string ID for the trial.</p></li>
+<li><p><strong>result</strong> – Dictionary of metrics for current training progress.
+Note that the result dict may include NaNs or
+may not include the optimization metric. It is up to the
+subclass implementation to preprocess the result to
+avoid breaking the optimization process. Upon errors, this
+may also be None.</p></li>
+<li><p><strong>error</strong> – True if the training process raised an error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.final_test_suggester.FinalSearcher.suggest">
+<span class="sig-name descname"><span class="pre">suggest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trial_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/final_test_suggester.html#FinalSearcher.suggest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.final_test_suggester.FinalSearcher.suggest" title="Link to this definition"></a></dt>
+<dd><p>Suggestion function - suggests the previously set configurations - exactly once each.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trial_id</strong> (<em>str</em>) – Trial id of the new trial</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>configuration</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.runtime_config.loss">
+<span id="ptgnn-runtime-config-loss-module"></span><h2>ptgnn.runtime_config.loss module<a class="headerlink" href="#module-ptgnn.runtime_config.loss" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.loss.graphgym_cross_entropy_loss">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.loss.</span></span><span class="sig-name descname"><span class="pre">graphgym_cross_entropy_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_multilabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/loss.html#graphgym_cross_entropy_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.loss.graphgym_cross_entropy_loss" title="Link to this definition"></a></dt>
+<dd><p>Cross entropy loss function adapted from graphgym:
+<a class="reference external" href="https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/graphgym/loss.html">https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/graphgym/loss.html</a></p>
+<p>Makes distinction whether the task is multilabel or binary label classification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pred</strong> (<em>torch.Tensor</em>) – prediction tensor</p></li>
+<li><p><strong>true</strong> (<em>torch.Tensor</em>) – true label tensor</p></li>
+<li><p><strong>reduction</strong> (<em>str</em>) – reduction method</p></li>
+<li><p><strong>is_multilabel</strong> (<em>bool</em>) – Whether or not the task is a multilabel prediction type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>loss</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.loss.l1_loss">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.loss.</span></span><span class="sig-name descname"><span class="pre">l1_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/loss.html#l1_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.loss.l1_loss" title="Link to this definition"></a></dt>
+<dd><p>L1 loss function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pred</strong> (<em>torch.Tensor</em>) – prediction tensor</p></li>
+<li><p><strong>true</strong> (<em>torch.Tensor</em>) – true label tensor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>loss</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.runtime_config.metrics">
+<span id="ptgnn-runtime-config-metrics-module"></span><h2>ptgnn.runtime_config.metrics module<a class="headerlink" href="#module-ptgnn.runtime_config.metrics" title="Link to this heading"></a></h2>
+<p>The contents of this file are based on/adapted from:
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/logger.py#L256">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/logger.py#L256</a>
+and
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/metric_wrapper.py#L194">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/metric_wrapper.py#L194</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.metrics.classification_binary">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.metrics.</span></span><span class="sig-name descname"><span class="pre">classification_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/metrics.html#classification_binary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.metrics.classification_binary" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.metrics.classification_multilabel">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.metrics.</span></span><span class="sig-name descname"><span class="pre">classification_multilabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/metrics.html#classification_multilabel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.metrics.classification_multilabel" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.metrics.eval_spearmanr">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.metrics.</span></span><span class="sig-name descname"><span class="pre">eval_spearmanr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/metrics.html#eval_spearmanr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.metrics.eval_spearmanr" title="Link to this definition"></a></dt>
+<dd><p>Compute Spearman Rho averaged across tasks.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.metrics.get_ranking_accuracies">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.metrics.</span></span><span class="sig-name descname"><span class="pre">get_ranking_accuracies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">difference_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/metrics.html#get_ranking_accuracies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.metrics.get_ranking_accuracies" title="Link to this definition"></a></dt>
+<dd><p>Adapted from
+<a class="reference external" href="https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L150">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L150</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.metrics.metric_system">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.metrics.</span></span><span class="sig-name descname"><span class="pre">metric_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">training_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'train'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/metrics.html#metric_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.metrics.metric_system" title="Link to this definition"></a></dt>
+<dd><p>Adapted from
+<a class="reference external" href="https://github.com/pyg-team/pytorch_geometric/blob/1675b019c7182dbdc4970561f0dbff6dec3ee299/torch_geometric/graphgym/logger.py#L226">https://github.com/pyg-team/pytorch_geometric/blob/1675b019c7182dbdc4970561f0dbff6dec3ee299/torch_geometric/graphgym/logger.py#L226</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.metrics.regression_fn">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.metrics.</span></span><span class="sig-name descname"><span class="pre">regression_fn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/metrics.html#regression_fn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.metrics.regression_fn" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.metrics.regression_rank">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.metrics.</span></span><span class="sig-name descname"><span class="pre">regression_rank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">training_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/metrics.html#regression_rank"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.metrics.regression_rank" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.metrics.rounding_fn">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.metrics.</span></span><span class="sig-name descname"><span class="pre">rounding_fn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">score</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/metrics.html#rounding_fn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.metrics.rounding_fn" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-ptgnn.runtime_config.run_config">
+<span id="ptgnn-runtime-config-run-config-module"></span><h2>ptgnn.runtime_config.run_config module<a class="headerlink" href="#module-ptgnn.runtime_config.run_config" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.create_model">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">create_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Module</span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#create_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.create_model" title="Link to this definition"></a></dt>
+<dd><p>Function to create the model based on the passed config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_sizes</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – sizes of the data, node and edge dimension respectively</p></li>
+<li><p><strong>model_config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – config to use for building the model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Model built using the config</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Inherits torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.eval_epoch">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">eval_epoch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#eval_epoch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.eval_epoch" title="Link to this definition"></a></dt>
+<dd><p>Function to evaluate a model on (validation or test) data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric_dict</strong> (<em>dict</em>) – Dictionary in which to store the measured metrics</p></li>
+<li><p><strong>device</strong> – device on which to operate the evaluation. Commonly torch devices, such as <code class="docutils literal notranslate"><span class="pre">cpu</span></code> or <code class="docutils literal notranslate"><span class="pre">cuda</span></code></p></li>
+<li><p><strong>df_dict</strong> (<em>dict</em>) – dictionary containing all splits of dataset</p></li>
+<li><p><strong>loss_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>]</em><em>,</em><em>[</em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>]</em><em>]</em>) – Loss function to use to generate the loss value and pre-format the predictions</p></li>
+<li><p><strong>model</strong> (<em>torch.nn.Module</em>) – Model to evaluate</p></li>
+<li><p><strong>out_dim</strong> (<em>int</em>) – Output dimension of the model</p></li>
+<li><p><strong>task_type</strong> (<em>str</em>) – Task type</p></li>
+<li><p><strong>eval_loader</strong> – Data loader to use for evaluation</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – Dataset mode, specifies which split is currently tested</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Verbose option</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Metric dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.fetch_data_size">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">fetch_data_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataLoader</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#fetch_data_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.fetch_data_size" title="Link to this definition"></a></dt>
+<dd><p>Function to fetch the data sizes from an existing loader. Returns the node and edge dimension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>train_loader</strong> (<em>torch.utils.data.DataLoader</em>) – Loader to use for fetching the first element</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>node and edge dimension, respectively</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tuple</em>[int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.fetch_loaders">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">fetch_loaders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_multiprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DataLoader</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataLoader</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataLoader</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#fetch_loaders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.fetch_loaders" title="Link to this definition"></a></dt>
+<dd><p>Function used to build the loaders based on the parameters passed in the config dict object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – config object storing the parameters required for the creation of the loaders</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether or not progress should be plotted to output</p></li>
+<li><p><strong>use_multiprocess</strong> (<em>bool</em>) – Parameter capable of turning off multiprocessing after Linux was discovered to behave
+strangely when enabled (although still working)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>train, validation and test loaders</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Tuple</em>[torch.utils.data.DataLoader, torch.utils.data.DataLoader, torch.utils.data.DataLoader]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.fetch_optimizer">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">fetch_optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#fetch_optimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.fetch_optimizer" title="Link to this definition"></a></dt>
+<dd><p>Function that creates optimizer based on the passed parameters in the dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_params</strong> – Model parameters to use for the creation of the optimizer</p></li>
+<li><p><strong>optimizer_config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – Config storing the config for the optimizer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optimizer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.fetch_scheduler">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">fetch_scheduler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheduler_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#fetch_scheduler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.fetch_scheduler" title="Link to this definition"></a></dt>
+<dd><p>Function to build the scheduler. A scheduler adapts the learning rate to safely converge to an optimum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optimizer</strong> – Optimizer to use for the creation of the scheduler</p></li>
+<li><p><strong>scheduler_config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – Config to pass to the scheduler and the type of scheduler to use.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Scheduler</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.run_config">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">run_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#run_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.run_config" title="Link to this definition"></a></dt>
+<dd><p>Function to use to run experiment with a certain configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_dict</strong> (<em>dict</em>) – Configuration specifying which experiment and with which data, model, etc. it is to be executed</p></li>
+<li><p><strong>report</strong> (<em>bool</em>) – Whether to report the measured metrics to ray framework or not. Should be enabled in the
+hyper optimization, else disabled.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Verbose option</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – <p>Device on which to execute experiment. The following options are possible:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cpu</span></code> - runs on the CPU</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda</span></code> - runs on the CUDA framework, i.e. GPU. (Does not check whether this is available)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> - if possible uses cuda, else cpu</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>metric dict dataframe</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.train_epoch">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">train_epoch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_grad_norm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheduler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#train_epoch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.train_epoch" title="Link to this definition"></a></dt>
+<dd><p>Function used to train model for one epoch with the training dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric_dict</strong> (<em>dict</em>) – Metric dict in which to store results</p></li>
+<li><p><strong>clip_grad_norm</strong> (<em>bool</em>) – Whether to clip the gradient norm or not. If enabled, prevents too large training steps</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Which device to use for training the model</p></li>
+<li><p><strong>df_dict</strong> (<em>dict</em>) – dictionary containing all dataframe splits</p></li>
+<li><p><strong>loss_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>]</em><em>,</em><em>[</em><em>torch.Tensor</em><em>, </em><em>torch.Tensor</em><em>]</em><em>]</em>) – Loss function to use for training</p></li>
+<li><p><strong>model</strong> (<em>torch.nn.Module</em>) – Model to train</p></li>
+<li><p><strong>optimizer</strong> – Optimizer to use for training</p></li>
+<li><p><strong>out_dim</strong> (<em>int</em>) – Output dimension</p></li>
+<li><p><strong>scheduler</strong> – Scheduler to use for training, controls optimizer learning rate</p></li>
+<li><p><strong>task_type</strong> (<em>str</em>) – Task type of training</p></li>
+<li><p><strong>train_loader</strong> – Loader of training data to use for training</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Verbose option</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>metric dict</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ptgnn.runtime_config.run_config.training_procedure">
+<span class="sig-prename descclassname"><span class="pre">ptgnn.runtime_config.run_config.</span></span><span class="sig-name descname"><span class="pre">training_procedure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheduler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_max_epochs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_grad_norm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_test_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/ptgnn/runtime_config/run_config.html#training_procedure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ptgnn.runtime_config.run_config.training_procedure" title="Link to this definition"></a></dt>
+<dd><p>Function that executes the training and testing procedure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>torch.nn.Module</em>) – Model to train and evaluate</p></li>
+<li><p><strong>optimizer</strong> – Optimizer to use for training</p></li>
+<li><p><strong>scheduler</strong> – Scheduler to use for adapting learning rate of optimizer</p></li>
+<li><p><strong>train_loader</strong> – Loader of training dataset</p></li>
+<li><p><strong>val_loader</strong> – Loader of validation dataset</p></li>
+<li><p><strong>test_loader</strong> – Loader of testing dataset</p></li>
+<li><p><strong>task_type</strong> (<em>str</em>) – Task type</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Device to use for training and testing</p></li>
+<li><p><strong>n_max_epochs</strong> (<em>int</em>) – Number of maximal epochs to execute</p></li>
+<li><p><strong>loss_function</strong> (<em>str</em>) – Loss function to use for training</p></li>
+<li><p><strong>clip_grad_norm</strong> (<em>bool</em>) – Whether to clip the gradient or not. Prevents too large training steps</p></li>
+<li><p><strong>out_dim</strong> (<em>int</em>) – Output dimension of model</p></li>
+<li><p><strong>use_test_set</strong> (<em>bool</em>) – Whether to use the test set or not. Should be disabled for hyperparameter optimization and
+enabled for final test</p></li>
+<li><p><strong>report</strong> (<em>bool</em>) – Whether to report measured metric scores to ray framework. Should be enabled if ray is to be used</p></li>
+<li><p><strong>verbose</strong> (<em>int</em>) – Verbose setting</p></li>
+<li><p><strong>kwargs</strong> – Auxiliary parameters that are not directly required</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Collected metric scores of training and test set</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-ptgnn.runtime_config">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ptgnn.runtime_config" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ptgnn.optimizing.html" class="btn btn-neutral float-left" title="ptgnn.optimizing package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ptgnn.transform.html" class="btn btn-neutral float-right" title="ptgnn.transform package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

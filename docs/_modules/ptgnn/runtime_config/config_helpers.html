@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.runtime_config.config_helpers &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.runtime_config.config_helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.runtime_config.config_helpers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># use with partial function</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">from</span> <span class="nn">ptgnn.runtime_config.config</span> <span class="kn">import</span> <span class="n">priority_merge_config</span><span class="p">,</span> <span class="n">import_as</span>
+<span class="kn">from</span> <span class="nn">ptgnn.runtime_config.run_config</span> <span class="kn">import</span> <span class="n">run_config</span>
+
+
+<div class="viewcode-block" id="run_config_adapter">
+<a class="viewcode-back" href="../../../ptgnn.runtime_config.html#ptgnn.runtime_config.config_helpers.run_config_adapter">[docs]</a>
+<span class="k">def</span> <span class="nf">run_config_adapter</span><span class="p">(</span>
+        <span class="n">hyper_opt_config</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">default_config</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function that runs the original function ``run_config`` with parameters from the hyperparameter optimization</span>
+<span class="sd">    framework and the default parameters. This is meant to work so that the hyper parameter parameters overwrite the</span>
+<span class="sd">    default parameters defined in the second dict.</span>
+
+<span class="sd">    :param hyper_opt_config: Dictionary containing the parameters set by the hyperparameter optimization framework</span>
+<span class="sd">    :type hyper_opt_config: typing.Dict[str, typing.Any]</span>
+<span class="sd">    :param default_config: Dictionary containing the default parameter which are to use if not overwritten by the hyper</span>
+<span class="sd">        parameter optimization parameters</span>
+<span class="sd">    :type default_config: typing.Dict[str, typing.Any]</span>
+<span class="sd">    :param report: Whether or not the hyperparameter optimization is active - controlls whether the metrics are to be</span>
+<span class="sd">        reported using ``ray.train.report(...)``</span>
+<span class="sd">    :type report: bool</span>
+<span class="sd">    :param verbose: Whether or not progress is reported</span>
+<span class="sd">    :type verbose: bool</span>
+<span class="sd">    :param device: Specifies device to run on. If ``None`` then cuda is used if available, else cpu. If specified then</span>
+<span class="sd">        this device is used.</span>
+<span class="sd">    :type device: str</span>
+<span class="sd">    :return: Returns the output of the ``run_config(...)`` function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># merge configs with priority to hyperopt config</span>
+    <span class="n">merged_config</span> <span class="o">=</span> <span class="n">priority_merge_config</span><span class="p">(</span><span class="n">hyper_opt_config</span><span class="p">,</span> <span class="n">default_config</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">run_config</span><span class="p">(</span><span class="n">config_dict</span><span class="o">=</span><span class="n">merged_config</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="load_and_merge_default_configs">
+<a class="viewcode-back" href="../../../ptgnn.runtime_config.html#ptgnn.runtime_config.config_helpers.load_and_merge_default_configs">[docs]</a>
+<span class="k">def</span> <span class="nf">load_and_merge_default_configs</span><span class="p">(</span>
+        <span class="n">file_path_lists</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function that loads stored configs from json or yaml files which are then merged in order of the specified file</span>
+<span class="sd">    paths.</span>
+
+<span class="sd">    :param file_path_lists: List of file paths which are to be loaded to a dictionary</span>
+<span class="sd">    :type file_path_lists: typing.List[str]</span>
+<span class="sd">    :return: Config dictionaries loaded from the files</span>
+<span class="sd">    :rtype: typing.Dict[str, typing.Any]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initial dict</span>
+    <span class="n">config_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># iterate over file paths, load and merge</span>
+    <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">file_path_lists</span><span class="p">:</span>
+
+        <span class="c1"># load config</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">import_as</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+        <span class="c1"># merge config</span>
+        <span class="n">config_dict</span> <span class="o">=</span> <span class="n">priority_merge_config</span><span class="p">(</span><span class="n">config_dict</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">config_dict</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

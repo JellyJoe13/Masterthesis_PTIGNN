@@ -119,6 +119,7 @@ def angle_2d(a: np.array, b: np.array) -> np.array:
     Args:
         a: a 2D vector of shape (2,).
         b: a 2D vector of shape (2,).
+
     Returns:
         Angle in radians.
     """

@@ -110,6 +110,7 @@ class ChiENNMessage(nn.Module):
 
         Args:
             batch: a batch of data containing the following attributes:
+
                 - `x` - node features of shape (num_nodes, hidden_dim).
                 - `circle_index` - a tensor of shape (num_nodes, circle_size) containing the indices of the
                     (non-parallel) neighbors in the pre-computed order. To simplify the implementation, the first (k-1)
@@ -229,6 +230,7 @@ class ChiENNAggregate(nn.Module):
 
         Args:
             batch: a batch of data containing the following attributes:
+
                 - x: a tensor of shape (num_nodes, hidden_dim) containing the node features.
                 - parallel_node_index: a tensor of shape (num_nodes,) containing the index of the parallel node.
             msg: a tensor of shape (num_nodes, max_num_neighbors, hidden_dim) containing the order-sensitive messages.

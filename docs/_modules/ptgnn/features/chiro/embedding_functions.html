@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ptgnn.features.chiro.embedding_functions &mdash; Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ptgnn.html">ptgnn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../experiments.html">experiments</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Masterthesis - Permutation tree invariant graph neural networks and applications to molecular graphs with stereochemistry</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ptgnn.features.chiro.embedding_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ptgnn.features.chiro.embedding_functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The contents of this file are from</span>
+<span class="sd">https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/embedding_functions.py#L24</span>
+
+<span class="sd">Original files did not contain docstring, docstring information is inferred from functionality</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">rdkit</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">rdMolTransforms</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">TorsionFingerprints</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="n">atomTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;Si&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;Cl&#39;</span><span class="p">,</span> <span class="s1">&#39;Br&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">]</span>
+<span class="n">formalCharge</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">degree</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="n">num_Hs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="n">local_chiral_tags</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="n">hybridization</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">HybridizationType</span><span class="o">.</span><span class="n">S</span><span class="p">,</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">HybridizationType</span><span class="o">.</span><span class="n">SP</span><span class="p">,</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">HybridizationType</span><span class="o">.</span><span class="n">SP2</span><span class="p">,</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">HybridizationType</span><span class="o">.</span><span class="n">SP3</span><span class="p">,</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">HybridizationType</span><span class="o">.</span><span class="n">SP3D</span><span class="p">,</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">HybridizationType</span><span class="o">.</span><span class="n">SP3D2</span><span class="p">,</span>
+    <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">HybridizationType</span><span class="o">.</span><span class="n">UNSPECIFIED</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">bondTypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SINGLE&#39;</span><span class="p">,</span> <span class="s1">&#39;DOUBLE&#39;</span><span class="p">,</span> <span class="s1">&#39;TRIPLE&#39;</span><span class="p">,</span> <span class="s1">&#39;AROMATIC&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="one_hot_embedding">
+<a class="viewcode-back" href="../../../../ptgnn.features.chiro.html#ptgnn.features.chiro.embedding_functions.one_hot_embedding">[docs]</a>
+<span class="k">def</span> <span class="nf">one_hot_embedding</span><span class="p">(</span>
+        <span class="n">value</span><span class="p">,</span>
+        <span class="n">options</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform an integer value to a one hot embedding/encoding.</span>
+
+<span class="sd">    :param value: Current value to be transformed to one hot embedding</span>
+<span class="sd">    :param options: All possible options for the one hot embedding</span>
+<span class="sd">    :return: one hot embedding</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">embedding</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">options</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">embedding</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">embedding</span></div>
+
+
+
+<div class="viewcode-block" id="adjacency_to_undirected_edge_index">
+<a class="viewcode-back" href="../../../../ptgnn.features.chiro.html#ptgnn.features.chiro.embedding_functions.adjacency_to_undirected_edge_index">[docs]</a>
+<span class="k">def</span> <span class="nf">adjacency_to_undirected_edge_index</span><span class="p">(</span><span class="n">adj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform adjacency matrix to edge index (undirected).</span>
+
+<span class="sd">    :param adj: adjacency matrix</span>
+<span class="sd">    :type adj: Array, most likely np.ndarray</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">adj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">))</span>  <span class="c1"># keeping just upper triangular entries from sym matrix</span>
+    <span class="n">array_adj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">adj</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>  <span class="c1"># indices of non-zero values in adj matrix</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">array_adj</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>  <span class="c1"># placeholder for undirected edge list</span>
+    <span class="n">edge_index</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_adj</span>
+    <span class="n">edge_index</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">array_adj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">edge_index</span></div>
+
+
+
+<div class="viewcode-block" id="get_all_paths">
+<a class="viewcode-back" href="../../../../ptgnn.features.chiro.html#ptgnn.features.chiro.embedding_functions.get_all_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">get_all_paths</span><span class="p">(</span>
+        <span class="n">G</span><span class="p">,</span>
+        <span class="n">N</span><span class="o">=</span><span class="mi">3</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get all edge paths of length N in the graph.</span>
+
+<span class="sd">    Originally adapted from:</span>
+<span class="sd">    https://stackoverflow.com/questions/28095646/finding-all-paths-walks-of-given-length-in-a-networkx-graph</span>
+
+<span class="sd">    :param G: graph</span>
+<span class="sd">    :param N: length of paths to find</span>
+<span class="sd">    :return: list of all paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">findPaths</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[[</span><span class="n">u</span><span class="p">]]</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[[</span><span class="n">u</span><span class="p">]</span> <span class="o">+</span> <span class="n">path</span> <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">findPaths</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">u</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">paths</span>
+
+    <span class="n">allpaths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="p">:</span>
+        <span class="n">allpaths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">findPaths</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">allpaths</span></div>
+
+
+
+<div class="viewcode-block" id="getNodeFeatures">
+<a class="viewcode-back" href="../../../../ptgnn.features.chiro.html#ptgnn.features.chiro.embedding_functions.getNodeFeatures">[docs]</a>
+<span class="k">def</span> <span class="nf">getNodeFeatures</span><span class="p">(</span>
+        <span class="n">list_rdkit_atoms</span><span class="p">,</span>
+        <span class="n">owningMol</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get node features of the atoms passed in the parameters.</span>
+
+<span class="sd">    :param list_rdkit_atoms: atoms for which to calculate the node features</span>
+<span class="sd">    :param owningMol: molecule from which the atoms are from</span>
+<span class="sd">    :return: node features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">F_v</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atomTypes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> \
+          <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> \
+          <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">formalCharge</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> \
+          <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">num_Hs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> \
+          <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hybridization</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> \
+          <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">5</span>  <span class="c1"># 52</span>
+
+    <span class="n">global_tags</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">FindMolChiralCenters</span><span class="p">(</span><span class="n">owningMol</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">includeUnassigned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">useLegacyImplementation</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+    <span class="n">node_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">list_rdkit_atoms</span><span class="p">),</span> <span class="n">F_v</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">node_index</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">list_rdkit_atoms</span><span class="p">):</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">(),</span> <span class="n">atomTypes</span><span class="p">)</span>  <span class="c1"># atom symbol, dim=12 + 1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">GetTotalDegree</span><span class="p">(),</span> <span class="n">degree</span><span class="p">)</span>  <span class="c1"># total number of bonds, H included, dim=7 + 1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">GetFormalCharge</span><span class="p">(),</span> <span class="n">formalCharge</span><span class="p">)</span>  <span class="c1"># formal charge, dim=5+1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">GetTotalNumHs</span><span class="p">(),</span> <span class="n">num_Hs</span><span class="p">)</span>  <span class="c1"># total number of bonded hydrogens, dim=5 + 1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">GetHybridization</span><span class="p">(),</span> <span class="n">hybridization</span><span class="p">)</span>  <span class="c1"># hybridization state, dim=7 + 1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">GetIsAromatic</span><span class="p">())]</span>  <span class="c1"># whether atom is part of aromatic system, dim = 1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">GetMass</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">]</span>  <span class="c1"># atomic mass / 100, dim=1</span>
+
+        <span class="c1">### chiral tags go last ###</span>
+        <span class="c1"># global chiral tag</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+        <span class="n">global_chiral_tag</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">global_tags</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">global_tags</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span>
+                <span class="n">global_chiral_tag</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">global_tags</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                <span class="n">global_chiral_tag</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">global_chiral_tag</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">features</span> <span class="o">+=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="n">global_chiral_tag</span><span class="p">,</span>
+                                      <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>  <span class="c1"># chiral tag of atom, dim=3+1 (global chiral features)</span>
+
+        <span class="c1"># local chiral tag</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">GetChiralTag</span><span class="p">(),</span>
+                                      <span class="n">local_chiral_tags</span><span class="p">)</span>  <span class="c1"># chiral tag of atom, dim=4+1 (local chiral features)</span>
+
+        <span class="n">node_features</span><span class="p">[</span><span class="n">node_index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">features</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">node_features</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="getEdgeFeatures">
+<a class="viewcode-back" href="../../../../ptgnn.features.chiro.html#ptgnn.features.chiro.embedding_functions.getEdgeFeatures">[docs]</a>
+<span class="k">def</span> <span class="nf">getEdgeFeatures</span><span class="p">(</span><span class="n">list_rdkit_bonds</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate features of passed bonds.</span>
+
+<span class="sd">    :param list_rdkit_bonds: List of Bonds for which to generate the features</span>
+<span class="sd">    :return: features of the bonds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">F_e</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bondTypes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">6</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 14</span>
+
+    <span class="n">edge_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">list_rdkit_bonds</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">F_e</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">list_rdkit_bonds</span><span class="p">):</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">GetBondType</span><span class="p">()),</span> <span class="n">bondTypes</span><span class="p">)</span>  <span class="c1"># dim=4+1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">GetIsConjugated</span><span class="p">())]</span>  <span class="c1"># dim=1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">IsInRing</span><span class="p">())]</span>  <span class="c1"># dim=1</span>
+        <span class="n">features</span> <span class="o">+=</span> <span class="n">one_hot_embedding</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">GetStereo</span><span class="p">(),</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span>  <span class="c1"># dim=6+1</span>
+
+        <span class="c1"># Encode both directed edges to get undirected edge</span>
+        <span class="n">edge_features</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">edge_index</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">edge_index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">features</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">edge_features</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="getInternalCoordinatesFromAllPaths">
+<a class="viewcode-back" href="../../../../ptgnn.features.chiro.html#ptgnn.features.chiro.embedding_functions.getInternalCoordinatesFromAllPaths">[docs]</a>
+<span class="k">def</span> <span class="nf">getInternalCoordinatesFromAllPaths</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Conformer</span><span class="p">):</span>
+        <span class="n">conformer</span> <span class="o">=</span> <span class="n">mol</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">):</span>
+        <span class="n">conformer</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+
+    <span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_array</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">parallel_edges</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">create_using</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">distance_paths</span><span class="p">,</span> <span class="n">angle_paths</span><span class="p">,</span> <span class="n">dihedral_paths</span> <span class="o">=</span> <span class="n">get_all_paths</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">get_all_paths</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">get_all_paths</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dihedral_paths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No Dihedral Angle Detected&#39;</span><span class="p">)</span>
+
+    <span class="n">bond_distance_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">distance_paths</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">bond_angle_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">angle_paths</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">dihedral_angle_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dihedral_paths</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">repeats</span><span class="p">:</span>  <span class="c1"># only taking (0,1) vs. (1,0); (1,2,3) vs (3,2,1); (1,3,6,7) vs (7,6,3,1)</span>
+        <span class="n">bond_distance_indices</span> <span class="o">=</span> <span class="n">bond_distance_indices</span><span class="p">[</span><span class="n">bond_distance_indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bond_distance_indices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span>
+        <span class="n">bond_angle_indices</span> <span class="o">=</span> <span class="n">bond_angle_indices</span><span class="p">[</span><span class="n">bond_angle_indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bond_angle_indices</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span>
+        <span class="n">dihedral_angle_indices</span> <span class="o">=</span> <span class="n">dihedral_angle_indices</span><span class="p">[</span><span class="n">dihedral_angle_indices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">dihedral_angle_indices</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span>
+
+    <span class="n">bond_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">rdMolTransforms</span><span class="o">.</span><span class="n">GetBondLength</span><span class="p">(</span><span class="n">conformer</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">bond_distance_indices</span><span class="p">],</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">bond_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">rdMolTransforms</span><span class="o">.</span><span class="n">GetAngleRad</span><span class="p">(</span><span class="n">conformer</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span>
+         <span class="n">bond_angle_indices</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">dihedral_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">rdMolTransforms</span><span class="o">.</span><span class="n">GetDihedralRad</span><span class="p">(</span><span class="n">conformer</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span> <span class="k">for</span> <span class="n">index</span>
+         <span class="ow">in</span> <span class="n">dihedral_angle_indices</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bond_distances</span><span class="p">,</span> <span class="n">bond_distance_indices</span><span class="p">,</span> <span class="n">bond_angles</span><span class="p">,</span> <span class="n">bond_angle_indices</span><span class="p">,</span> <span class="n">dihedral_angles</span><span class="p">,</span> <span class="n">dihedral_angle_indices</span></div>
+
+
+
+<div class="viewcode-block" id="embedConformerWithAllPaths">
+<a class="viewcode-back" href="../../../../ptgnn.features.chiro.html#ptgnn.features.chiro.embedding_functions.embedConformerWithAllPaths">[docs]</a>
+<span class="k">def</span> <span class="nf">embedConformerWithAllPaths</span><span class="p">(</span><span class="n">rdkit_mol3D</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rdkit_mol3D</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Conformer</span><span class="p">):</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit_mol3D</span><span class="o">.</span><span class="n">GetOwningMol</span><span class="p">()</span>
+        <span class="n">conformer</span> <span class="o">=</span> <span class="n">rdkit_mol3D</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rdkit_mol3D</span><span class="p">,</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="p">):</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">rdkit_mol3D</span>
+        <span class="n">conformer</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span>
+
+    <span class="c1"># Edge Index</span>
+    <span class="n">adj</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">GetAdjacencyMatrix</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">adjacency_to_undirected_edge_index</span><span class="p">(</span><span class="n">adj</span><span class="p">)</span>
+
+    <span class="c1"># Edge Features</span>
+    <span class="n">bonds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">edge_index</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)):</span>
+        <span class="n">bond_index</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[:,</span> <span class="p">::</span><span class="mi">2</span><span class="p">][:,</span> <span class="n">b</span><span class="p">]</span>
+        <span class="n">bond</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetBondBetweenAtoms</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bond_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">bond_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+    <span class="n">edge_features</span> <span class="o">=</span> <span class="n">getEdgeFeatures</span><span class="p">(</span><span class="n">bonds</span><span class="p">)</span>
+
+    <span class="c1"># Node Features</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">rdkit</span><span class="o">.</span><span class="n">Chem</span><span class="o">.</span><span class="n">rdchem</span><span class="o">.</span><span class="n">Mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">atom_symbols</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+    <span class="n">node_features</span> <span class="o">=</span> <span class="n">getNodeFeatures</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">mol</span><span class="p">)</span>
+
+    <span class="n">bond_distances</span><span class="p">,</span> <span class="n">bond_distance_indices</span><span class="p">,</span> <span class="n">bond_angles</span><span class="p">,</span> <span class="n">bond_angle_indices</span><span class="p">,</span> <span class="n">dihedral_angles</span><span class="p">,</span> <span class="n">dihedral_angle_indices</span> <span class="o">=</span> <span class="n">getInternalCoordinatesFromAllPaths</span><span class="p">(</span>
+        <span class="n">conformer</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="n">repeats</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">atom_symbols</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_features</span><span class="p">,</span> <span class="n">node_features</span><span class="p">,</span> <span class="n">bond_distances</span><span class="p">,</span> <span class="n">bond_distance_indices</span><span class="p">,</span> <span class="n">bond_angles</span><span class="p">,</span> <span class="n">bond_angle_indices</span><span class="p">,</span> <span class="n">dihedral_angles</span><span class="p">,</span> <span class="n">dihedral_angle_indices</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Johannes P. Urban, B.Sc..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
