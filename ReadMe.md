@@ -33,7 +33,7 @@ equivariant. (Changing it now would change almost every file which is guaranteed
 - .gitignore: Prevent pushing of datasets to GitHub repo
 - ReadMe.md: General information and installation instructions
 
-For more information regarding the implementation (classes, function, etc) please refer to the documentation https://github.com/JellyJoe13/Masterthesis_PTIGNN or directly the source code.
+For more information regarding the implementation (classes, function, etc) please refer to the documentation https://github.com/JellyJoe13/Masterthesis_PTIGNN or directly the source code from which this documentation was created using Sphinx.
 
 ## Notebook information:
 
