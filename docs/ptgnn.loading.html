@@ -263,7 +263,7 @@ pooling instruction matrices. Returns a batch object.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dataset</strong> – Dataset which to wrap in a loader</p></li>
-<li><p><strong>n_neighbors_in_circle</strong> (<em>int</em>) – number of neighbors in circle in case of ChiENN cycle index setting.</p></li>
+<li><p><strong>n_neighbors_in_circle</strong> (<em>int</em>) – number of neighbors in circle in case of ChiENN circle index setting.</p></li>
 <li><p><strong>batch_size</strong> (<em>int</em>) – batch size</p></li>
 <li><p><strong>sampler</strong> (<em>str</em>) – Whether to use the full batch or single conformer sampling method</p></li>
 <li><p><strong>shuffle</strong> (<em>bool</em>) – Whether to shuffle the data or not</p></li>
@@ -296,7 +296,7 @@ pooling instruction matrices. Returns a batch object.</p>
 <li><p><strong>shuffle</strong> (<em>bool</em>) – Whether or not to shuffle the dataset</p></li>
 <li><p><strong>follow_batch</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – Follow batch parameter of Collater</p></li>
 <li><p><strong>exclude_keys</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – Exclude keys parameter of Collater</p></li>
-<li><p><strong>n_neighbors_in_circle</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – number of neighbors in cycle - relevant for ChiENN model</p></li>
+<li><p><strong>n_neighbors_in_circle</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – number of neighbors in circle - relevant for ChiENN model</p></li>
 <li><p><strong>precompute_pos_enc</strong> (<em>list</em>) – list of positional embeddings to compute</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – Whether or not to print intermediary output/progress</p></li>
 <li><p><strong>kwargs</strong> – Excessive parameters</p></li>

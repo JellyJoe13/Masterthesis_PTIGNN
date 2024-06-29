@@ -89,6 +89,8 @@
 <span class="sd">    to reproduce training procedure to some extent. Samples number of positive and negative conformers for one batch</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="SingleConformerSampler.__init__">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.sampling.SingleConformerSampler.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">single_conformer_ds</span><span class="p">,</span>
@@ -110,7 +112,8 @@
 
         <span class="c1"># positive and negative sampler</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">positive_sampler</span> <span class="o">=</span> <span class="n">SampleMapToPositives</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_ds</span><span class="p">,</span> <span class="n">include_anchor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span> <span class="o">=</span> <span class="n">SampleMapToNegatives</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_ds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">negative_sampler</span> <span class="o">=</span> <span class="n">SampleMapToNegatives</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_ds</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># define groups</span>
@@ -152,6 +155,8 @@
 <span class="sd">    Adapted/copied from</span>
 <span class="sd">    https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L167</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SampleMapToPositives.__init__">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.sampling.SampleMapToPositives.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">dataframe</span><span class="p">,</span>
@@ -171,7 +176,8 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">positives</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">subset_df</span><span class="p">[(</span><span class="n">subset_df</span><span class="o">.</span><span class="n">ID</span> <span class="o">==</span> <span class="n">row</span><span class="o">.</span><span class="n">ID</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">subset_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span> <span class="o">!=</span> <span class="n">row_index</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">row_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">positives</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">row_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">positives</span></div>
+
 
 <div class="viewcode-block" id="SampleMapToPositives.sample">
 <a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.sampling.SampleMapToPositives.sample">[docs]</a>
@@ -199,6 +205,8 @@
 <span class="sd">    Adapted/copied from</span>
 <span class="sd">    https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/submodules/ChIRo/model/datasets_samplers.py#L191</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SampleMapToNegatives.__init__">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.sampling.SampleMapToNegatives.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">dataframe</span><span class="p">,</span>
@@ -224,7 +232,8 @@
                     <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouped_negatives</span>
                 <span class="p">]</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">row_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_classes</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">row_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">negative_classes</span></div>
+
 
 <div class="viewcode-block" id="SampleMapToNegatives.sample">
 <a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.sampling.SampleMapToNegatives.sample">[docs]</a>

@@ -22,7 +22,7 @@ def custom_loader(
     https://github.com/gmum/ChiENN/blob/ee3185b39e8469a8caacf3d6d45a04c4a1cfff5b/experiments/graphgps/dataset/utils.py#L99
 
     :param dataset: Dataset which to wrap in a loader
-    :param n_neighbors_in_circle: number of neighbors in circle in case of ChiENN cycle index setting.
+    :param n_neighbors_in_circle: number of neighbors in circle in case of ChiENN circle index setting.
     :type n_neighbors_in_circle: int
     :param batch_size: batch size
     :type batch_size: int

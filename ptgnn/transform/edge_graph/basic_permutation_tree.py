@@ -14,9 +14,9 @@ def _circle_index_to_primordial_tree(
         inner_type: str = "Z"
 ):
     """
-    Turns a ChiENN cycle index to its equivalent permutation tree (S(self, parallel, Type(cycle_index))).
+    Turns a ChiENN circle index to its equivalent permutation tree (S(self, parallel, Type(circle_index))).
 
-    :param circle_index: circle index, also often called cycle index because of the cyclic order it imposes
+    :param circle_index: circle index, also often called circle index because of the cyclic order it imposes
     :type circle_index: List[int]
     :param parallel_node: parallel node (each edge has a parallel node due to its edge graph transformation)
     :type parallel_node: int

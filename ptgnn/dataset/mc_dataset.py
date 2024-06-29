@@ -167,7 +167,7 @@ class MCDataset(InMemoryDataset):
         :type split: str
         :param graph_mode: Mode of the graph. Either ``"edge"`` or ``"vertex"``. Controls whether an edge graph
             transformation should take place or not. For PTGNN both options are possible, for ChiENN only edge graph
-            is possible or else their 'cycle_index' will not work.
+            is possible or else their 'circle_index' will not work.
         :type graph_mode: str
         :param transformation_mode: Specifies the mode of transformation. Currently available: ``"default"``=``chienn``,
             ``"permutation_tree"``.

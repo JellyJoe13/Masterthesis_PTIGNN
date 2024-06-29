@@ -28,6 +28,8 @@ pip install multiprocess==0.70.16
 
 ## Content information:
 
+- docs: Code HTML documentation, hosted on Pages
+- docs-config: Files required to produce docs
 - experiments: Experiments and notebooks
 - ptgnn: Related code realizing model, framework, etc. Model name is technically Permutation Tree Invariant Graph Neural Network (PTIGNN),
 however, at the beginning of the project the general term PTGNN was chosen which does not specify whether th emodel is to be invariant or

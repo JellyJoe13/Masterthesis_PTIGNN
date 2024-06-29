@@ -81,6 +81,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrapper around a torch module that puts the return value of a forward into the batch x node embedding.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CustomWrapper.__init__">
+<a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.CustomWrapper.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">layer_to_wrap</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
@@ -92,7 +94,8 @@
 <span class="sd">        :type layer_to_wrap: torch.nn.Module</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CustomWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layer_to_wrap</span> <span class="o">=</span> <span class="n">layer_to_wrap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_to_wrap</span> <span class="o">=</span> <span class="n">layer_to_wrap</span></div>
+
 
 <div class="viewcode-block" id="CustomWrapper.forward">
 <a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.CustomWrapper.forward">[docs]</a>
@@ -117,6 +120,8 @@
 <span class="sd">    Wrapper around a torch module that puts the return value of a forward into the batch x node embedding and uses</span>
 <span class="sd">    normal network internally as batch.x is passed to wrapped module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="InputOutputWrapper.__init__">
+<a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.InputOutputWrapper.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">layer_to_wrap</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span>
@@ -128,7 +133,8 @@
 <span class="sd">        :type layer_to_wrap: torch.nn.Module</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">InputOutputWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layer_to_wrap</span> <span class="o">=</span> <span class="n">layer_to_wrap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_to_wrap</span> <span class="o">=</span> <span class="n">layer_to_wrap</span></div>
+
 
 <div class="viewcode-block" id="InputOutputWrapper.forward">
 <a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.custom_wrapper.InputOutputWrapper.forward">[docs]</a>

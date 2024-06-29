@@ -84,6 +84,8 @@
 <span class="sd">    configurations of the parameter search to use the ray framework to execute this configurations in one final test</span>
 <span class="sd">    at the end - in parallel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FinalSearcher.__init__">
+<a class="viewcode-back" href="../../../ptgnn.runtime_config.html#ptgnn.runtime_config.final_test_suggester.FinalSearcher.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_configs_to_test</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Init function of FinalSearcher</span>
@@ -93,7 +95,8 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">FinalSearcher</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">my_configurations</span> <span class="o">=</span> <span class="n">best_configs_to_test</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">configurations</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configurations</span> <span class="o">=</span> <span class="p">{}</span></div>
+
 
 <div class="viewcode-block" id="FinalSearcher.suggest">
 <a class="viewcode-back" href="../../../ptgnn.runtime_config.html#ptgnn.runtime_config.final_test_suggester.FinalSearcher.suggest">[docs]</a>

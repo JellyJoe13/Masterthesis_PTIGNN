@@ -37,7 +37,7 @@ class UniversalLoader(DataLoader):
         :type follow_batch: Optional[List[str]]
         :param exclude_keys: Exclude keys parameter of Collater
         :type exclude_keys: Optional[List[str]]
-        :param n_neighbors_in_circle: number of neighbors in cycle - relevant for ChiENN model
+        :param n_neighbors_in_circle: number of neighbors in circle - relevant for ChiENN model
         :type n_neighbors_in_circle: Optional[int]
         :param precompute_pos_enc: list of positional embeddings to compute
         :type precompute_pos_enc: list

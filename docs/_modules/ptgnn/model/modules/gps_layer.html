@@ -91,6 +91,8 @@
 
 <span class="sd">    Model with residual connection around stored layer and a feed forward network (also with residual connection)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CustomGPSLayer.__init__">
+<a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.gps_layer.CustomGPSLayer.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -175,7 +177,8 @@
             <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">),</span>
             <span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">),</span>
             <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">)</span>
-        <span class="p">])</span>
+        <span class="p">])</span></div>
+
 
 <div class="viewcode-block" id="CustomGPSLayer.forward">
 <a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.gps_layer.CustomGPSLayer.forward">[docs]</a>

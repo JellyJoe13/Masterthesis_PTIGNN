@@ -85,6 +85,8 @@
 <span class="sd">    Advanced permutation tree invariant layer. Advanced as it is significantly more efficient than its basic counterpart</span>
 <span class="sd">    . Uses order/instruction matrices instead of recursive calls to reduce (slow) python control flow.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AdvancedPermutationEdgeTreeLayer.__init__">
+<a class="viewcode-back" href="../../../../../ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer_e.AdvancedPermutationEdgeTreeLayer.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -170,7 +172,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">edge_mode</span> <span class="o">=</span> <span class="n">edge_mode</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_mode</span> <span class="o">==</span> <span class="s2">&quot;linear_reduction&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reduction_ll</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reduction_ll</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="AdvancedPermutationEdgeTreeLayer.forward">
 <a class="viewcode-back" href="../../../../../ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.advanced_tree_layer_e.AdvancedPermutationEdgeTreeLayer.forward">[docs]</a>

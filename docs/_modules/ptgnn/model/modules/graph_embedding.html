@@ -83,6 +83,8 @@
 <span class="sd">    Embedding module for a graph. Applies node and edge level embeddings and thus embed both of them to different sizes,</span>
 <span class="sd">    normally hidden dimension.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GraphEmbedding.__init__">
+<a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.GraphEmbedding.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">node_in_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -137,7 +139,8 @@
         <span class="k">if</span> <span class="n">edge_type</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">edge_embedder</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">edge_in_dim</span><span class="p">,</span> <span class="n">edge_out_dim</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;type </span><span class="si">{</span><span class="n">edge_type</span><span class="si">}</span><span class="s2"> is not yet implemented for GraphEmbedding.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;type </span><span class="si">{</span><span class="n">edge_type</span><span class="si">}</span><span class="s2"> is not yet implemented for GraphEmbedding.&quot;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="GraphEmbedding.forward">
 <a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.GraphEmbedding.forward">[docs]</a>
@@ -163,6 +166,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adapted from https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/encoder/kernel_pos_encoder.py</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RWSE.__init__">
+<a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.RWSE.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">dim_emb</span><span class="p">,</span>
@@ -202,7 +207,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">pe_encoder</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_rw_steps</span><span class="p">,</span> <span class="n">dim_pos_enc</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: Does not support &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">model_type</span><span class="si">}</span><span class="s2">&#39; encoder model.&quot;</span><span class="p">)</span>
+                             <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">model_type</span><span class="si">}</span><span class="s2">&#39; encoder model.&quot;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="RWSE.forward">
 <a class="viewcode-back" href="../../../../ptgnn.model.modules.html#ptgnn.model.modules.graph_embedding.RWSE.forward">[docs]</a>

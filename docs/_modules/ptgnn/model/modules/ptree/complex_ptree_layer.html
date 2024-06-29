@@ -86,6 +86,8 @@
 <span class="sd">    due to internal working where setting values is not working properly. Instead adding results to zero value tensor</span>
 <span class="sd">    is to be used. (and other masking methods)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ComplexPtreeLayer.__init__">
+<a class="viewcode-back" href="../../../../../ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.complex_ptree_layer.ComplexPtreeLayer.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -119,7 +121,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">p_final_layer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">final_elu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ELU</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type_dict</span> <span class="o">=</span> <span class="n">type_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type_dict</span> <span class="o">=</span> <span class="n">type_dict</span></div>
+
 
 <div class="viewcode-block" id="ComplexPtreeLayer.forward">
 <a class="viewcode-back" href="../../../../../ptgnn.model.modules.ptree.html#ptgnn.model.modules.ptree.complex_ptree_layer.ComplexPtreeLayer.forward">[docs]</a>

@@ -96,6 +96,8 @@
 <span class="sd">    Heavily based and modified(optimized) from</span>
 <span class="sd">    https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/binding_affinity_dataset.py</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BindingAffinityDataset.__init__">
+<a class="viewcode-back" href="../../../ptgnn.dataset.html#ptgnn.dataset.bindingaffinity_dataset.BindingAffinityDataset.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;src/bindingaffinity&quot;</span><span class="p">,</span>
@@ -132,7 +134,7 @@
 <span class="sd">        :type split: str</span>
 <span class="sd">        :param graph_mode: Mode of the graph. Either ``&quot;edge&quot;`` or ``&quot;vertex&quot;``. Controls whether an edge graph</span>
 <span class="sd">            transformation should take place or not. For PTGNN both options are possible, for ChiENN only edge graph</span>
-<span class="sd">            is possible or else their &#39;cycle_index&#39; will not work.</span>
+<span class="sd">            is possible or else their &#39;circle_index&#39; will not work.</span>
 <span class="sd">        :type graph_mode: str</span>
 <span class="sd">        :param transformation_mode: Specifies the mode of transformation. Currently available: ``&quot;default&quot;``=``chienn``,</span>
 <span class="sd">            ``&quot;permutation_tree&quot;``.</span>
@@ -181,7 +183,8 @@
         <span class="c1"># part that actually loads the data into the class</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processed_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.pt&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processed_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processed_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">))</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">raw_file_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>

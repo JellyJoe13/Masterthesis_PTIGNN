@@ -88,6 +88,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Inspired/adapted from https://github.com/gmum/ChiENN/blob/master/experiments/graphgps/dataset/dataloader.py</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="UniversalLoader.__init__">
+<a class="viewcode-back" href="../../../ptgnn.loading.html#ptgnn.loading.load.UniversalLoader.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseData</span><span class="p">]],</span>
@@ -113,7 +115,7 @@
 <span class="sd">        :type follow_batch: Optional[List[str]]</span>
 <span class="sd">        :param exclude_keys: Exclude keys parameter of Collater</span>
 <span class="sd">        :type exclude_keys: Optional[List[str]]</span>
-<span class="sd">        :param n_neighbors_in_circle: number of neighbors in cycle - relevant for ChiENN model</span>
+<span class="sd">        :param n_neighbors_in_circle: number of neighbors in circle - relevant for ChiENN model</span>
 <span class="sd">        :type n_neighbors_in_circle: Optional[int]</span>
 <span class="sd">        :param precompute_pos_enc: list of positional embeddings to compute</span>
 <span class="sd">        :type precompute_pos_enc: list</span>
@@ -135,6 +137,7 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">precompute_pos_enc</span><span class="p">):</span>
             <span class="n">precompute_pos_enc_function</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">precompute_pos_enc</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 
